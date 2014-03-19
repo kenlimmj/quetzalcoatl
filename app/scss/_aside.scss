@@ -1,0 +1,41 @@
+$textwidth: (100/1.618/1.618/1.618) * 1vw;
+
+aside {
+  z-index: 1;
+  width: $textwidth;
+  overflow-y: scroll;
+  height: 100vh;
+  padding: 1rem;
+  font-size: 1.2rem;
+  background-color: #fdf6e3;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  @extend .text--inactive;
+  transition: color 150ms linear;
+  &:hover {
+    @extend .text--active;
+  }
+}
+
+ul > li:not(:first-child) {
+  margin-top: 6.472rem;
+}
+
+.text--inactive {
+  color: #eee8d5;
+}
+
+.text--active {
+  color: #657b83;
+}
+
+ul > ol:not(:first-child) {
+  margin-top: 6.472rem;
+}

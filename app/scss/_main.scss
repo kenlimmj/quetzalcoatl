@@ -1,0 +1,22 @@
+$mainwidth: 100-$textwidth;
+
+main {
+  z-index: 1;
+  width: $mainwidth;
+  background-color: #002b36;
+  overflow-y: scroll;
+  height: 100vh;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.item {
+  width: $mainwidth/4;
+  height: $mainwidth/4;
+  display: inline-block;
+}
+
+img {
+  width: inherit;
+  border: 1px solid #444;
+}
