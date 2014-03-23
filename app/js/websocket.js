@@ -10,6 +10,9 @@ var socketAddress = "ws://localhost:1620/KinectApp";
 // 3. If reconnection fails, k increases by 1 and the process restarts at step 1.
 // 4. To truncate the max interval, when a certain number of attempts k has
 //    been reached, k stops increasing after each attempt.
+//
+// Input: Unit
+// Output: Unit
 function createWebSocket() {
     var attempts = 1;
 
@@ -55,6 +58,8 @@ function createWebSocket() {
 }
 
 // An instance generates an back-off interval for making server connections
+// Input: Integer of attempts made at connection
+// Output: Float of back-off interval (in microseconds)
 function generateInterval(k) {
     var maxInterval = (Math.pow(2, k) - 1) * 1000;
 
@@ -80,4 +85,4 @@ function updateConsoleServer(state) {
 }
 
 updateConsoleServer(false);
-createWebSocket();
+// createWebSocket();
