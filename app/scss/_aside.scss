@@ -10,21 +10,21 @@ aside {
   background-color: #fdf6e3;
 }
 
-ul {
+aside > ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-li {
-  @extend .text--inactive;
+aside > ul > li {
+  // @extend .text--inactive;
   transition: color 150ms linear;
-  &:hover {
-    @extend .text--active;
-  }
+  // &:hover {
+  //   @extend .text--active;
+  // }
 }
 
-ul > li:not(:first-child) {
+aside > ul > li:not(:first-child) {
   margin-top: 6.472rem;
 }
 
@@ -36,6 +36,6 @@ ul > li:not(:first-child) {
   color: #657b83;
 }
 
-ul > ol:not(:first-child) {
+aside > ul > ol:not(:first-child) {
   margin-top: 6.472rem;
 }
