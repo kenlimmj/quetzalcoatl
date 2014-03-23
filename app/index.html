@@ -12,11 +12,15 @@
   <canvas id="cursor"></canvas>
   <div id="console">
     <p>Status: <span id="serverstatus"></span></p>
-    <p>Screen x: <span id="screenx"></span></p>
-    <p>Screen y: <span id="screeny"></span></p>
-    <p>Kinect x: <span id="kinectx"></span></p>
-    <p>Kinect y: <span id="kinecty"></span></p>
+    <p>Left Screen x: <span id="lscreenx"></span></p>
+    <p>Left Screen y: <span id="lscreeny"></span></p>
+    <p>Left Kinect x: <span id="lkinectx"></span></p>
+    <p>Left Kinect y: <span id="lkinecty"></span></p>
     <p>LH State: <span id="lhstate"></span></p>
+    <p>Right Screen x: <span id="rscreenx"></span></p>
+    <p>Right Screen y: <span id="rscreeny"></span></p>
+    <p>Right Kinect x: <span id="rkinectx"></span></p>
+    <p>Right Kinect y: <span id="rkinecty"></span></p>
     <p>RH State: <span id="rhstate"></span></p>
   </div>
   <aside id="text">
@@ -41,18 +45,23 @@
   </ul>
   </aside>
   <main>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
-    <li class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item1" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item2" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item3" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item4" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item5" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item6" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item7" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item8" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item9" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item10" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item11" class="item"><img src="http://placehold.it/300x300"></li>
+    <li id="item12" class="item"><img src="http://placehold.it/300x300"></li>
+    <div id="item1" class="modal">
+      <article>
+        <img src="http://placehold.it/1500x1500">
+      </article>
+    </div>
   </main>
 </body>
 <script type="text/x-mathjax-config">
@@ -67,5 +76,6 @@
 </script>
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script src="js/cursor.js"></script>
+<script src="js/modal.js"></script>
 <script src="js/websocket.js"></script>
 </html>
