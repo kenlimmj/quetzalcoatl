@@ -1,6 +1,8 @@
 * {
   box-sizing: border-box;
   font-family: "Clear Sans";
+  color-profile: sRGB;
+  rendering-intent: auto;
 }
 
 html,body {
@@ -20,28 +22,4 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-}
-
-#console {
-  z-index: 3;
-  position: absolute;
-  width: auto;
-  height: auto;
-  background-color: #888;
-  border-top-left-radius: 1em;
-  bottom: 0;
-  right: 0;
-  padding: 0.5rem 0.75rem;
-  transition: opacity 150ms linear;
-  opacity: 0.25;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  & p,span {
-    font-size: 0.75rem;
-    font-family: Mensch;
-    margin: 0;
-  }
 }
