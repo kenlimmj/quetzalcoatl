@@ -4,8 +4,8 @@ var c = document.getElementById("cursor"),
 
 // Set the radius of the
 var open_radius = 25;
-// var grab_radius = 10;
-// var point_radius = 5;
+var grab_radius = 15.451174289;
+var point_radius = 9.549551477;
 
 // Set the width and height of the canvas to be the size of the window
 ctx.canvas.width = window.innerWidth;
@@ -14,9 +14,15 @@ ctx.canvas.height = window.innerHeight;
 // Set the opacity of the cursor layer to 0.5
 ctx.globalAlpha = 0.5;
 
-// Draw the cursor circle on the screen
+// Initialize the left and right cursor circles on the screen
 ctx.beginPath();
+// Left Hand: Top left of the screen
 ctx.arc(0, 0, open_radius, 0, 2 * Math.PI);
+ctx.fillStyle = "#dc322f";
+ctx.fill();
+// Right Hand: Top right of the screen
+ctx.arc(window.innerWidth, 0, open_radius, 0, 2 * Math.PI);
+ctx.fillStyle = "#268bd2";
 ctx.fill();
 
 // An instance maps Kinect coordinates to Screen coordinates
@@ -50,20 +56,96 @@ function mapCoordinates(arr) {
 // An instance updates the console on the bottom right of the screen with cursor coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
-function updateConsole(arr) {
-    var screenx = document.getElementById("screenx"),
-        screeny = document.getElementById("screeny");
+function updateConsole(larr, lhandState, rarr, rhandState) {
+    var lscreenx = document.getElementById("lscreenx"),
+        lscreeny = document.getElementById("lscreeny"),
+        rscreenx = document.getElementById("rscreenx"),
+        rscreeny = document.getElementById("rscreeny");
 
-    var kinectx = document.getElementById("kinectx"),
-        kinecty = document.getElementById("kinecty");
+    var lkinectx = document.getElementById("lkinectx"),
+        lkinecty = document.getElementById("lkinecty"),
+        rkinectx = document.getElementById("rkinectx"),
+        rkinecty = document.getElementById("rkinecty");
 
-    kinectx.innerText = arr[0] + "/512";
-    kinecty.innerText = arr[1] + "/424";
+    var lstate = document.getElementById("lhstate"),
+        rstate = document.getElementById("rhstate");
 
-    var coord = mapCoordinates(arr);
+    lkinectx.innerText = larr[0] + "/512";
+    lkinecty.innerText = larr[1] + "/424";
 
-    screenx.innerText = coord[0] + "/" + window.innerWidth;
-    screeny.innerText = coord[1] + "/" + window.innerHeight;
+    rkinectx.innerText = rarr[0] + "/512";
+    rkinecty.innerText = rarr[1] + "/424";
+
+    var lcoord = mapCoordinates(larr),
+        rcoord = mapCoordinates(rarr);
+
+    lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
+    lscreeny.innerText = lcoord[1] + "/" + window.innerHeight;
+
+    rscreenx.innerText = rcoord[0] + "/" + window.innerWidth;
+    rscreeny.innerText = rcoord[1] + "/" + window.innerHeight;
+
+    lstate.innerText = lhandState;
+    rstate.innerText = rhandState;
 }
 
-updateConsole([0, 0]);
+// An instance redraws the cursor on the overlay layer
+// Input: Array of float x and float y coordinates of the depth data from the Kinect
+// Output: Unit
+function reDraw(larr, lhandState, rarr, rhandState) {
+    // Clear the canvas
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // Initialize the radius of the cursor circle
+    var lradius = null,
+        rradius = null;
+
+    // Get the left hand state and assign the correct cursor size
+    switch (lhandState) {
+        case "open":
+            lradius = open_radius;
+            break;
+        case "closed":
+            lradius = grab_radius;
+            break;
+        case "point":
+            lradius = point_radius;
+            break;
+        default:
+            lradius = open_radius;
+            break;
+    }
+
+    // Get the right hand state and assign the correct cursor size
+    switch (rhandState) {
+        case "open":
+            rradius = open_radius;
+            break;
+        case "closed":
+            rradius = grab_radius;
+            break;
+        case "point":
+            rradius = point_radius;
+            break;
+        default:
+            rradius = open_radius;
+            break;
+    }
+
+    // Map the coordinates from the Kinect depth space to the screen space
+    var lcoord = mapCoordinates(larr),
+        rcoord = mapCoordinates(rarr);
+
+    // Draw the cursors at their new location
+    ctx.beginPath();
+    // Left Hand
+    ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
+    ctx.fillStyle = "#dc322f";
+    ctx.fill();
+    // Right Hand
+    ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
+    ctx.fillStyle = "#268bd2";
+    ctx.fill();
+}
+
+updateConsole([0, 0], "open", [0, 0], "open");
