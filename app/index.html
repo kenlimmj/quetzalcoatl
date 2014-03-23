@@ -7,6 +7,7 @@
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
 </head>
 <body>
   <canvas id="cursor"></canvas>
@@ -44,23 +45,20 @@
     <li>Cras aliquet, mauris vulputate tristique hendrerit, risus urna dictum magna, ut faucibus ipsum leo vel odio.</li>
   </ul>
   </aside>
-  <main>
-    <li id="item1" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item2" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item3" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item4" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item5" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item6" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item7" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item8" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item9" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item10" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item11" class="item"><img src="http://placehold.it/300x300"></li>
-    <li id="item12" class="item"><img src="http://placehold.it/300x300"></li>
-    <div id="item1" class="modal">
-      <article>
-        <img src="http://placehold.it/1500x1500">
-      </article>
+  <main class="zoomViewPort">
+    <div class="zoomContainer">
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
+    <div class="item zoomTarget" data-closeclick="true"><img src="http://placehold.it/1000x1000" alt="Test image"></div>
     </div>
   </main>
 </body>
@@ -75,7 +73,9 @@
   });
 </script>
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="js/cursor.js"></script>
-<script src="js/modal.js"></script>
+<script src="js/jquery.zoomooz.min.js"></script>
+<!-- <script src="js/modal.js"></script> -->
 <script src="js/websocket.js"></script>
 </html>
