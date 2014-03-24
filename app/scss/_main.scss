@@ -14,6 +14,12 @@ main {
   justify-content: space-between;
   align-items: stretch;
   align-content: stretch;
+
+  -webkit-transform: translate3d(0,0,0);
+}
+
+.zoomTarget {
+  -webkit-transform: translate3d(0,0,0);
 }
 
 .item {
@@ -24,5 +30,4 @@ main {
 
 img {
   width: inherit;
-  border: 0;
 }
