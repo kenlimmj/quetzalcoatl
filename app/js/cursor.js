@@ -2,10 +2,10 @@
 var c = document.getElementById("cursor"),
     ctx = c.getContext("2d");
 
-// Set the radius of the
+// Set the radius of the cursor circles
 var open_radius = 25;
-var grab_radius = 15.451174289;
-var point_radius = 9.549551477;
+var grab_radius = open_radius / 1.618;
+var point_radius = grab_radius / 1.618;
 
 // Set the width and height of the canvas to be the size of the window
 ctx.canvas.width = window.innerWidth;
@@ -57,34 +57,41 @@ function mapCoordinates(arr) {
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
 function updateConsole(larr, lhandState, rarr, rhandState) {
+    // Initialize handlers for the screen coordinates in the console
     var lscreenx = document.getElementById("lscreenx"),
         lscreeny = document.getElementById("lscreeny"),
         rscreenx = document.getElementById("rscreenx"),
         rscreeny = document.getElementById("rscreeny");
 
+    // Initialize handlers for the kinect coordinates in the console
     var lkinectx = document.getElementById("lkinectx"),
         lkinecty = document.getElementById("lkinecty"),
         rkinectx = document.getElementById("rkinectx"),
         rkinecty = document.getElementById("rkinecty");
 
+    // Initialize handlers for the hand states in the console
     var lstate = document.getElementById("lhstate"),
         rstate = document.getElementById("rhstate");
 
+    // Write the Kinect coordinates
     lkinectx.innerText = larr[0] + "/512";
     lkinecty.innerText = larr[1] + "/424";
 
     rkinectx.innerText = rarr[0] + "/512";
     rkinecty.innerText = rarr[1] + "/424";
 
+    // Map the Kinect coordinates to screen coordinates
     var lcoord = mapCoordinates(larr),
         rcoord = mapCoordinates(rarr);
 
+    // Write the screen coordinates
     lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
     lscreeny.innerText = lcoord[1] + "/" + window.innerHeight;
 
     rscreenx.innerText = rcoord[0] + "/" + window.innerWidth;
     rscreeny.innerText = rcoord[1] + "/" + window.innerHeight;
 
+    // Write the handstates
     lstate.innerText = lhandState;
     rstate.innerText = rhandState;
 }
@@ -146,6 +153,16 @@ function reDraw(larr, lhandState, rarr, rhandState) {
     ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
     ctx.fillStyle = "#268bd2";
     ctx.fill();
+}
+
+// An instance mimics a click on the object below the cursor circle
+// Input: Array of float x and float y coordinates of the mapped screen coordinates
+function click(arr) {
+    // Get the DOM Node below the current cursor location
+    var elem = document.elementFromPoint(arr[0], arr[1]);
+
+    // Call a click event on the node;
+    elem.click();
 }
 
 updateConsole([0, 0], "open", [0, 0], "open");
