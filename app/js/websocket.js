@@ -33,12 +33,13 @@ function createWebSocket() {
         if (typeof event.data === "string") {
             console.log("Kinect data received. Interpreting...");
 
-            console.log("Server sent message: " + event.data);
+            // console.log("Server sent message: " + event.data);
 
             // 1. Parse the JSON
-            // var jsonObject = JSON.parse(event.data);
+            var data = JSON.parse(event.data);
 
-            // TODO: 2. Process and display the data
+            console.log(data);
+            // updateConsole(larr, lhandState, rarr, rhandState);
         }
     };
 
