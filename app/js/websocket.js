@@ -1,3 +1,14 @@
+// Set to true to emit verbose output to the console
+var debug = true;
+
+if (debug === false) {
+    // Initialize a handler for the console element
+    var consoleelem = document.getElementById("console");
+
+    // Hide the console if console output is not requested
+    consoleelem.style.display = "none";
+}
+
 // Set the socket address to match the port which the C# WebSocket Server is broadcasting on
 var socketAddress = "ws://localhost:1620/KinectApp";
 
@@ -31,15 +42,23 @@ function createWebSocket() {
 
     connection.onmessage = function(event) {
         if (typeof event.data === "string") {
-            console.log("Kinect data received. Interpreting...");
+            if (debug === true) {
+                console.log("Data of type STRING received from server. Interpreting...");
+            }
 
-            // console.log("Server sent message: " + event.data);
-
-            // 1. Parse the JSON
+            // Parse the JSON
             var data = JSON.parse(event.data);
 
-            console.log(data);
-            // updateConsole(larr, lhandState, rarr, rhandState);
+            // Extract the left and right hand positions
+            var larr = [data.lx, data.ly];
+            rarr = [data.rx, data.ry];
+
+            if (debug === true) {
+                console.log(data);
+                updateConsole(larr, data.lhandState, rarr, data.rhandState);
+            }
+
+            reDraw(larr, data.lhandState, rarr, data.rhandState);
         }
     };
 
@@ -79,11 +98,18 @@ function generateInterval(k) {
 function updateConsoleServer(state) {
     var serverstatus = document.getElementById("serverstatus");
     if (state === true) {
+        // If the server is connected, display "Connected" in green
         serverstatus.innerText = "Connected";
+        serverstatus.style.color = "#859900";
     } else {
+        // If the server is disconnected, display "Disconnected" in red
         serverstatus.innerText = "Disconnected";
+        serverstatus.style.color = "#dc322f";
     }
 }
 
+// Set the initial state of the server to "Disconnected"
 updateConsoleServer(false);
+
+// Start the web socket connection
 // createWebSocket();
