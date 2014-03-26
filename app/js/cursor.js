@@ -11,19 +11,32 @@ var point_radius = grab_radius / 1.618;
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 
-// Set the opacity of the cursor layer to 0.5
-ctx.globalAlpha = 0.5;
-
-// Initialize the left and right cursor circles on the screen
+// Initialize the left hand cursor at the top first-third point of the screen
 ctx.beginPath();
-// Left Hand: Top left of the screen
-ctx.arc(0, 0, open_radius, 0, 2 * Math.PI);
+ctx.arc(window.innerWidth / 3, 0, open_radius, 0, 2 * Math.PI);
 ctx.fillStyle = "#dc322f";
 ctx.fill();
-// Right Hand: Top right of the screen
-ctx.arc(window.innerWidth, 0, open_radius, 0, 2 * Math.PI);
+ctx.closePath();
+
+// Initialize the right hand cursor at the top second-third point of the screen
+ctx.beginPath();
+ctx.arc(2 / 3 * window.innerWidth, 0, open_radius, 0, 2 * Math.PI);
 ctx.fillStyle = "#268bd2";
 ctx.fill();
+ctx.closePath();
+
+// An instance sets up the mapping from the Kinect space to the Screen space
+// Input: Array of float x and float y coordinates of the depth data from the Kinect
+// corresponding to a start frame, and a string describing whether the hand is
+// "left" or "right"
+// Output: ?
+function setMapping(arr, parity) {
+    if (parity === "left") {
+
+    } else {
+
+    }
+}
 
 // An instance maps Kinect coordinates to Screen coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
@@ -64,34 +77,34 @@ function updateConsole(larr, lhandState, rarr, rhandState) {
         rscreeny = document.getElementById("rscreeny");
 
     // Initialize handlers for the kinect coordinates in the console
-    var lkinectx = document.getElementById("lkinectx"),
-        lkinecty = document.getElementById("lkinecty"),
-        rkinectx = document.getElementById("rkinectx"),
-        rkinecty = document.getElementById("rkinecty");
+    // var lkinectx = document.getElementById("lkinectx"),
+    //     lkinecty = document.getElementById("lkinecty"),
+    //     rkinectx = document.getElementById("rkinectx"),
+    //     rkinecty = document.getElementById("rkinecty");
 
     // Initialize handlers for the hand states in the console
     var lstate = document.getElementById("lhstate"),
         rstate = document.getElementById("rhstate");
 
     // Write the Kinect coordinates
-    lkinectx.innerText = larr[0] + "/512";
-    lkinecty.innerText = larr[1] + "/424";
+    // lkinectx.innerText = larr[0] + "/512";
+    // lkinecty.innerText = larr[1] + "/424";
 
-    rkinectx.innerText = rarr[0] + "/512";
-    rkinecty.innerText = rarr[1] + "/424";
+    // rkinectx.innerText = rarr[0] + "/512";
+    // rkinecty.innerText = rarr[1] + "/424";
 
     // Map the Kinect coordinates to screen coordinates
     var lcoord = mapCoordinates(larr),
         rcoord = mapCoordinates(rarr);
 
     // Write the screen coordinates
-    lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
-    lscreeny.innerText = lcoord[1] + "/" + window.innerHeight;
+    lscreenx.innerText = Math.round(lcoord[0]) + "/" + window.innerWidth;
+    lscreeny.innerText = Math.round(lcoord[1]) + "/" + window.innerHeight;
 
-    rscreenx.innerText = rcoord[0] + "/" + window.innerWidth;
-    rscreeny.innerText = rcoord[1] + "/" + window.innerHeight;
+    rscreenx.innerText = Math.round(rcoord[0]) + "/" + window.innerWidth;
+    rscreeny.innerText = Math.round(rcoord[1]) + "/" + window.innerHeight;
 
-    // Write the handstates
+    // Write the hand states
     lstate.innerText = lhandState;
     rstate.innerText = rhandState;
 }
