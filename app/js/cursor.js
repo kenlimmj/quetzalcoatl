@@ -3,9 +3,13 @@ var c = document.getElementById("cursor"),
     ctx = c.getContext("2d");
 
 // Set the radius of the cursor circles
-var open_radius = 25;
-var grab_radius = open_radius / 1.618;
-var point_radius = grab_radius / 1.618;
+var open_radius = 25,
+    grab_radius = open_radius / 1.618,
+    point_radius = grab_radius / 1.618;
+
+// Set the colors for the cursor circles
+var leftColor = "#d33682",
+    rightColor = "#6c71c4";
 
 // Set the width and height of the canvas to be the size of the window
 ctx.canvas.width = window.innerWidth;
@@ -13,20 +17,17 @@ ctx.canvas.height = window.innerHeight;
 
 // Initialize the left hand cursor at the top first-third point of the screen
 ctx.beginPath();
-ctx.arc(window.innerWidth / 3, 0, open_radius, 0, 2 * Math.PI);
-ctx.fillStyle = "#d33682";
+ctx.arc(0, 0, open_radius, 0, 2 * Math.PI);
+ctx.fillStyle = leftColor;
 ctx.fill();
 ctx.closePath();
 
 // Initialize the right hand cursor at the top second-third point of the screen
 ctx.beginPath();
-ctx.arc(2 / 3 * window.innerWidth, 0, open_radius, 0, 2 * Math.PI);
-ctx.fillStyle = "#6c71c4";
+ctx.arc(window.innerWidth, 0, open_radius, 0, 2 * Math.PI);
+ctx.fillStyle = rightColor;
 ctx.fill();
 ctx.closePath();
-
-// Initialize a threshold for the length of the bone from the elbow to the wrist
-var boneThreshold = 50;
 
 // Initialize holders for the coordinates of the cursor circles
 var currlcoord = [],
@@ -36,50 +37,33 @@ var currlcoord = [],
 var currlstate = null,
     currrstate = null;
 
-// An instance calculates the viable space given the coordinates of the right hand in the start gesture
-// Input: Array of float x and float y coordinates of the depth data from the Kinect
-// corresponding to a start frame.
-// Output: Object literal of float min/max width and height of the viable space
-function setMapping(arr) {
-    // The maximum width is a bit more space to the right of the right elbow
-    var maxWidth = Math.min(arr[0] + 0.5 * boneThreshold, 512),
-        // The maximum height is the point just above the base of the user's spine
-        maxHeight = Math.min(arr[1] + 1.5 * boneThreshold, 424);
-
-    // The minimum width is a little bit more space to left of the left elbow
-    var minWidth = Math.max(0, arr[0] - 2.5 * boneThreshold),
-        // The minimum height is the y-coordinate of the right hand in the starting position
-        // It's unlikely that the user will go any higher than that
-        minHeight = arr[1];
-
-    return {
-        xmin: minWidth,
-        xmax: maxWidth,
-        ymin: minHeight,
-        ymax: maxHeight
-    };
-}
-
 // An instance maps Kinect coordinates to Screen coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // and object literal of coordinates describing the viable space
-// Output: Array of float x and float y coordinates of the screen
-function mapCoordinates(arr) {
+// Output: Array of Integer x and Integer y coordinates of the screen
+function mapCoordinates(arr, screenw, screenh, spinebasex, spinebasey) {
     // Coordinates of the user's screen
     var scoord = {
-        xmax: window.innerWidth,
         xmin: 0,
-        ymax: window.innerHeight,
-        ymin: 0
+        xmax: window.innerWidth,
+        ymin: 0,
+        ymax: window.innerHeight
     };
 
-    // Clip any coordinates that occur outside the viable space
-    // kcoord is a mapping to the viable space, set by createWebSocket() in js/websocket.js
-    var xcoord = Math.max(Math.max(kcoord.xmin, arr[0]), kcoord.xmax),
-        ycoord = Math.max(Math.max(kcoord.ymin, arr[1]), kcoord.ymax);
+    // Coordinates of the viable space. The bottom center of the viable space is
+    // centered at the user's spine base
+    var kcoord = {
+        xmin: spinebasex - screenw / 2,
+        xmax: spinebasex + screenw / 2,
+        ymin: spinebasey - screenh,
+        ymax: spinebasey
+    };
+
+    // Clip the x and y coordinates of the cursor if they are outside the viable space
+    var xcoord = Math.min(Math.max(kcoord.xmin, arr[0]), kcoord.xmax),
+        ycoord = Math.min(Math.max(kcoord.ymin, arr[1]), kcoord.ymax);
 
     // Scale the input coordinates to the size of the user's screen
-    // kcoord is a mapping to the viable space, set by createWebSocket() in js/websocket.js
     var x = xcoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin),
         y = ycoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin);
 
@@ -97,33 +81,20 @@ function updateConsole(larr, lhandState, rarr, rhandState) {
         rscreenx = document.getElementById("rscreenx"),
         rscreeny = document.getElementById("rscreeny");
 
-    // Initialize handlers for the kinect coordinates in the console
-    // var lkinectx = document.getElementById("lkinectx"),
-    //     lkinecty = document.getElementById("lkinecty"),
-    //     rkinectx = document.getElementById("rkinectx"),
-    //     rkinecty = document.getElementById("rkinecty");
-
     // Initialize handlers for the hand states in the console
     var lstate = document.getElementById("lhstate"),
         rstate = document.getElementById("rhstate");
 
-    // Write the Kinect coordinates
-    // lkinectx.innerText = larr[0] + "/512";
-    // lkinecty.innerText = larr[1] + "/424";
-
-    // rkinectx.innerText = rarr[0] + "/512";
-    // rkinecty.innerText = rarr[1] + "/424";
-
     // Map the Kinect coordinates to screen coordinates
-    var lcoord = mapCoordinates(larr),
-        rcoord = mapCoordinates(rarr);
+    var lcoord = mapCoordinates(larr, screenw, screenh, spinebasex, spinebasey),
+        rcoord = mapCoordinates(rarr, screenw, screenh, spinebasex, spinebasey);
 
     // Write the screen coordinates
-    lscreenx.innerText = Math.round(lcoord[0]) + "/" + window.innerWidth;
-    lscreeny.innerText = Math.round(lcoord[1]) + "/" + window.innerHeight;
+    lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
+    lscreeny.innerText = lcoord[1] + "/" + window.innerHeight;
 
-    rscreenx.innerText = Math.round(rcoord[0]) + "/" + window.innerWidth;
-    rscreeny.innerText = Math.round(rcoord[1]) + "/" + window.innerHeight;
+    rscreenx.innerText = rcoord[0] + "/" + window.innerWidth;
+    rscreeny.innerText = rcoord[1] + "/" + window.innerHeight;
 
     // Write the hand states
     lstate.innerText = lhandState;
@@ -133,10 +104,10 @@ function updateConsole(larr, lhandState, rarr, rhandState) {
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
-function reDraw(larr, lhandState, rarr, rhandState) {
+function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, spinebasex, spinebasey) {
     // Map the coordinates from the Kinect depth space to the screen space
-    var lcoord = mapCoordinates(larr),
-        rcoord = mapCoordinates(rarr);
+    var lcoord = mapCoordinates(larr, screenw, screenh, spinebasex, spinebasey),
+        rcoord = mapCoordinates(rarr, screenw, screenh, spinebasex, spinebasey);
 
     // Only redraw the coordinates if there's been a change
     if (lcoord !== currlcoord || rcoord !== currrcoord || lhandState !== currlstate || rhandState !== currrstate) {
@@ -191,11 +162,11 @@ function reDraw(larr, lhandState, rarr, rhandState) {
         ctx.beginPath();
         // Left Hand
         ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
-        ctx.fillStyle = "#d33682";
+        ctx.fillStyle = leftColor;
         ctx.fill();
         // Right Hand
         ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
-        ctx.fillStyle = "#6c71c4";
+        ctx.fillStyle = rightColor;
         ctx.fill();
     }
 }
@@ -210,4 +181,5 @@ function click(arr) {
     elem.click();
 }
 
-updateConsole([0, 0], "open", [0, 0], "open");
+// Write placeholder variables to the console
+updateConsole([0, 0], "N/A", [0, 0], "N/A");

@@ -27,15 +27,19 @@ var socketAddress = "ws://localhost:1620/KinectApp";
 function createWebSocket() {
     var attempts = 1;
 
-    console.log("Initializing connection with " + socketAddress);
+    if (debug === true) {
+        console.log("Initializing connection with " + socketAddress);
+    }
     var connection = new WebSocket(socketAddress);
 
     connection.onopen = function() {
         // Reset the tries back to 1 since we have a new connection opened
         attempts = 1;
 
-        console.log("Successfully established connection with server.");
-        updateConsoleServer(true);
+        if (debug === true) {
+            console.log("Successfully established connection with server.");
+            updateConsoleServer(true);
+        }
 
         connection.send("test");
     };
@@ -50,13 +54,8 @@ function createWebSocket() {
             var data = JSON.parse(event.data);
 
             // Extract the left and right hand positions
-            var larr = [data.lx, data.ly];
-            rarr = [data.rx, data.ry];
-
-            // Every time the start state is detected, re-define the viable space
-            if (data.startState === true) {
-                var kcoord = setMapping(rarr);
-            }
+            var larr = [data.lx, data.ly],
+                rarr = [data.rx, data.ry];
 
             if (debug === true) {
                 console.log(data);
@@ -69,8 +68,10 @@ function createWebSocket() {
     };
 
     connection.onclose = function() {
-        console.log("Server connection lost. Retrying...");
-        updateConsoleServer(false);
+        if (debug === true) {
+            console.log("Server connection lost. Retrying...");
+            updateConsoleServer(false);
+        }
         var time = generateInterval(attempts);
 
         setTimeout(function() {
