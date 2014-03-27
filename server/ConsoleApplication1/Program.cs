@@ -16,255 +16,217 @@ using Newtonsoft.Json;
 
 namespace Kinect.Server
 {
-    class Program
-    {
-        static List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
-        static bool _serverInitialized = false;
+	class Program
+	{
+		// Maintain a list of all clients connected to the server
+		static List<IWebSocketConnection> allSockets = new List<IWebSocketConnection> ();
 
-        static void Main(string[] args)
-        {
-            InitializeServer();
-        }
+		static void Main (string[] args)
+		{
+			// Start the Kinect Server when the program loads
+			InitializeServer ();
+		}
 
-        private static void InitializeServer()
-        {
+		/// An instance starts the Kinect server
+		/// Input: Unit
+		/// Output: Unit
+		private static void InitializeServer ()
+		{	
+			// Initialize a server at the address specified
+			var server = new WebSocketServer ("ws://localhost:1620");
+			server.Start (socket => {
+				socket.OnOpen = () => {
+					Console.WriteLine ("Opening a new socket...");
+					allSockets.Add (socket);
 
-            var server = new WebSocketServer("ws://localhost:1620");
-            server.Start(socket =>
-            {
-                socket.OnOpen = () =>
-                {
-                    Console.WriteLine("Open!");
-                    allSockets.Add(socket);
-                    Kinect alpha = new Kinect();
-                    alpha.InitializeKinect();
-                };
-                socket.OnClose = () =>
-                {
-                    Console.WriteLine("Close!");
-                    allSockets.Remove(socket);
-                };
-                socket.OnMessage = message =>
-                {
-                    Console.WriteLine(message);
-                    allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
-                };
-            });
+					// Initialize a new Kinect object
+					Kinect alpha = new Kinect ();
+					alpha.InitializeKinect ();
+				};
+				socket.OnClose = () => {
+					Console.WriteLine ("Closing all connections...");
+					allSockets.Remove (socket);
+				};
+			});
 
-            _serverInitialized = true;
+			// Logic to allow for a soft quit of the server when "Exit" is input at the CLI
+			var input = Console.ReadLine ();
+			while (input != "exit") {
+				foreach (var socket in allSockets.ToList()) {
+					socket.Send (input);
+				}
+				input = Console.ReadLine ();
+			}
+		}
 
-            var input = Console.ReadLine();
-            while (input != "exit")
-            {
-                foreach (var socket in allSockets.ToList())
-                {
-                    socket.Send(input);
-                }
-                input = Console.ReadLine();
-            }
-        }
+		public class Kinect
+		{
+			// Initialize a handler for the bodies the Kinect tracks
+			private Body[] bodies = null;
+			// Initialize a handler for the Kinect itself
+			private KinectSensor kinectSensor = null;
+			// Initialize a handler for the coordinate mapping function
+			private CoordinateMapper coordinateMapper = null;
+			// Initialize a buffer to handle the frames coming in from the Kinect
+			private BodyFrameReader reader = null;
 
-        public class Kinect
-        {
-            private Body[] bodies = null;
-            private KinectSensor kinectSensor = null;
-            private CoordinateMapper coordinateMapper = null;
-            private BodyFrameReader reader = null;
+			public void InitializeKinect ()
+			{
+				// Initialize the Kinect itself. Since we're running the Dev API, there's support for only one Kinect.
+				this.kinectSensor = KinectSensor.Default;
 
-            public void InitializeKinect()
-            {
-                this.kinectSensor = KinectSensor.Default;
+				if (this.kinectSensor != null) {
+					Console.WriteLine ("Kinect detected. Awaiting start gesture...");
+					allSockets.ToList ().ForEach (s => s.Send ("Kinect detected. Awaiting start gesture..."));
 
-                if (this.kinectSensor != null)
-                {
-                    Console.WriteLine("Kinect detected. Starting...");
-                    allSockets.ToList().ForEach(s => s.Send("Kinect detected. Starting..."));
+					// Get the coordinate mapper
+					// The Kinect depth sensor measures in millimeters. CoordinateMapper converts millimeters to pixels.
+					this.coordinateMapper = this.kinectSensor.CoordinateMapper;
 
-                    // Get the coordinate mapper
-                    this.coordinateMapper = this.kinectSensor.CoordinateMapper;
+					// Initialize the depth sensor
+					this.kinectSensor.Open ();
 
-                    // Open the sensor
-                    this.kinectSensor.Open();
+					// Retrieve the bodies that the Kinect detects
+					this.bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
 
-                    this.bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
+					// Open the reader for the body frames
+					this.reader = this.kinectSensor.BodyFrameSource.OpenReader ();
 
-                    // Open the reader for the body frames
-                    this.reader = this.kinectSensor.BodyFrameSource.OpenReader();
+					if (this.reader != null) {
+						// If the Kinect is connected properly, keep pulling frames from the sensor
+						this.reader.FrameArrived += this.Reader_FrameArrived;
+					}
+				}
+			}
 
-                    if (this.reader != null)
-                    {
-                        this.reader.FrameArrived += this.Reader_FrameArrived;
-                    }
-                }
-            }
+			/// An instance handles the body frame data arriving from the sensor
+			/// Input: Object sending the event and any event arguments 
+			private void Reader_FrameArrived (object sender, BodyFrameArrivedEventArgs e)
+			{
+				BodyFrameReference frameReference = e.FrameReference;
 
-            /// <summary>
-            /// Handles the body frame data arriving from the sensor
-            /// </summary>
-            /// <param name="sender">object sending the event</param>
-            /// <param name="e">event arguments</param>
-            private void Reader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
-            {
-                BodyFrameReference frameReference = e.FrameReference;
+				try {
+					BodyFrame frame = frameReference.AcquireFrame ();
 
-                try
-                {
-                    BodyFrame frame = frameReference.AcquireFrame();
+					if (frame != null) {
+						using (frame) {
+							frame.GetAndRefreshBodyData (this.bodies);
 
-                    if (frame != null)
-                    {
-                        using (frame)
-                        {
-                            frame.GetAndRefreshBodyData(this.bodies);
+							foreach (Body body in this.bodies) {
+								if (body.IsTracked) {
+									IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
 
-                            foreach (Body body in this.bodies)
-                            {
-                                if (body.IsTracked)
-                                {
-                                    IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
+									// Invoke the coordinate mapper to convert the joint coordinates from millimeters to pixels
+									Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point> ();
+									foreach (JointType jointType in joints.Keys) {
+										DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace (joints [jointType].Position);
+										jointPoints [jointType] = new Point (depthSpacePoint.X, depthSpacePoint.Y);
+									}
+										
+									if (engaged == true) {
+										// If the start gesture is detected, package the current joint information and send it
+										string packet = MakeJson (body.HandRightState, jointPoints [JointType.HandRight], body.HandLeftState, jointPoints [JointType.HandLeft]);
+										allSockets.ToList ().ForEach (s => s.Send (packet));
+										this.CheckStartStop (sender, e);
+									} else {
+										Console.WriteLine ("Awaiting start gesture");
+										this.CheckStartStop (sender, e);
+									}
+								}
+								//    }
+							}
+						}
+					}
+				} catch (Exception) {
+					// Ignore if the frame is no longer available
+				}
+			}
 
-                                    // convert the joint points to depth (display) space
-                                    Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
-                                    foreach (JointType jointType in joints.Keys)
-                                    {
-                                        DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(joints[jointType].Position);
-                                        jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-                                    }
-                                    //          this.DrawBody(joints, jointPoints, dc);
+			public bool engaged = false;
 
-                                    if (engaged)
-                                    {
-                                        //this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], "left");
-                                        //this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], "right");
-                                        string info = MakeJson(body.HandRightState, jointPoints[JointType.HandRight], body.HandLeftState, jointPoints[JointType.HandLeft]);
-                                        allSockets.ToList().ForEach(s => s.Send(info));
-                                        Console.WriteLine(info);
-                                        this.CheckStartStop(sender, e);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Checking for Start");
-                                        this.CheckStartStop(sender, e);
-                                    }
-                                }
-                                //    }
-                            }
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // ignore if the frame is no longer available
-                }
-            }
+			private void CheckStartStop (object sender, BodyFrameArrivedEventArgs e)
+			{
+				BodyFrameReference frameReference = e.FrameReference;
 
-            bool engaged = false;
+				try {
+					BodyFrame frame = frameReference.AcquireFrame ();
 
-            /// <summary>
-            /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
-            /// </summary>
-            /// <param name="handState">state of the hand</param>
-            /// <param name="handPosition">position of the hand</param>
-            /// <param name="drawingContext">drawing context to draw to</param>
-            private void CheckStartStop(object sender, BodyFrameArrivedEventArgs e)
-            {
-                BodyFrameReference frameReference = e.FrameReference;
+					if (frame != null) {
+						using (frame) {
+							frame.GetAndRefreshBodyData (this.bodies);
 
-                try
-                {
-                    BodyFrame frame = frameReference.AcquireFrame();
+							foreach (Body body in this.bodies) {
+								if (body.IsTracked) {
+									IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
 
-                    if (frame != null)
-                    {
-                        using (frame)
-                        {
-                            frame.GetAndRefreshBodyData(this.bodies);
+									// convert the joint points to depth (display) space
+									Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point> ();
+									foreach (JointType jointType in joints.Keys) {
+										DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace (joints [jointType].Position);
+										jointPoints [jointType] = new Point (depthSpacePoint.X, depthSpacePoint.Y);
+									}
 
-                            foreach (Body body in this.bodies)
-                            {
-                                if (body.IsTracked)
-                                {
-                                    IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
+									if (jointPoints [JointType.ShoulderRight].X <= jointPoints [JointType.WristRight].X && jointPoints [JointType.WristRight].X <= jointPoints [JointType.ElbowRight].X) {
+										if (jointPoints [JointType.ShoulderRight].Y >= jointPoints [JointType.WristRight].Y && jointPoints [JointType.WristRight].Y <= jointPoints [JointType.ElbowRight].Y) {
+											Console.WriteLine ("Start gesture detected...");
+											engaged = true;
+										}
+									} else if (jointPoints [JointType.HandLeft].Y >= jointPoints [JointType.SpineBase].Y && jointPoints [JointType.HandRight].Y >= jointPoints [JointType.SpineBase].Y) {
+										engaged = false;
+									}
+								}
+							}
+						}
+					}
+				} catch (Exception) {
+					// ignore if the frame is no longer available
+				}
+			}
 
-                                    // convert the joint points to depth (display) space
-                                    Dictionary<JointType, Point> jointPoints = new Dictionary<JointType, Point>();
-                                    foreach (JointType jointType in joints.Keys)
-                                    {
-                                        DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(joints[jointType].Position);
-                                        jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-                                    }
+			/// An instance is a constructor for the JSON packet
+			private class Hands
+			{
+				/// Right Hand Coordinates
+				public double rx { get; set; }
 
-                                    if (jointPoints[JointType.ShoulderRight].X <= jointPoints[JointType.WristRight].X && jointPoints[JointType.WristRight].X <= jointPoints[JointType.ElbowRight].X)
-                                    {
-                                        if (jointPoints[JointType.ShoulderRight].Y >= jointPoints[JointType.WristRight].Y && jointPoints[JointType.WristRight].Y <= jointPoints[JointType.ElbowRight].Y)
-                                        {
-                                            Console.WriteLine("Start Detected.");
-                                            engaged = true;
-                                        }
-                                    }
-                                    else if (jointPoints[JointType.HandLeft].Y >= jointPoints[JointType.SpineBase].Y && jointPoints[JointType.HandRight].Y >= jointPoints[JointType.SpineBase].Y)
-                                    {
-                                        engaged = false;
-                                    }
-                                }
-                                //    }
-                            }
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // ignore if the frame is no longer available
-                }
-            }
+				public double ry { get; set; }
 
-            private class Hands
-            {
-                public HandState rhandState { get; set; }
-                public double rx { get; set; }
-                public double ry { get; set; }
-                public HandState lhandState { get; set; }
-                public double lx { get; set; }
-                public double ly { get; set; }
-            }
+				/// Left Hand Coordinates
+				public double lx { get; set; }
 
-            public string MakeJson(HandState rightstate, Point rightpos, HandState leftstate, Point leftpos)
-            {
-                Hands hands = new Hands
-                {
-                    rhandState = rightstate,
-                    rx = rightpos.X,
-                    ry = rightpos.Y,
-                    lhandState = leftstate,
-                    lx = leftpos.X,
-                    ly = leftpos.Y,
-                };
+				public double ly { get; set; }
 
-                string json = JsonConvert.SerializeObject(hands, Formatting.Indented);
-                return json;
-            }
+				/// Left and Right Hand States
+				public HandState rhandState { get; set; }
 
-            
-            private void DrawHand(HandState handState, Point handPosition, String parity)
-            {
-                switch (handState)
-                {
-                    case HandState.Closed:
-                        Console.WriteLine(parity.ToUpper() + " hand is closed at Position: " + handPosition);
-                        allSockets.ToList().ForEach(s => s.Send(parity.ToUpper() + " hand is closed at Position: " + handPosition));
-                        break;
+				public HandState lhandState { get; set; }
 
-                    case HandState.Open:
-                        Console.WriteLine(parity.ToUpper() + " hand is open at Position: " + handPosition);
-                        allSockets.ToList().ForEach(s => s.Send(parity.ToUpper() + " hand is open at Position: " + handPosition));
-                        break;
+				/// Boolean States
+				public bool startState { get; set; }
 
-                    case HandState.Lasso:
-                        Console.WriteLine(parity.ToUpper() + " hand is pointing at Position: " + handPosition);
-                        allSockets.ToList().ForEach(s => s.Send(parity.ToUpper() + " hand is pointing at Position: " + handPosition));
-                        break;
-                }
-            }
-        }
-    }
+				public bool endState { get; set; }
+			}
+
+			/// An instance constructs a JSON from a list of parameters
+			/// Input: Left and right hand coordinates, and left and right hand states
+			/// Output: Formatted JSON packet
+			public string MakeJson (HandState rightstate, Point rightpos, HandState leftstate, Point leftpos)
+			{
+				Hands hands = new Hands {
+					rx = rightpos.X,
+					ry = rightpos.Y,
+
+					lx = leftpos.X,
+					ly = leftpos.Y,
+
+					rhandState = rightstate,
+					lhandState = leftstate
+				};
+
+				// Create a nicely formatted JSON from the hand object
+				string json = JsonConvert.SerializeObject (hands, Formatting.Indented);
+				return json;
+			}
+		}
+	}
 }
