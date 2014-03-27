@@ -10,6 +10,12 @@ var highlightState = false;
 // True if the block is collapsed, and false otherwise
 var collapseState = false;
 
+// Initialize a handler to the "Previous" button
+var prevButton = document.getElementById("zoomPrev");
+
+// Initialize a handler to the "Next" button
+var nextButton = document.getElementById("zoomNext");
+
 // Get the DOM Node for the main block
 container = document.querySelector("main");
 
@@ -71,15 +77,10 @@ function swipeleft(arr) {
 
     if (jQuery.contains(container, elem)) {
         if (zoomState === true) {
-            // Initialize a handler to the "Previous" button
-            var elem = document.getElementById("zoomNext");
-
             // Mimic a click on the button
             // FIXME: This is a very hacky method for interfacing with the Zoomoz API
-            elem.click();
+            nextButton.click();
         }
-    } else {
-        // Expand the side block
     }
 }
 
@@ -96,20 +97,16 @@ function swiperight(arr) {
 
     if (jQuery.contains(container, elem)) {
         if (zoomState === true) {
-            // Initialize a handler to the "Next" button
-            var elem = document.getElementById("zoomPrev");
-
             // Mimic a click on the button
             // FIXME: This is a very hacky method for interfacing with the Zoomoz API
-            elem.click();
+            prevButton.click();
         }
-    } else {
-        // Collapse the side block
     }
 }
 
 // An instance calls a swipe up gesture on the canvas
 // A swipe up gesture is a positive change in the y-axis made with a closed hand
+// - Swiping up on the main block scrolls downwards
 // - Swiping up on the side block highlights the next section of text under the cursor
 // Input: Array of float x and float y coordinates of the mapped screen coordinates
 function swipeUp(arr) {
@@ -118,6 +115,7 @@ function swipeUp(arr) {
 
 // An instance calls a swipe down gesture on the canvas
 // A swipe down gesture is a negative change in the y-axis made with a closed hand
+// - Swiping down on the main block scrolls upwards
 // - Swiping down on the side block highlights the previous section of text under the cursor
 // Input: Array of float x and float y coordinates of the mapped screen coordinates
 function swipeDown(arr) {
