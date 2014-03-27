@@ -63,7 +63,11 @@ function createWebSocket() {
             }
 
             // Draw the cursor on the screen
-            reDraw(larr, data.lhandState, rarr, data.rhandState);
+            reDraw(larr, data.lhandState, rarr, data.rhandState, data.screenw, data.screenh, data.sx, data.sy);
+
+            if (data.rhandState === "closed") {
+                click(mapCoordinates(rarr, data.screenw, data.screenh, data.sx, data.sy));
+            }
         }
     };
 

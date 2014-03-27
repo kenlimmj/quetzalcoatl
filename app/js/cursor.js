@@ -41,7 +41,7 @@ var currlstate = null,
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // and object literal of coordinates describing the viable space
 // Output: Array of Integer x and Integer y coordinates of the screen
-function mapCoordinates(arr, screenw, screenh, spinebasex, spinebasey) {
+function mapCoordinates(arr, screenw, screenh, sx, sy) {
     // Coordinates of the user's screen
     var scoord = {
         xmin: 0,
@@ -53,10 +53,10 @@ function mapCoordinates(arr, screenw, screenh, spinebasex, spinebasey) {
     // Coordinates of the viable space. The bottom center of the viable space is
     // centered at the user's spine base
     var kcoord = {
-        xmin: spinebasex - screenw / 2,
-        xmax: spinebasex + screenw / 2,
-        ymin: spinebasey - screenh,
-        ymax: spinebasey
+        xmin: sx - screenw / 2,
+        xmax: sx + screenw / 2,
+        ymin: sy - screenh,
+        ymax: sy
     };
 
     // Clip the x and y coordinates of the cursor if they are outside the viable space
@@ -104,10 +104,10 @@ function updateConsole(larr, lhandState, rarr, rhandState) {
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
-function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, spinebasex, spinebasey) {
+function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sxx, sy) {
     // Map the coordinates from the Kinect depth space to the screen space
-    var lcoord = mapCoordinates(larr, screenw, screenh, spinebasex, spinebasey),
-        rcoord = mapCoordinates(rarr, screenw, screenh, spinebasex, spinebasey);
+    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy),
+        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy);
 
     // Only redraw the coordinates if there's been a change
     if (lcoord !== currlcoord || rcoord !== currrcoord || lhandState !== currlstate || rhandState !== currrstate) {
