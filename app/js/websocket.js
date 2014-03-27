@@ -53,11 +53,17 @@ function createWebSocket() {
             var larr = [data.lx, data.ly];
             rarr = [data.rx, data.ry];
 
+            // Every time the start state is detected, re-define the viable space
+            if (data.startState === true) {
+                var kcoord = setMapping(rarr);
+            }
+
             if (debug === true) {
                 console.log(data);
                 updateConsole(larr, data.lhandState, rarr, data.rhandState);
             }
 
+            // Draw the cursor on the screen
             reDraw(larr, data.lhandState, rarr, data.rhandState);
         }
     };
