@@ -76,6 +76,7 @@ function createWebSocket() {
             console.log("Server connection lost. Retrying...");
             updateConsoleServer(false);
         }
+
         var time = generateInterval(attempts);
 
         setTimeout(function() {
