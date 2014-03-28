@@ -189,11 +189,11 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
         // Draw the cursors at their new location
         ctx.beginPath();
         // Left Hand
-        ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
+        ctx.arc(currlcoord[0], currlcoord[1], lradius, 0, 2 * Math.PI);
         ctx.fillStyle = leftColor;
         ctx.fill();
         // Right Hand
-        ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
+        ctx.arc(currrcoord[0], currrcoord[1], rradius, 0, 2 * Math.PI);
         ctx.fillStyle = rightColor;
         ctx.fill();
     }

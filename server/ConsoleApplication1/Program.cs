@@ -273,9 +273,9 @@ namespace Kinect.Server
                public double ly { get; set; }
  
                /// Left and Right Hand States
-               public HandState rhandState { get; set; }
+               public string rhandState { get; set; }
  
-               public HandState lhandState { get; set; }
+               public string lhandState { get; set; }
 
                ///Spine Base Coordinates
                public double sx { get; set; }
@@ -300,16 +300,54 @@ namespace Kinect.Server
            /// Input: Left and right hand coordinates, and left and right hand states
           /// Output: Formatted JSON packet
          public string MakeJson (HandState rightstate, Point rightpos, HandState leftstate, Point leftpos, Point spinebase, double width, double height, bool rightpull, bool leftpull, double zoom)
-           {
+           {    
+               // Initialize placeholder variables for the left and right hand states
+               String rstateval = "";
+               String lstateval = "";
+               
+               // Text-ify the right hand state
+               switch (rightstate)
+               {
+                   case HandState.Open:
+                       rstateval = "open";
+                       break;
+                   case HandState.Closed:
+                       rstateval = "closed";
+                       break;
+                   case HandState.Lasso:
+                       rstateval = "point";
+                       break;
+                   default:
+                       rstateval = "unknown";
+                       break;
+               }
+
+               // Text-ify the left hand state
+               switch (leftstate)
+               {
+                   case HandState.Open:
+                       lstateval = "open";
+                       break;
+                   case HandState.Closed:
+                       lstateval = "closed";
+                       break;
+                   case HandState.Lasso:
+                       lstateval = "point";
+                       break;
+                   default:
+                       lstateval = "unknown";
+                       break;
+               }
+
                Info body = new Info {
                    rx = rightpos.X,
                    ry = rightpos.Y,
  
                    lx = leftpos.X,
                    ly = leftpos.Y,
- 
-                   rhandState = rightstate,
-                   lhandState = leftstate,
+    
+                   rhandState = rstateval,
+                   lhandState = lstateval,
 
                    sx = spinebase.X,
                    sy = spinebase.Y,
