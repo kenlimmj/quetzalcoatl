@@ -17,14 +17,14 @@ aside > ul {
 }
 
 aside > ul > li {
-  // @extend .text--inactive;
   transition: color 150ms linear;
-  // &:hover {
-  //   @extend .text--active;
-  // }
 }
 
 aside > ul > li:not(:first-child) {
+  margin-top: 6.472rem;
+}
+
+aside > ul > ol:not(:first-child) {
   margin-top: 6.472rem;
 }
 
@@ -36,6 +36,8 @@ aside > ul > li:not(:first-child) {
   color: #657b83;
 }
 
-aside > ul > ol:not(:first-child) {
-  margin-top: 6.472rem;
+aside.collapsed {
+  transition: width 150ms linear;
+  width: $textwidth/10;
 }
+
