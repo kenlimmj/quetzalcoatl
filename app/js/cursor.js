@@ -59,9 +59,32 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
         ymax: sy
     };
 
-    // Clip the x and y coordinates of the cursor if they are outside the viable space
-    var xcoord = Math.min(Math.max(kcoord.xmin, (arr[0] - (512 - (kcoord.xmax - kcoord.xmin)))), kcoord.xmax),
-        ycoord = Math.min(Math.max(kcoord.ymin, (arr[1] - (424 - (kcoord.ymax - kcoord.ymin)))), kcoord.ymax);
+    var xcoord = null,
+        ycoord = null;
+
+    // Calculate the coordinate space for the incoming x-coordinate
+    if (arr[0] < kcoord.xmin) {
+        // If the hand is too far to the left, clip to the left edge of the screen
+        xcoord = kcoord.xmin;
+    } else if (arr[0] > kcoord.xmax) {
+        // If the hand is too far to the right, clip to the right edge of the screen
+        xcoord = kcoord.xmax;
+    } else {
+        // Otherwise, translate it so it fits within the viable space
+        xcoord = arr[0] - kcoord.xmin;
+    }
+
+    // Calculate the coordinate space for the incoming y-coordinate
+    if (arr[1] < kcoord.ymin) {
+        // If the hand is too high up, clip it to the top edge of the screen
+        ycoord = kcoord.ymin;
+    } else if (arr[1] > kcoord.ymax) {
+        // If the hand is too low down, clip it to the bottom edge of the screen
+        ycoord = kcoord.ymax;
+    } else {
+        // Otherwise, translate it so it fits within the viable space
+        ycoord = arr[1] - kcoord.ymin;
+    }
 
     // Scale the input coordinates to the size of the user's screen
     var x = xcoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin),
@@ -110,6 +133,7 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
         rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy);
 
     // Only redraw the coordinates if there's been a change
+    // FIXME: Need to investigate if there's a way of minimizing repaints without creating jitter
     if (lcoord !== currlcoord || rcoord !== currrcoord || lhandState !== currlstate || rhandState !== currrstate) {
         // Update the current coordinates
         currlcoord = lcoord;
@@ -182,4 +206,4 @@ function click(arr) {
 }
 
 // Write placeholder variables to the console
-updateConsole([0, 0], "N/A", [0, 0], "N/A");
+updateConsole([0, 0], "N/A", [0, 0], "N/A", 0, 0, 0, 0);
