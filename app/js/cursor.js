@@ -66,33 +66,34 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
     var xcoord = null,
         ycoord = null;
 
+    var x = null,
+        y = null;
+
     // Calculate the coordinate space for the incoming x-coordinate
     if (arr[0] < kcoord.xmin) {
         // If the hand is too far to the left, clip to the left edge of the screen
-        xcoord = kcoord.xmin;
+        x = 0;
     } else if (arr[0] > kcoord.xmax) {
         // If the hand is too far to the right, clip to the right edge of the screen
-        xcoord = kcoord.xmax;
+        x = window.innerWidth;
     } else {
         // Otherwise, translate it so it fits within the viable space
         xcoord = arr[0] - kcoord.xmin;
+        x = xcoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin);
     }
 
     // Calculate the coordinate space for the incoming y-coordinate
     if (arr[1] < kcoord.ymin) {
         // If the hand is too high up, clip it to the top edge of the screen
-        ycoord = kcoord.ymin;
+        y = 0;
     } else if (arr[1] > kcoord.ymax) {
         // If the hand is too low down, clip it to the bottom edge of the screen
-        ycoord = kcoord.ymax;
+        y = window.innerHeight;
     } else {
         // Otherwise, translate it so it fits within the viable space
         ycoord = arr[1] - kcoord.ymin;
-    }
-
-    // Scale the input coordinates to the size of the user's screen
-    var x = xcoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin),
         y = ycoord / (kcoord.ymax - kcoord.ymin) * (scoord.ymax - scoord.ymin);
+    }
 
     // Round the result to integer values because pixels don't have decimal places.
     return [Math.round(x), Math.round(y)];
@@ -136,66 +137,68 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
     var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy),
         rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy);
 
-    // Only redraw the coordinates if there's been a change
-    // FIXME: Need to investigate if there's a way of minimizing repaints without creating jitter
-    if (lcoord !== currlcoord || rcoord !== currrcoord || lhandState !== currlstate || rhandState !== currrstate) {
-        // Update the current coordinates
-        currlcoord = lcoord;
-        currrcoord = rcoord;
+    // Clear the canvas
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-        // Update the current hand state
-        currlstate = lhandState;
-        currrstate = rhandState;
+    // Initialize the radius of the cursor circle
+    var lradius = null,
+        rradius = null;
 
-        // Clear the canvas
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    // Get the left hand state and assign the correct cursor size
+    switch (lhandState) {
+        case "open":
+            lradius = open_radius;
+            break;
+        case "closed":
+            lradius = grab_radius;
+            break;
+        case "point":
+            lradius = point_radius;
+            break;
+        default:
+            lradius = open_radius;
+            break;
+    }
 
-        // Initialize the radius of the cursor circle
-        var lradius = null,
-            rradius = null;
+    // Get the right hand state and assign the correct cursor size
+    switch (rhandState) {
+        case "open":
+            rradius = open_radius;
+            break;
+        case "closed":
+            rradius = grab_radius;
+            break;
+        case "point":
+            rradius = point_radius;
+            break;
+        default:
+            rradius = open_radius;
+            break;
+    }
 
-        // Get the left hand state and assign the correct cursor size
-        switch (lhandState) {
-            case "open":
-                lradius = open_radius;
-                break;
-            case "closed":
-                lradius = grab_radius;
-                break;
-            case "point":
-                lradius = point_radius;
-                break;
-            default:
-                lradius = open_radius;
-                break;
-        }
-
-        // Get the right hand state and assign the correct cursor size
-        switch (rhandState) {
-            case "open":
-                rradius = open_radius;
-                break;
-            case "closed":
-                rradius = grab_radius;
-                break;
-            case "point":
-                rradius = point_radius;
-                break;
-            default:
-                rradius = open_radius;
-                break;
-        }
-
-        // Draw the cursors at their new location
+    // Draw the cursors at their new location
+    // Left Hand
+    if (lhandState !== "unknown") {
         ctx.beginPath();
-        // Left Hand
-        ctx.arc(currlcoord[0], currlcoord[1], lradius, 0, 2 * Math.PI);
+        ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
         ctx.fillStyle = leftColor;
         ctx.fill();
-        // Right Hand
-        ctx.arc(currrcoord[0], currrcoord[1], rradius, 0, 2 * Math.PI);
+        ctx.closePath();
+        if (lhandState === "closed") {
+            click(lcoord);
+        }
+    }
+
+    // Right Hand
+    if (rhandState !== "unknown") {
+        ctx.beginPath();
+        ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
         ctx.fillStyle = rightColor;
         ctx.fill();
+        ctx.closePath();
+        if (rhandState === "closed") {
+            click(rcoord);
+        }
     }
 }
 
