@@ -60,12 +60,12 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
     };
 
     // Clip the x and y coordinates of the cursor if they are outside the viable space
-    var xcoord = Math.min(Math.max(kcoord.xmin, arr[0]), kcoord.xmax),
-        ycoord = Math.min(Math.max(kcoord.ymin, arr[1]), kcoord.ymax);
+    var xcoord = Math.min(Math.max(kcoord.xmin, (arr[0] - (512 - (kcoord.xmax - kcoord.xmin)))), kcoord.xmax),
+        ycoord = Math.min(Math.max(kcoord.ymin, (arr[1] - (424 - (kcoord.ymax - kcoord.ymin)))), kcoord.ymax);
 
     // Scale the input coordinates to the size of the user's screen
     var x = xcoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin),
-        y = ycoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin);
+        y = ycoord / (kcoord.ymax - kcoord.ymin) * (scoord.ymax - scoord.ymin);
 
     // Round the result to integer values because pixels don't have decimal places.
     return [Math.round(x), Math.round(y)];
@@ -74,7 +74,7 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
 // An instance updates the console on the bottom right of the screen with cursor coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
-function updateConsole(larr, lhandState, rarr, rhandState) {
+function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
     // Initialize handlers for the screen coordinates in the console
     var lscreenx = document.getElementById("lscreenx"),
         lscreeny = document.getElementById("lscreeny"),
@@ -86,8 +86,8 @@ function updateConsole(larr, lhandState, rarr, rhandState) {
         rstate = document.getElementById("rhstate");
 
     // Map the Kinect coordinates to screen coordinates
-    var lcoord = mapCoordinates(larr, screenw, screenh, spinebasex, spinebasey),
-        rcoord = mapCoordinates(rarr, screenw, screenh, spinebasex, spinebasey);
+    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy),
+        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy);
 
     // Write the screen coordinates
     lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
@@ -104,7 +104,7 @@ function updateConsole(larr, lhandState, rarr, rhandState) {
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
-function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sxx, sy) {
+function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
     // Map the coordinates from the Kinect depth space to the screen space
     var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy),
         rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy);
