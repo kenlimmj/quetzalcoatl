@@ -53,9 +53,13 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
     // Coordinates of the viable space. The bottom center of the viable space is
     // centered at the user's spine base
     var kcoord = {
+        // The leftmost point is one arm length to the left of the spine base
         xmin: sx - screenw / 2,
+        // The rightmost point is one arm length to the right of the spine base
         xmax: sx + screenw / 2,
+        // The topmost point is the spine base minus the user height
         ymin: sy - screenh,
+        // The bottommost point is the spine base
         ymax: sy
     };
 
@@ -206,4 +210,4 @@ function click(arr) {
 }
 
 // Write placeholder variables to the console
-updateConsole([0, 0], "N/A", [0, 0], "N/A", 0, 0, 0, 0);
+updateConsole([0, 0], "N/A", [0, 0], "N/A", window.innerWidth, window.innerHeight, window.innerWidth / 2, window.innerHeight);
