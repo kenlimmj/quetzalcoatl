@@ -59,7 +59,7 @@ function createWebSocket() {
 
             if (debug === true) {
                 console.log(data);
-                updateConsole(larr, data.lhandState, rarr, data.rhandState);
+                updateConsole(larr, data.lhandState, rarr, data.rhandState, data.screenw, data.screenh, data.sx, data.sy);
             }
 
             // Draw the cursor on the screen
@@ -124,4 +124,4 @@ function updateConsoleServer(state) {
 updateConsoleServer(false);
 
 // Start the web socket connection
-// createWebSocket();
+createWebSocket();
