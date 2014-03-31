@@ -1,8 +1,8 @@
 // Set to true to emit verbose output to the console
 var debug = false;
 
-// Initialize a variable to hold data from the previous frame
-var prevData = null;
+// Initialize a stack to hold data from all previous frames
+var coordData = [];
 
 if (debug === false) {
     // Initialize a handler for the console element
@@ -56,23 +56,10 @@ function createWebSocket() {
             // Parse the JSON
             var data = JSON.parse(event.data);
 
-            // Initialize a dummy variable for the averaged data
-            var averagedData = null;
+            // Push the new frame onto the stack
+            coordData.push(data);
 
-            // Average the data from the current frame and the previous frame if it's available
-            // We do this to minimize cursor jitter
-            if (prevData !== null) {
-                averagedData = {
-                    lx: (data.lx + prevData.lx) / 2,
-                    ly: (data.ly + prevData.ly) / 2,
-                    rx: (data.rx + prevData.rx) / 2,
-                    ry: (data.ry + prevData.ry) / 2,
-                    sx: (data.sx + prevData.sx) / 2,
-                    sy: (data.sy + prevData.sy) / 2
-                };
-            } else {
-                averagedData = data;
-            }
+            var averagedData = averageFrames(coordData, Math.min(coordData.length, 3));
 
             if (debug === true) {
                 console.log(data);

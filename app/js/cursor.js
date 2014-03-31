@@ -129,6 +129,41 @@ function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx,
     rstate.innerText = rhandState;
 }
 
+// An instance sums the values corresponding to object keys in an array of objects
+// Precondition: Assumes the value at each key is a number (integer/float)
+// Input: (1) Array of object literals; (2) Valid key referenced in object literal
+// Output: Sum of values
+function sumIter(arr, key) {
+    var result = 0;
+    arr.forEach(function(entry) {
+        result += entry.key;
+    });
+}
+
+// An instance averages coordinate input across the specified number of frames
+// Input: (1) A stack of well-formed coordinate data; (2) Number of frames to be averaged
+// Output: Object literal (JSON-formatted) of coordinates
+function averageFrames(coordData, k) {
+    // Initialize a temporary holder for the frame data
+    var holdingArr = [];
+
+    // Pop all the required frames off the stack
+    for (var i = 0; i < k; i++) {
+        holdingArr[i] = coordData.pop();
+    }
+
+    var averagedData = {
+        lx: sumIter(holdingArr, lx) / k,
+        ly: sumIter(holdingArr, ly) / k,
+        rx: sumIter(holdingArr, rx) / k,
+        ry: sumIter(holdingArr, ry) / k,
+        sx: sumIter(holdingArr, sx) / k,
+        sy: sumIter(holdingArr, sy) / k
+    };
+
+    return averagedData;
+}
+
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
@@ -200,16 +235,6 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
             click(rcoord);
         }
     }
-}
-
-// An instance mimics a click on the object below the cursor circle
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
-function click(arr) {
-    // Get the DOM Node below the current cursor location
-    var elem = document.elementFromPoint(arr[0], arr[1]);
-
-    // Call a click event on the node;
-    elem.click();
 }
 
 // Write placeholder variables to the console
