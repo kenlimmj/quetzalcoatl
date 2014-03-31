@@ -138,46 +138,26 @@ function sumIter(arr, key) {
     arr.forEach(function(entry) {
         result += entry[key];
     });
+
     return result;
 }
 
-function selectState(arr, key) {
+// An instance counts the number of "unknown" that occur in an array of objects
+// Precondition: Assumes the value at the specified key is a valid hand state
+// Input: (1) Array of object literals; (2) Valid key referenced in object literal
+// Output: Sum of values
+function countUnknowns(arr, key) {
     // Initialize counters for each hand state
-    var openCount = 0,
-        closedCount = 0,
-        pointCount = 0,
-        unknownCount = 0;
+    var count = 0;
 
     // Go through the list and count the number of occurrences of each hand state
     arr.forEach(function(entry) {
-        switch (entry[key]) {
-            case "open":
-                openCount++;
-                break;
-            case "closed":
-                closedCount++;
-                break;
-            case "point":
-                pointCount++;
-                break;
-            case "unknown":
-                unknownCount++;
-                break;
-            default:
-                break;
+        if (entry[key] === "unknown") {
+            count++;
         }
     });
 
-    // Return the state with the highest occurrence
-    if (openCount > closedCount && openCount > pointCount && openCount > unknownCount) {
-        return "open";
-    } else if (closedCount > pointCount && closedCount > unknownCount) {
-        return "closed";
-    } else if (pointCount > unknownCount) {
-        return "point";
-    } else {
-        return "unknown";
-    }
+    return count;
 }
 
 // An instance averages coordinate input across the specified number of frames
@@ -188,12 +168,30 @@ function averageFrames(coordData, k) {
     // Initialize a temporary holder for the frame data
     var holdingArr = [];
 
+    // Initialize temporary holders for the left and right hand states
+    var avglhandState = null,
+        avgrhandState = null;
+
     // Use all available frames in the stack if more frames are requested than available
     k = Math.min(coordData.length, k);
 
     // Pop all the required frames off the stack
     for (var i = 0; i < k; i++) {
         holdingArr[i] = coordData[coordData.length - i - 1];
+    }
+
+    // Determine the left hand state
+    if (countUnknowns(holdingArr, "lhandState") > 0.5 * k) {
+        avglhandState = "unknown";
+    } else {
+        avglhandState = coordData[coordData.length - 1].lhandState;
+    }
+
+    // Determine the right hand state
+    if (countUnknowns(holdingArr, "rhandState") > 0.5 * k) {
+        avgrhandState = "unknown";
+    } else {
+        avgrhandState = coordData[coordData.length - 1].rhandState;
     }
 
     var averagedData = {
@@ -203,8 +201,8 @@ function averageFrames(coordData, k) {
         ry: sumIter(holdingArr, "ry") / k,
         sx: sumIter(holdingArr, "sx") / k,
         sy: sumIter(holdingArr, "sy") / k,
-        lhandState: selectState(holdingArr, "lhandState"),
-        rhandState: selectState(holdingArr, "rhandState")
+        lhandState: avglhandState,
+        rhandState: avgrhandState
     };
 
     return averagedData;
