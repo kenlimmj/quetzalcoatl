@@ -150,7 +150,7 @@ function averageFrames(coordData, k) {
 
     // Pop all the required frames off the stack
     for (var i = 0; i < k; i++) {
-        holdingArr[i] = coordData.pop();
+        holdingArr[i] = coordData[coordData.length-i-1];
     }
 
     var averagedData = {
