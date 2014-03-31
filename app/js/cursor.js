@@ -29,13 +29,12 @@ ctx.fillStyle = rightColor;
 ctx.fill();
 ctx.closePath();
 
-// Initialize holders for the coordinates of the cursor circles
-var currlcoord = [],
-    currrcoord = [];
-
-// Initialize holders for the hand states
-var currlstate = null,
-    currrstate = null;
+// An instance rounds a number to some multiple. This is used to stabilize the cursor jitter
+// Input: (1) A number; (2) An integer multiple which (1) will be rounded to
+// Output: A rounded number
+function stabilizer(x, factor) {
+    return x - (x % factor) + (x % factor > 0 && factor);
+}
 
 // An instance maps Kinect coordinates to Screen coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
@@ -96,7 +95,7 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
     }
 
     // Round the result to integer values because pixels don't have decimal places.
-    return [Math.round(x), Math.round(y)];
+    return [stabilizer(Math.round(x), 3), stabilizer(Math.round(y), 3)];
 }
 
 // An instance updates the console on the bottom right of the screen with cursor coordinates
@@ -138,26 +137,51 @@ function sumIter(arr, key) {
     arr.forEach(function(entry) {
         result += entry[key];
     });
-
     return result;
 }
 
-// An instance counts the number of "unknown" that occur in an array of objects
-// Precondition: Assumes the value at the specified key is a valid hand state
+// An instance counts the number of occurrences of each hand state and returns the
+// state with the highest frequency of occurrence
+// Precondition: Assumes that the value at the key provided is a valid hand state
 // Input: (1) Array of object literals; (2) Valid key referenced in object literal
-// Output: Sum of values
-function countUnknowns(arr, key) {
+// Output: Hand state
+function selectState(arr, key) {
     // Initialize counters for each hand state
-    var count = 0;
+    var openCount = 0,
+        closedCount = 0,
+        pointCount = 0,
+        unknownCount = 0;
 
     // Go through the list and count the number of occurrences of each hand state
     arr.forEach(function(entry) {
-        if (entry[key] === "unknown") {
-            count++;
+        switch (entry[key]) {
+            case "open":
+                openCount++;
+                break;
+            case "closed":
+                closedCount++;
+                break;
+            case "point":
+                pointCount++;
+                break;
+            case "unknown":
+                unknownCount++;
+                break;
+            default:
+                break;
         }
     });
 
-    return count;
+    // Return the state with the highest occurrence
+    if (openCount > closedCount && openCount > pointCount && openCount > unknownCount) {
+        return "open";
+    } else if (closedCount > pointCount && closedCount > unknownCount) {
+        return "closed";
+    } else if (pointCount > unknownCount) {
+        return "point";
+    } else {
+        return "unknown";
+    }
 }
 
 // An instance averages coordinate input across the specified number of frames
@@ -169,8 +193,8 @@ function averageFrames(coordData, k) {
     var holdingArr = [];
 
     // Initialize temporary holders for the left and right hand states
-    var avglhandState = null,
-        avgrhandState = null;
+    var avglhandstate = null,
+        avgrhandstate = null;
 
     // Use all available frames in the stack if more frames are requested than available
     k = Math.min(coordData.length, k);
@@ -180,18 +204,20 @@ function averageFrames(coordData, k) {
         holdingArr[i] = coordData[coordData.length - i - 1];
     }
 
-    // Determine the left hand state
-    if (countUnknowns(holdingArr, "lhandState") > 0.5 * k) {
-        avglhandState = "unknown";
+    // If the current left hand state is unknown, average the states and return the result
+    // Otherwise, return the hand state from the most recent frame
+    if (coordData[coordData.length - 1].lhandState === "unknown") {
+        avglhandstate = selectState(holdingArr, "lhandState");
     } else {
-        avglhandState = coordData[coordData.length - 1].lhandState;
+        avglhandstate = coordData[coordData.length - 1].lhandState;
     }
 
-    // Determine the right hand state
-    if (countUnknowns(holdingArr, "rhandState") > 0.5 * k) {
-        avgrhandState = "unknown";
+    // If the current right hand state is unknown, average the states and return the result
+    // Otherwise, return the hand state from the most recent frame
+    if (coordData[coordData.length - 1].rhandState === "unknown") {
+        avgrhandstate = selectState(holdingArr, "rhandState");
     } else {
-        avgrhandState = coordData[coordData.length - 1].rhandState;
+        avgrhandstate = coordData[coordData.length - 1].rhandState;
     }
 
     var averagedData = {
@@ -201,8 +227,8 @@ function averageFrames(coordData, k) {
         ry: sumIter(holdingArr, "ry") / k,
         sx: sumIter(holdingArr, "sx") / k,
         sy: sumIter(holdingArr, "sy") / k,
-        lhandState: avglhandState,
-        rhandState: avgrhandState
+        lhandState: avglhandstate,
+        rhandState: avgrhandstate
     };
 
     return averagedData;
