@@ -21,6 +21,16 @@ container = document.querySelector("main");
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// An instance mimics a click on the object below the cursor circle
+// Input: Array of float x and float y coordinates of the mapped screen coordinates
+function click(arr) {
+    // Get the DOM Node below the current cursor location
+    var elem = document.elementFromPoint(arr[0], arr[1]);
+
+    // Call a click event on the node;
+    elem.click();
+}
+
 // An instance calls a pull gesture on the canvas
 // A pull gesture is a negative change in the z-axis made with a closed hand
 // - Pulling on the main block zooms into the item under the cursor
