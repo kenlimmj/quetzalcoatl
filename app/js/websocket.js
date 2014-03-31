@@ -59,7 +59,7 @@ function createWebSocket() {
             // Push the new frame onto the stack
             coordData.push(data);
 
-            var averagedData = averageFrames(coordData, Math.min(coordData.length, 161));
+            var averagedData = averageFrames(coordData, 161);
 
             if (debug === true) {
                 console.log(data);
@@ -76,8 +76,8 @@ function createWebSocket() {
             // Here we're using the frame-averaged data for the hand coordinates and viewport
             // The hand states utilize the current frame data
             reDraw([averagedData.lx, averagedData.ly],
-                data.lhandState, [averagedData.rx, averagedData.ry],
-                data.rhandState,
+                averagedData.lhandState, [averagedData.rx, averagedData.ry],
+                averagedData.rhandState,
                 data.screenw,
                 data.screenh,
                 averagedData.sx,

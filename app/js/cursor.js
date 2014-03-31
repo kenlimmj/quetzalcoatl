@@ -141,16 +141,59 @@ function sumIter(arr, key) {
     return result;
 }
 
+function selectState(arr, key) {
+    // Initialize counters for each hand state
+    var openCount = 0,
+        closedCount = 0,
+        pointCount = 0,
+        unknownCount = 0;
+
+    // Go through the list and count the number of occurrences of each hand state
+    arr.forEach(function(entry) {
+        switch (entry[key]) {
+            case "open":
+                openCount++;
+                break;
+            case "closed":
+                closedCount++;
+                break;
+            case "point":
+                pointCount++;
+                break;
+            case "unknown":
+                unknownCount++;
+                break;
+            default:
+                break;
+        }
+    });
+
+    // Return the state with the highest occurrence
+    if (openCount > closedCount && openCount > pointCount && openCount > unknownCount) {
+        return "open";
+    } else if (closedCount > pointCount && closedCount > unknownCount) {
+        return "closed";
+    } else if (pointCount > unknownCount) {
+        return "point";
+    } else {
+        return "unknown";
+    }
+}
+
 // An instance averages coordinate input across the specified number of frames
+// If more frames are requested than available, we use all available frames in the stack
 // Input: (1) A stack of well-formed coordinate data; (2) Number of frames to be averaged
 // Output: Object literal (JSON-formatted) of coordinates
 function averageFrames(coordData, k) {
     // Initialize a temporary holder for the frame data
     var holdingArr = [];
 
+    // Use all available frames in the stack if more frames are requested than available
+    k = Math.min(coordData.length, k);
+
     // Pop all the required frames off the stack
     for (var i = 0; i < k; i++) {
-        holdingArr[i] = coordData[coordData.length-i-1];
+        holdingArr[i] = coordData[coordData.length - i - 1];
     }
 
     var averagedData = {
@@ -159,7 +202,9 @@ function averageFrames(coordData, k) {
         rx: sumIter(holdingArr, "rx") / k,
         ry: sumIter(holdingArr, "ry") / k,
         sx: sumIter(holdingArr, "sx") / k,
-        sy: sumIter(holdingArr, "sy") / k
+        sy: sumIter(holdingArr, "sy") / k,
+        lhandState: selectState(holdingArr, "lhandState"),
+        rhandState: selectState(holdingArr, "rhandState")
     };
 
     return averagedData;
