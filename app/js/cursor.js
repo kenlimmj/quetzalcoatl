@@ -136,8 +136,9 @@ function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx,
 function sumIter(arr, key) {
     var result = 0;
     arr.forEach(function(entry) {
-        result += entry.key;
+        result += entry[key];
     });
+    return result;
 }
 
 // An instance averages coordinate input across the specified number of frames
@@ -153,12 +154,12 @@ function averageFrames(coordData, k) {
     }
 
     var averagedData = {
-        lx: sumIter(holdingArr, lx) / k,
-        ly: sumIter(holdingArr, ly) / k,
-        rx: sumIter(holdingArr, rx) / k,
-        ry: sumIter(holdingArr, ry) / k,
-        sx: sumIter(holdingArr, sx) / k,
-        sy: sumIter(holdingArr, sy) / k
+        lx: sumIter(holdingArr, "lx") / k,
+        ly: sumIter(holdingArr, "ly") / k,
+        rx: sumIter(holdingArr, "rx") / k,
+        ry: sumIter(holdingArr, "ry") / k,
+        sx: sumIter(holdingArr, "sx") / k,
+        sy: sumIter(holdingArr, "sy") / k
     };
 
     return averagedData;
