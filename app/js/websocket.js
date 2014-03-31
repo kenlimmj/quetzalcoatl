@@ -1,5 +1,5 @@
 // Set to true to emit verbose output to the console
-var debug = true;
+var debug = false;
 
 // Initialize a stack to hold data from all previous frames
 var coordData = [];
@@ -59,7 +59,7 @@ function createWebSocket() {
             // Push the new frame onto the stack
             coordData.push(data);
 
-            var averagedData = averageFrames(coordData, Math.min(coordData.length, 3));
+            var averagedData = averageFrames(coordData, Math.min(coordData.length, 161));
 
             if (debug === true) {
                 console.log(data);
@@ -82,9 +82,6 @@ function createWebSocket() {
                 data.screenh,
                 averagedData.sx,
                 averagedData.sy);
-
-            // Store the current data for use in the next round
-            prevData = data;
         }
     };
 
