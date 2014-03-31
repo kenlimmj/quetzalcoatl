@@ -1,5 +1,5 @@
 // Set to true to emit verbose output to the console
-var debug = false;
+var debug = true;
 
 // Initialize a stack to hold data from all previous frames
 var coordData = [];
