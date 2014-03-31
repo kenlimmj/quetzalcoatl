@@ -1,6 +1,9 @@
 // Set to true to emit verbose output to the console
 var debug = false;
 
+// Initialize a variable to hold data from the previous frame
+var prevData = null;
+
 if (debug === false) {
     // Initialize a handler for the console element
     var consoleelem = document.getElementById("console");
@@ -32,6 +35,7 @@ function createWebSocket() {
     }
     var connection = new WebSocket(socketAddress);
 
+    // First-run logic when the connection to the server is initialized
     connection.onopen = function() {
         // Reset the tries back to 1 since we have a new connection opened
         attempts = 1;
@@ -40,10 +44,9 @@ function createWebSocket() {
             console.log("Successfully established connection with server.");
             updateConsoleServer(true);
         }
-
-        connection.send("test");
     };
 
+    // Logic when a message is received from the server
     connection.onmessage = function(event) {
         if (typeof event.data === "string") {
             if (debug === true) {
@@ -53,17 +56,48 @@ function createWebSocket() {
             // Parse the JSON
             var data = JSON.parse(event.data);
 
-            // Extract the left and right hand positions
-            var larr = [data.lx, data.ly],
-                rarr = [data.rx, data.ry];
+            // Initialize a dummy variable for the averaged data
+            var averagedData = null;
+
+            // Average the data from the current frame and the previous frame if it's available
+            // We do this to minimize cursor jitter
+            if (prevData !== null) {
+                averagedData = {
+                    lx: (data.lx + prevData.lx) / 2,
+                    ly: (data.ly + prevData.ly) / 2,
+                    rx: (data.rx + prevData.rx) / 2,
+                    ry: (data.ry + prevData.ry) / 2,
+                    sx: (data.sx + prevData.sx) / 2,
+                    sy: (data.sy + prevData.sy) / 2
+                };
+            } else {
+                averagedData = data;
+            }
 
             if (debug === true) {
                 console.log(data);
-                updateConsole(larr, data.lhandState, rarr, data.rhandState, data.screenw, data.screenh, data.sx, data.sy);
+                updateConsole([averagedData.lx, averagedData.ly],
+                    data.lhandState, [averagedData.rx, averagedData.ry],
+                    data.rhandState,
+                    data.screenw,
+                    data.screenh,
+                    averagedData.sx,
+                    averagedData.sy);
             }
 
             // Draw the cursor on the screen
-            reDraw(larr, data.lhandState, rarr, data.rhandState, data.screenw, data.screenh, data.sx, data.sy);
+            // Here we're using the frame-averaged data for the hand coordinates and viewport
+            // The hand states utilize the current frame data
+            reDraw([averagedData.lx, averagedData.ly],
+                data.lhandState, [averagedData.rx, averagedData.ry],
+                data.rhandState,
+                data.screenw,
+                data.screenh,
+                averagedData.sx,
+                averagedData.sy);
+
+            // Store the current data for use in the next round
+            prevData = data;
         }
     };
 
