@@ -95,7 +95,7 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
     }
 
     // Round the result to integer values because pixels don't have decimal places.
-    return [stabilizer(Math.round(x), 3), stabilizer(Math.round(y), 3)];
+    return [stabilizer(Math.round(x), 30), stabilizer(Math.round(y), 30)];
 }
 
 // An instance updates the console on the bottom right of the screen with cursor coordinates
