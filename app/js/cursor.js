@@ -94,8 +94,8 @@ function mapCoordinates(arr, screenw, screenh, sx, sy) {
         y = ycoord / (kcoord.ymax - kcoord.ymin) * (scoord.ymax - scoord.ymin);
     }
 
-    // Round the result to integer values because pixels don't have decimal places.
-    return [stabilizer(Math.round(x), 30), stabilizer(Math.round(y), 30)];
+    // Threshold the result to minimize jitter
+    return [stabilizer(x, Math.round(0.015625 * window.innerWidth)), stabilizer(y, Math.round(0.015625 * window.innerHeight))];
 }
 
 // An instance updates the console on the bottom right of the screen with cursor coordinates
@@ -234,6 +234,33 @@ function averageFrames(coordData, k) {
     return averagedData;
 }
 
+// An instance draws a circle from a tweening function
+function circleTween() {
+    // Clear the canvas
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    ctx.beginPath();
+    ctx.arc(this.tweenX.getValue(), this.tweenY.getValue(), open_radius, 0, 2 * Math.PI);
+    ctx.fillStyle = this.handColor;
+    ctx.fill();
+    ctx.closePath();
+}
+
+function runCircleTween(start, end) {
+    // Calculate the animation duration for a 60fps animation
+    var duration = 1000 / 60;
+
+    // Define linear tweening functions for the x and y coordinates
+    this.tweenX = new Tween(start[0], end[0], duration, "linear");
+    this.tweenY = new Tween(start[1], end[1], duration, "linear");
+
+    // Draw the circle at every interval
+    setInterval(circleTween, duration);
+}
+
+var prevlcoord = null,
+    prevrcoord = null;
+
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
@@ -241,9 +268,6 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
     // Map the coordinates from the Kinect depth space to the screen space
     var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy),
         rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy);
-
-    // Clear the canvas
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     // Initialize the radius of the cursor circle
     var lradius = null,
@@ -284,11 +308,19 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
     // Draw the cursors at their new location
     // Left Hand
     if (lhandState !== "unknown") {
-        ctx.beginPath();
-        ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
-        ctx.fillStyle = leftColor;
-        ctx.fill();
-        ctx.closePath();
+        this.handColor = leftColor;
+        if (prevlcoord !== null) {
+            runCircleTween(prevlcoord, lcoord);
+        } else {
+            // Clear the canvas
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+            ctx.beginPath();
+            ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
+            ctx.fillStyle = leftColor;
+            ctx.fill();
+            ctx.closePath();
+        }
         if (lhandState === "closed") {
             click(lcoord);
         }
@@ -296,15 +328,26 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy) {
 
     // Right Hand
     if (rhandState !== "unknown") {
-        ctx.beginPath();
-        ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
-        ctx.fillStyle = rightColor;
-        ctx.fill();
-        ctx.closePath();
+        this.handColor = rightColor;
+        if (prevrcoord !== null) {
+            runCircleTween(prevrcoord, rcoord);
+        } else {
+            // Clear the canvas
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+            ctx.beginPath();
+            ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
+            ctx.fillStyle = rightColor;
+            ctx.fill();
+            ctx.closePath();
+        }
         if (rhandState === "closed") {
             click(rcoord);
         }
     }
+
+    prevlcoord = lcoord;
+    prevrcoord = rcoord;
 }
 
 // Write placeholder variables to the console

@@ -138,4 +138,4 @@ function updateConsoleServer(state) {
 updateConsoleServer(false);
 
 // Start the web socket connection
-createWebSocket();
+// createWebSocket();
