@@ -72,6 +72,18 @@ function createWebSocket() {
                     averagedData.sy);
             }
 
+            if (averagedData.lhandState === "point") {
+                lthreshold = 1/100
+            } else {
+                lthreshold = 1/50;
+            }
+
+            if (averagedData.rhandState === "point") {
+                rthreshold = 1/100
+            } else {
+                rthreshold = 1/50;
+            }
+
             // Draw the cursor on the screen
             // Here we're using the frame-averaged data for the hand coordinates and viewport
             // The hand states utilize the current frame data
@@ -81,7 +93,7 @@ function createWebSocket() {
                 data.screenw,
                 data.screenh,
                 averagedData.sx,
-                averagedData.sy);
+                averagedData.sy,lthreshold,rthreshold);
         }
     };
 
@@ -138,4 +150,4 @@ function updateConsoleServer(state) {
 updateConsoleServer(false);
 
 // Start the web socket connection
-// createWebSocket();
+createWebSocket();
