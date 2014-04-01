@@ -132,22 +132,18 @@ namespace Kinect.Server
                                        jointPoints [jointType] = new Point (depthSpacePoint.X, depthSpacePoint.Y);
                                    }
 
-
-
                                    if (engaged == true) {
-                                       // If the start gesture is detected, package the current joint information and send it
-
                                        if (body.HandRightState == HandState.Closed)
                                        {
                                            if (this.rframecount >= 45)
                                            {
                                                rframecount = 0;
-                                               rpull = CheckPull(body.Joints[JointType.HandRight].Position.Z, "right", rframecount);
                                            }
-                                           else
-                                           {
-                                                rpull = CheckPull(body.Joints[JointType.HandRight].Position.Z, "right", rframecount);
-                                           }
+                                           rpull = CheckPull(body.Joints[JointType.HandRight].Position.Z, "right", rframecount);
+                                       }
+                                       else
+                                       {
+                                           rpull = false;
                                        }
 
                                        if (body.HandLeftState == HandState.Closed)
@@ -155,31 +151,39 @@ namespace Kinect.Server
                                            if(this.lframecount >=45)
                                            {
                                                lframecount = 0;
-                                               lpull = CheckPull(body.Joints[JointType.HandLeft].Position.Z, "left", lframecount);
                                            }
-                                           else
-                                           {
-                                               lpull = CheckPull(body.Joints[JointType.HandLeft].Position.Z, "left", lframecount);
-                                           }
+                                           lpull = CheckPull(body.Joints[JointType.HandLeft].Position.Z, "left", lframecount);
                                        }
+                                       else
+                                       {
+                                           lpull = false;
+                                       }
+
                                        Point rshoulder = jointPoints[JointType.ShoulderRight];
                                        Point lshoulder = jointPoints[JointType.ShoulderLeft];
+
                                        Point wrist = jointPoints[JointType.WristRight];
                                        Point elbow = jointPoints[JointType.ElbowRight];
-                                       double width = (Math.Pow((Math.Pow(Math.Abs(rshoulder.X - elbow.X), 2) + Math.Pow(Math.Abs(rshoulder.Y - elbow.Y), 2)), 0.5)+
-                                           (Math.Pow((Math.Pow(Math.Abs(elbow.X - wrist.X), 2) + Math.Pow(Math.Abs(elbow.Y - wrist.Y), 2)), 0.5)/2))*2 + Math.Abs(rshoulder.X-lshoulder.X);
+
                                        Point bSpine = jointPoints[JointType.SpineBase];
                                        Point neck = jointPoints[JointType.Neck];
                                        Point head = jointPoints[JointType.Head];
+
                                        CheckZoom(body.HandLeftState, body.HandRightState, jointPoints[JointType.HandRight], jointPoints[JointType.HandLeft], 
                                            rshoulder, lshoulder, bSpine, jointPoints[JointType.Head]);
+
+                                       double width = (Math.Pow((Math.Pow(Math.Abs(rshoulder.X - elbow.X), 2) + Math.Pow(Math.Abs(rshoulder.Y - elbow.Y), 2)), 0.5) +
+                                           (Math.Pow((Math.Pow(Math.Abs(elbow.X - wrist.X), 2) + Math.Pow(Math.Abs(elbow.Y - wrist.Y), 2)), 0.5) / 2)) * 2 + Math.Abs(rshoulder.X - lshoulder.X);
                                        double height = Math.Abs(bSpine.Y - neck.Y) + 2 * (neck.Y - head.Y);
+
                                        string packet = MakeJson(body.HandRightState, jointPoints [JointType.HandRight], body.HandLeftState, jointPoints [JointType.HandLeft], 
                                            jointPoints[JointType.SpineBase], width, height, rpull, lpull, zoomscale);
                                        allSockets.ToList ().ForEach (s => s.Send (packet));
                                        Console.WriteLine(packet);
+
                                        this.CheckStartStop (jointPoints [JointType.ShoulderRight], jointPoints [JointType.ElbowRight], jointPoints [JointType.WristRight], 
                                            jointPoints [JointType.HandLeft], jointPoints [JointType.HandRight], jointPoints [JointType.SpineBase]);
+
                                        rframecount += 1;
                                        lframecount += 1;
                                    } else {
@@ -192,7 +196,7 @@ namespace Kinect.Server
                        }
                    }
                } catch (Exception) {
-                   // Ignore if the frame is no longer available
+                   Console.WriteLine("Frame data unavailable");
                }
            }
  
