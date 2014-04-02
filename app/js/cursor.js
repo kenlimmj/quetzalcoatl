@@ -11,6 +11,14 @@ var open_radius = 25,
 var leftColor = "#d33682",
     rightColor = "#6c71c4";
 
+// Coordinates of the user's screen
+var scoord = {
+    xmin: 0,
+    xmax: window.innerWidth,
+    ymin: 0,
+    ymax: window.innerHeight
+};
+
 // Set the width and height of the canvas to be the size of the window
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
@@ -41,14 +49,6 @@ function stabilizer(x, factor) {
 // and object literal of coordinates describing the viable space
 // Output: Array of Integer x and Integer y coordinates of the screen
 function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
-    // Coordinates of the user's screen
-    var scoord = {
-        xmin: 0,
-        xmax: window.innerWidth,
-        ymin: 0,
-        ymax: window.innerHeight
-    };
-
     // Coordinates of the viable space. The bottom center of the viable space is
     // centered at the user's spine base
     var kcoord = {
@@ -234,6 +234,20 @@ function averageFrames(coordData, k) {
     return averagedData;
 }
 
+// An instance assigns the appropriate radius depending on the hand state
+function assignRadius(state) {
+    switch (state) {
+        case "open":
+            return open_radius;
+        case "closed":
+            return grab_radius;
+        case "point":
+            return point_radius;
+        default:
+            return open_radius;
+    }
+}
+
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
@@ -242,44 +256,12 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy, lt
     var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy, lthreshold),
         rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy, rthreshold);
 
+    // Initialize the radius of the cursor circle
+    var lradius = assignRadius(lhandState),
+        rradius = assignRadius(rhandState);
+
     // Clear the canvas
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-    // Initialize the radius of the cursor circle
-    var lradius = null,
-        rradius = null;
-
-    // Get the left hand state and assign the correct cursor size
-    switch (lhandState) {
-        case "open":
-            lradius = open_radius;
-            break;
-        case "closed":
-            lradius = grab_radius;
-            break;
-        case "point":
-            lradius = point_radius;
-            break;
-        default:
-            lradius = open_radius;
-            break;
-    }
-
-    // Get the right hand state and assign the correct cursor size
-    switch (rhandState) {
-        case "open":
-            rradius = open_radius;
-            break;
-        case "closed":
-            rradius = grab_radius;
-            break;
-        case "point":
-            rradius = point_radius;
-            break;
-        default:
-            rradius = open_radius;
-            break;
-    }
 
     // Draw the cursors at their new location
     // Left Hand
@@ -289,9 +271,6 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy, lt
         ctx.fillStyle = leftColor;
         ctx.fill();
         ctx.closePath();
-        if (lhandState === "closed") {
-            click(lcoord);
-        }
     }
 
     // Right Hand
@@ -301,9 +280,6 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy, lt
         ctx.fillStyle = rightColor;
         ctx.fill();
         ctx.closePath();
-        if (rhandState === "closed") {
-            click(rcoord);
-        }
     }
 }
 
