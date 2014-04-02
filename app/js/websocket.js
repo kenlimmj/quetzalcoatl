@@ -1,10 +1,11 @@
 // Set to true to emit verbose output to the console
-var debug = true;
+var debug = false;
 
 // Initialize a stack to hold data from all previous frames
 var coordData = [];
 
-var rpullState = false;
+var lpullState = false,
+    rpullState = false;
 
 if (debug === false) {
     // Initialize a handler for the console element
@@ -64,17 +65,6 @@ function createWebSocket() {
 
             var averagedData = averageFrames(coordData, 2);
 
-            if (debug === true) {
-                console.log(data);
-                updateConsole([averagedData.lx, averagedData.ly],
-                    data.lhandState, [averagedData.rx, averagedData.ry],
-                    data.rhandState,
-                    data.screenw,
-                    data.screenh,
-                    averagedData.sx,
-                    averagedData.sy);
-            }
-
             if (averagedData.lhandState === "point") {
                 lthreshold = 1 / 100;
             } else {
@@ -85,6 +75,17 @@ function createWebSocket() {
                 rthreshold = 1 / 100;
             } else {
                 rthreshold = 1 / 50;
+            }
+
+            if (debug === true) {
+                console.log(data);
+                updateConsole([averagedData.lx, averagedData.ly],
+                    data.lhandState, [averagedData.rx, averagedData.ry],
+                    data.rhandState,
+                    data.screenw,
+                    data.screenh,
+                    averagedData.sx,
+                    averagedData.sy,lthreshold,rthreshold);
             }
 
             // Draw the cursor on the screen
@@ -98,13 +99,27 @@ function createWebSocket() {
                 averagedData.sx,
                 averagedData.sy, lthreshold, rthreshold);
 
+            var lcoord = mapCoordinates([averagedData.lx, averagedData.ly], data.screenw, data.screenh, data.sx, data.sy, lthreshold),
+                rcoord = mapCoordinates([averagedData.rx, averagedData.ry], data.screenw, data.screenh, data.sx, data.sy, rthreshold);
+
+            if (lpullState === false) {
+                if (data.lp === true) {
+                    pull(lcoord);
+                    lpullState = true;
+                }
+            } else {
+                if (data.lp === false) {
+                    lpullState = false;
+                }
+            }
+
             if (rpullState === false) {
-                if (data.rpull === true) {
-                    pull([averagedData.lx, averagedData.ly], [averagedData.rx, averagedData.ry]);
+                if (data.rp === true) {
+                    pull(rcoord);
                     rpullState = true;
                 }
             } else {
-                if (data.rpull === false) {
+                if (data.rp === false) {
                     rpullState = false;
                 }
             }
