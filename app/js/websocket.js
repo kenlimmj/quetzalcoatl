@@ -4,6 +4,8 @@ var debug = true;
 // Initialize a stack to hold data from all previous frames
 var coordData = [];
 
+var rpullState = false;
+
 if (debug === false) {
     // Initialize a handler for the console element
     var consoleelem = document.getElementById("console");
@@ -33,6 +35,7 @@ function createWebSocket() {
     if (debug === true) {
         console.log("Initializing connection with " + socketAddress);
     }
+
     var connection = new WebSocket(socketAddress);
 
     // First-run logic when the connection to the server is initialized
@@ -73,15 +76,15 @@ function createWebSocket() {
             }
 
             if (averagedData.lhandState === "point") {
-                lthreshold = 1/100
+                lthreshold = 1 / 100;
             } else {
-                lthreshold = 1/50;
+                lthreshold = 1 / 50;
             }
 
             if (averagedData.rhandState === "point") {
-                rthreshold = 1/100
+                rthreshold = 1 / 100;
             } else {
-                rthreshold = 1/50;
+                rthreshold = 1 / 50;
             }
 
             // Draw the cursor on the screen
@@ -93,7 +96,18 @@ function createWebSocket() {
                 data.screenw,
                 data.screenh,
                 averagedData.sx,
-                averagedData.sy,lthreshold,rthreshold);
+                averagedData.sy, lthreshold, rthreshold);
+
+            if (rpullState === false) {
+                if (data.rpull === true) {
+                    pull([averagedData.lx, averagedData.ly], [averagedData.rx, averagedData.ry]);
+                    rpullState = true;
+                }
+            } else {
+                if (data.rpull === false) {
+                    rpullState = false;
+                }
+            }
         }
     };
 
