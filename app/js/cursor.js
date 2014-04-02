@@ -101,7 +101,7 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
 // An instance updates the console on the bottom right of the screen with cursor coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
-function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy,lthreshold,rthreshold) {
+function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy, lthreshold, rthreshold) {
     // Initialize handlers for the screen coordinates in the console
     var lscreenx = document.getElementById("lscreenx"),
         lscreeny = document.getElementById("lscreeny"),
@@ -113,8 +113,8 @@ function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx,
         rstate = document.getElementById("rhstate");
 
     // Map the Kinect coordinates to screen coordinates
-    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy,lthreshold),
-        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy,rthreshold);
+    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy, lthreshold),
+        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy, rthreshold);
 
     // Write the screen coordinates
     lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
@@ -237,10 +237,10 @@ function averageFrames(coordData, k) {
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // Output: Unit
-function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy,lthreshold,rthreshold) {
+function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy, lthreshold, rthreshold) {
     // Map the coordinates from the Kinect depth space to the screen space
-    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy,lthreshold),
-        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy,rthreshold);
+    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy, lthreshold),
+        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy, rthreshold);
 
     // Clear the canvas
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -284,11 +284,11 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy,lth
     // Draw the cursors at their new location
     // Left Hand
     if (lhandState !== "unknown") {
-            ctx.beginPath();
-            ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
-            ctx.fillStyle = leftColor;
-            ctx.fill();
-            ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
+        ctx.fillStyle = leftColor;
+        ctx.fill();
+        ctx.closePath();
         if (lhandState === "closed") {
             click(lcoord);
         }
@@ -296,11 +296,11 @@ function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy,lth
 
     // Right Hand
     if (rhandState !== "unknown") {
-            ctx.beginPath();
-            ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
-            ctx.fillStyle = rightColor;
-            ctx.fill();
-            ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
+        ctx.fillStyle = rightColor;
+        ctx.fill();
+        ctx.closePath();
         if (rhandState === "closed") {
             click(rcoord);
         }
