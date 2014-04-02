@@ -54,7 +54,7 @@ function createWebSocket() {
     connection.onmessage = function(event) {
         if (typeof event.data === "string") {
             if (debug === true) {
-                console.log("Data of type STRING received from server. Interpreting...");
+                console.log("Data of type STRING received from server. Interpreting as JSON...");
             }
 
             // Parse the JSON
@@ -63,44 +63,26 @@ function createWebSocket() {
             // Push the new frame onto the stack
             coordData.push(data);
 
+            // Average the data over a pair of frames for increased accuracy
             var averagedData = averageFrames(coordData, 2);
 
-            if (averagedData.lhandState === "point") {
-                lthreshold = 1 / 100;
-            } else {
-                lthreshold = 1 / 50;
-            }
+            // Calculate the precision threshold value for each hand
+            var lthreshold = cursorThreshold(averagedData.lhandState),
+                rthreshold = cursorThreshold(averagedData.rhandState);
 
-            if (averagedData.rhandState === "point") {
-                rthreshold = 1 / 100;
-            } else {
-                rthreshold = 1 / 50;
-            }
+            // Map the coordinates from the Kinect space to screen space
+            var lcoord = mapCoordinates([averagedData.lx, averagedData.ly], data.screenw, data.screenh, data.sx, data.sy, lthreshold),
+                rcoord = mapCoordinates([averagedData.rx, averagedData.ry], data.screenw, data.screenh, data.sx, data.sy, rthreshold);
 
             if (debug === true) {
-                console.log(data);
-                updateConsole([averagedData.lx, averagedData.ly],
-                    data.lhandState, [averagedData.rx, averagedData.ry],
-                    data.rhandState,
-                    data.screenw,
-                    data.screenh,
-                    averagedData.sx,
-                    averagedData.sy,lthreshold,rthreshold);
+                // console.log(data);
+                updateConsole(lcoord, data.lhandState, rcoord, data.rhandState);
             }
 
             // Draw the cursor on the screen
             // Here we're using the frame-averaged data for the hand coordinates and viewport
             // The hand states utilize the current frame data
-            reDraw([averagedData.lx, averagedData.ly],
-                averagedData.lhandState, [averagedData.rx, averagedData.ry],
-                averagedData.rhandState,
-                data.screenw,
-                data.screenh,
-                averagedData.sx,
-                averagedData.sy, lthreshold, rthreshold);
-
-            var lcoord = mapCoordinates([averagedData.lx, averagedData.ly], data.screenw, data.screenh, data.sx, data.sy, lthreshold),
-                rcoord = mapCoordinates([averagedData.rx, averagedData.ry], data.screenw, data.screenh, data.sx, data.sy, rthreshold);
+            reDraw(lcoord, averagedData.lhandState, rcoord, averagedData.rhandState);
 
             if (lpullState === false) {
                 if (data.lp === true) {

@@ -62,8 +62,8 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
         ymax: sy
     };
 
-    var xcoord = null,
-        ycoord = null;
+    // var xcoord = null,
+    //     ycoord = null;
 
     var x = null,
         y = null;
@@ -77,8 +77,8 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
         x = window.innerWidth;
     } else {
         // Otherwise, translate it so it fits within the viable space
-        xcoord = arr[0] - kcoord.xmin;
-        x = xcoord / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin);
+        // xcoord = arr[0] - kcoord.xmin;
+        x = (arr[0] - kcoord.xmin) / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin);
     }
 
     // Calculate the coordinate space for the incoming y-coordinate
@@ -90,8 +90,8 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
         y = window.innerHeight;
     } else {
         // Otherwise, translate it so it fits within the viable space
-        ycoord = arr[1] - kcoord.ymin;
-        y = ycoord / (kcoord.ymax - kcoord.ymin) * (scoord.ymax - scoord.ymin);
+        // ycoord = arr[1] - kcoord.ymin;
+        y = (arr[1] - kcoord.ymin) / (kcoord.ymax - kcoord.ymin) * (scoord.ymax - scoord.ymin);
     }
 
     // Threshold the result to minimize jitter
@@ -99,9 +99,9 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
 }
 
 // An instance updates the console on the bottom right of the screen with cursor coordinates
-// Input: Array of float x and float y coordinates of the depth data from the Kinect
+// Input: Array of float x and float y mapped coordinates
 // Output: Unit
-function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy, lthreshold, rthreshold) {
+function updateConsole(lcoord, lhandState, rcoord, rhandState) {
     // Initialize handlers for the screen coordinates in the console
     var lscreenx = document.getElementById("lscreenx"),
         lscreeny = document.getElementById("lscreeny"),
@@ -111,10 +111,6 @@ function updateConsole(larr, lhandState, rarr, rhandState, screenw, screenh, sx,
     // Initialize handlers for the hand states in the console
     var lstate = document.getElementById("lhstate"),
         rstate = document.getElementById("rhstate");
-
-    // Map the Kinect coordinates to screen coordinates
-    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy, lthreshold),
-        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy, rthreshold);
 
     // Write the screen coordinates
     lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
@@ -184,6 +180,15 @@ function selectState(arr, key) {
     }
 }
 
+// An instance looks up a precision threshold value for the hand state
+function cursorThreshold(state) {
+    if (state === "point") {
+        return 1 / 100;
+    } else {
+        return 1 / 50;
+    }
+}
+
 // An instance averages coordinate input across the specified number of frames
 // If more frames are requested than available, we use all available frames in the stack
 // Input: (1) A stack of well-formed coordinate data; (2) Number of frames to be averaged
@@ -235,6 +240,8 @@ function averageFrames(coordData, k) {
 }
 
 // An instance assigns the appropriate radius depending on the hand state
+// Input: A valid hand state
+// Output: A float radius value
 function assignRadius(state) {
     switch (state) {
         case "open":
@@ -249,13 +256,9 @@ function assignRadius(state) {
 }
 
 // An instance redraws the cursor on the overlay layer
-// Input: Array of float x and float y coordinates of the depth data from the Kinect
+// Input: Array of float x and float y mapped coordinates
 // Output: Unit
-function reDraw(larr, lhandState, rarr, rhandState, screenw, screenh, sx, sy, lthreshold, rthreshold) {
-    // Map the coordinates from the Kinect depth space to the screen space
-    var lcoord = mapCoordinates(larr, screenw, screenh, sx, sy, lthreshold),
-        rcoord = mapCoordinates(rarr, screenw, screenh, sx, sy, rthreshold);
-
+function reDraw(lcoord, lhandState, rcoord, rhandState) {
     // Initialize the radius of the cursor circle
     var lradius = assignRadius(lhandState),
         rradius = assignRadius(rhandState);
