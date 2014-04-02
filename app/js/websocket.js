@@ -4,6 +4,7 @@ var debug = false;
 // Initialize a stack to hold data from all previous frames
 var coordData = [];
 
+// Initialize variables to keep track of whether we are in the middle of a pull gesture
 var lpullState = false,
     rpullState = false;
 
@@ -13,6 +14,9 @@ if (debug === false) {
 
     // Hide the console if console output is not requested
     consoleelem.style.display = "none";
+} else {
+    // Set the initial state of the server to "Disconnected"
+    updateConsoleServer(false);
 }
 
 // Set the socket address to match the port which the C# WebSocket Server is broadcasting on
@@ -53,10 +57,6 @@ function createWebSocket() {
     // Logic when a message is received from the server
     connection.onmessage = function(event) {
         if (typeof event.data === "string") {
-            if (debug === true) {
-                console.log("Data of type STRING received from server. Interpreting as JSON...");
-            }
-
             // Parse the JSON
             var data = JSON.parse(event.data);
 
@@ -109,12 +109,12 @@ function createWebSocket() {
     };
 
     connection.onclose = function() {
+        var time = generateInterval(attempts);
+
         if (debug === true) {
-            console.log("Server connection lost. Retrying...");
+            console.log("Server connection lost. Retrying in " + time);
             updateConsoleServer(false);
         }
-
-        var time = generateInterval(attempts);
 
         setTimeout(function() {
             // We've tried to reconnect so increment the attempt counter
@@ -156,9 +156,6 @@ function updateConsoleServer(state) {
         serverstatus.style.color = "#dc322f";
     }
 }
-
-// Set the initial state of the server to "Disconnected"
-updateConsoleServer(false);
 
 // Start the web socket connection
 createWebSocket();
