@@ -8,6 +8,9 @@ var coordData = [];
 var lpullState = false,
     rpullState = false;
 
+// Set the socket address to match the port which the C# WebSocket Server is broadcasting on
+var socketAddress = "ws://localhost:1620/KinectApp";
+
 if (debug === false) {
     // Initialize a handler for the console element
     var consoleelem = document.getElementById("console");
@@ -18,9 +21,6 @@ if (debug === false) {
     // Set the initial state of the server to "Disconnected"
     updateConsoleServer(false);
 }
-
-// Set the socket address to match the port which the C# WebSocket Server is broadcasting on
-var socketAddress = "ws://localhost:1620/KinectApp";
 
 // Implements the Exponential Backoff Algorithm to spread out reconnection attempts
 // so we don't flood the server with too many requests in the event that we go offline
@@ -39,6 +39,7 @@ function createWebSocket() {
 
     if (debug === true) {
         console.log("Initializing connection with " + socketAddress);
+        document.getElementById("serverstatus").innerText = "Initializing";
     }
 
     var connection = new WebSocket(socketAddress);
@@ -75,7 +76,6 @@ function createWebSocket() {
                 rcoord = mapCoordinates([averagedData.rx, averagedData.ry], data.screenw, data.screenh, data.sx, data.sy, rthreshold);
 
             if (debug === true) {
-                // console.log(data);
                 updateConsole(lcoord, data.lhandState, rcoord, data.rhandState);
             }
 

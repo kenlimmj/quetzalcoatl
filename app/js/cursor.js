@@ -23,20 +23,6 @@ var scoord = {
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 
-// Initialize the left hand cursor at the top first-third point of the screen
-ctx.beginPath();
-ctx.arc(0, 0, open_radius, 0, 2 * Math.PI);
-ctx.fillStyle = leftColor;
-ctx.fill();
-ctx.closePath();
-
-// Initialize the right hand cursor at the top second-third point of the screen
-ctx.beginPath();
-ctx.arc(window.innerWidth, 0, open_radius, 0, 2 * Math.PI);
-ctx.fillStyle = rightColor;
-ctx.fill();
-ctx.closePath();
-
 // An instance rounds a number to some multiple. This is used to stabilize the cursor jitter
 // Input: (1) A number; (2) An integer multiple which (1) will be rounded to
 // Output: A rounded number
@@ -95,7 +81,7 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
     }
 
     // Threshold the result to minimize jitter
-    return [stabilizer(x, Math.round(threshold * window.innerWidth)), stabilizer(y, Math.round(threshold * window.innerHeight))];
+    return [stabilizer(x, threshold * window.innerWidth), stabilizer(y, threshold * window.innerHeight)];
 }
 
 // An instance updates the console on the bottom right of the screen with cursor coordinates
@@ -130,9 +116,12 @@ function updateConsole(lcoord, lhandState, rcoord, rhandState) {
 // Output: Sum of values
 function sumIter(arr, key) {
     var result = 0;
+
+    // Go through every element in the array and add its value to the result
     arr.forEach(function(entry) {
         result += entry[key];
     });
+
     return result;
 }
 
