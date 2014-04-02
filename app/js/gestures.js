@@ -28,7 +28,9 @@ function click(arr) {
     var elem = document.elementFromPoint(arr[0], arr[1]);
 
     // Call a click event on the node;
-    elem.click();
+    if (elem !== null) {
+        elem.click();
+    }
 }
 
 // An instance calls a pull gesture on the canvas
@@ -44,8 +46,10 @@ function pull(arr) {
         // Only do something if we're not currently zoomed in
         if (zoomState === false) {
             // Dynamically mimic a click event on the element
-            // The behavior that causes the zoom/highlight is coded separately
-            elem.click();
+            // The behavior that causes the zoom is coded separately
+            if (elem !== null) {
+                elem.click();
+            }
 
             // If the element the cursor is currently over is in the main block, we've
             // zoomed into an item, and zoomState is now true
@@ -55,7 +59,7 @@ function pull(arr) {
         // Only do something if we're not currently highlighted
         if (highlightState === false) {
             // Dynamically mimic a click event on the element
-            // The behavior that causes the zoom/highlight is coded separately
+            // The behavior that causes the highlight is coded separately
             elem.click();
 
             // Otherwise, the cursor must be over an element in the side block, and we've
