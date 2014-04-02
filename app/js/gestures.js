@@ -75,7 +75,34 @@ function pull(arr) {
 // - Pushing anywhere on the side block un-highlights any highlighted text
 // Input: Array of float x and float y coordinates of the mapped screen coordinates
 function push(arr) {
+    // Get the DOM Node below the current cursor location
+    var elem = document.elementFromPoint(arr[0], arr[1]);
 
+    if (jQuery.contains(container, elem)) {
+        // Only do something if we're currently zoomed in
+        if (zoomState === true) {
+            // Dynamically mimic a click event on the element
+            // The behavior that causes the zoom is coded separately
+            if (elem !== null) {
+                elem.click();
+            }
+
+            // If the element the cursor is currently over is in the main block, we've
+            // zoomed out of an item, and zoomState is now false
+            zoomState = false;
+        }
+    } else {
+        // Only do something if we're currently highlighted
+        if (highlightState === true) {
+            // Dynamically mimic a click event on the element
+            // The behavior that causes the highlight is coded separately
+            elem.click();
+
+            // Otherwise, the cursor must be over an element in the side block, and we've
+            // un-highlighted an item, so highlightState is now false
+            highlightState = false;
+        }
+    }
 }
 
 // An instance calls a swipe left gesture on the canvas
