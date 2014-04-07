@@ -86,7 +86,6 @@ var scoord = {
 ctx.canvas.width = scoord.xmax - scoord.xmin;
 ctx.canvas.height = scoord.ymax - scoord.ymin;
 
-
 /**
  * Rounds a number such that it is a multiple of the provided number. This function
  * comes in handy for stabilizing cursor jitter (by rounding the mapped coordinates).
@@ -100,13 +99,28 @@ ctx.canvas.height = scoord.ymax - scoord.ymin;
  * @example
  *      stabilizer(92,6) = 96
  */
-// An instance rounds a number to some multiple. This is used to stabilize the cursor jitter
-// Input: (1) A number; (2) An integer multiple which (1) will be rounded to
-// Output: A rounded number
 function stabilizer(x, factor) {
     return x - (x % factor) + (x % factor > 0 && factor);
 }
 
+/**
+ * Maps a pair of coordinates from the Kinect's viewport to the screen viewport.
+ * This function first creates the user's viewport via the following method:
+ * 1. A box is defined using the user viewport width and height. This data comes
+ * from the Kinect, which calculates the width as the distance from the midpoint
+ * of the left elbow-wrist joint to the the midpoint of the right elbow-wrist joint.
+ * The height is the distance from the top of the head to the spine base.
+ * 2.
+ *
+ * @method stabilizer
+ * @static
+ * @param {Number} x A number to be rounded.
+ * @param {Number} factor A number which represents a multiple to which x will be rounded.
+ * @return {Number} A rounded number.
+ *
+ * @example
+ *      stabilizer(92,6) = 96
+ */
 // An instance maps Kinect coordinates to Screen coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // and object literal of coordinates describing the user viewport
