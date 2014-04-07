@@ -112,28 +112,26 @@ function stabilizer(x, factor) {
  *    The height is the distance from the top of the head to the spine base.
  * 2. As a result of (1), the user viewport is created around the user, centered
  *    at the user's spine base. When the user's spine base moves, the user viewport moves.
+ *
  * Next, the function looks at the coordinates of the hand in the Kinect viewport and
  * does one of two things:
  * 1. If the coordinates are within the user viewport, it does a straightforward linear
  * mapping from the user's viewport to the screen viewport.
- * 2. If the coordinates are outside the user viewport, it maps the
+ * 2. If the coordinates are outside the user viewport, it maps the coordinate to the nearest screen edge.
  *
  * @method mapCoordinates
  * @static
- * @param {Array} arr A set of coordinates (x,y) in the Kinect viewport
- * @param {Array} screenarr A tuple (width,height) of the width and height of the user viewport
- * @param {Array} spinearr A set of coordinates (x,y) of the user's spine base in the Kinect viewport
+ * @param {Array} arr An array of coordinates ```[x,y]``` in the Kinect viewport
+ * @param {Array} screenArr An array ```[width,height]``` of the width and height of the user viewport
+ * @param {Array} spineArr An array of coordinates ```[x,y]``` of the user's spine base in the Kinect viewport
  * @param {Number} threshold A value to which the final coordinates are rounded.
  * This value can be obtained from ```cursorThreshold```
- * @return {Array} A set of coordinates (x,y) in the user viewport
+ * @return {Array} An array of coordinates ```[x,y]``` in the user viewport
+ * @uses stabilizer
  *
  * @example
  *      mapCoordinates([300,300],[250,250],[400,300],1/100) = [154, 808]
  */
-// An instance maps Kinect coordinates to Screen coordinates
-// Input: Array of float x and float y coordinates of the depth data from the Kinect
-// and object literal of coordinates describing the user viewport
-// Output: Array of Integer x and Integer y coordinates of the screen viewport
 function mapCoordinates(arr, screenarr, spinearr, threshold) {
     // Coordinates of the user viewport. The bottom center of the user viewport is
     // centered at the user's spine base
@@ -182,9 +180,19 @@ function mapCoordinates(arr, screenarr, spinearr, threshold) {
     return [xcoord, ycoord];
 }
 
-// An instance updates the console on the bottom right of the screen with cursor coordinates
-// Input: Array of float x and float y mapped coordinates
-// Output: Unit
+/**
+ * Updates the on-screen console with information about the left and right hand
+ * state and coordinate positions
+ *
+ * @method updateConsole
+ * @static
+ * @param {Array} lcoord An array of coordinates ```[x,y]``` corresponding to the position
+ * of the left hand in the screen viewport.
+ * @param {Array} rcoord A array of coordinates ```[x,y]``` corresponding to the position
+ * of the right hand in the screen viewport.
+ * @param {String} lhandState The state of the left hand (open,closed,point,push,pull).
+ * @param {String} rhandState The state of the right hand (open,closed,point,push,pull).
+ */
 function updateConsole(lcoord, lhandState, rcoord, rhandState) {
     // Initialize handlers for the screen coordinates in the console
     var lscreenx = document.getElementById("lscreenx"),
@@ -208,10 +216,17 @@ function updateConsole(lcoord, lhandState, rcoord, rhandState) {
     rstate.innerText = rhandState;
 }
 
-// An instance sums the values corresponding to object keys in an array of objects
-// Precondition: Assumes the value at each key is a number (integer/float)
-// Input: (1) Array of object literals; (2) Valid key referenced in object literal
-// Output: Sum of values
+/**
+ * Sums the values corresponding to object keys in an array of objects
+ *
+ * @method sumIter
+ * @static
+ * @param {Array} arr An array of objects. Each object in the array must have key-value pairs.
+ * @param {String} key A key referenced in an object literal. The value corresponding to the key
+ * must be a number.
+ *
+ * @return {Number} The sum of all numbers corresponding to the specified key in every object in the array.
+ */
 function sumIter(arr, key) {
     var result = 0;
 
@@ -223,11 +238,18 @@ function sumIter(arr, key) {
     return result;
 }
 
-// An instance counts the number of occurrences of each hand state and returns the
-// state with the highest frequency of occurrence
-// Precondition: Assumes that the value at the key provided is a valid hand state
-// Input: (1) Array of object literals; (2) Valid key referenced in object literal
-// Output: Hand state
+/**
+ * Counts the number of occurrences of a hand state in an array of objects and
+ * returns the state with the highest frequency of occurrence.
+ *
+ * @method selectState
+ * @static
+ * @param {Array} arr An array of objects. Each object in the array must have key-value pairs.
+ * @param {String} key A key referenced in an object literal. The value corresponding to the key
+ * must be a valid hand state.
+ *
+ * @return {Number} The hand state with the highest occurrence frequency in the array
+ */
 function selectState(arr, key) {
     // Initialize counters for each hand state
     var openCount = 0,
@@ -267,19 +289,37 @@ function selectState(arr, key) {
     }
 }
 
-// An instance looks up a precision threshold value for the hand state
+/**
+ * Looks up the cursor sensitivity value for a given hand state
+ *
+ * @method cursorThreshold
+ * @static
+ * @param {String} state The state of a hand (open,closed,point,push,pull)
+ *
+ * @return {Number} A threshold value
+ */
 function cursorThreshold(state) {
     if (state === "point") {
-        return 1 / 100;
+        return 1 / 200;
     } else {
         return 1 / 100;
     }
 }
 
-// An instance averages coordinate input across the specified number of frames
-// If more frames are requested than available, we use all available frames in the stack
-// Input: (1) A stack of well-formed coordinate data; (2) Number of frames to be averaged
-// Output: Object literal (JSON-formatted) of coordinates
+/**
+ * Averages incoming frame data across the specified number of frames. If more frames
+ * than requested are available, averaging will be performed over all available frames
+ * in the stack. The hand state that is returned will be that of the most recent frame,
+ * unless the current hand state is unknown, in which case the most commonly occurring
+ * hand state across the averaged frames will be returned.
+ *
+ * @method averageFrames
+ * @static
+ * @param {Object} coordData A stack of frames
+ * @param {Number} k The number of frames to be averaged over
+ *
+ * @return {Object} An object literal representing a frame
+ */
 function averageFrames(coordData, k) {
     // Initialize a temporary holder for the frame data
     var holdingArr = [];
@@ -326,9 +366,17 @@ function averageFrames(coordData, k) {
     return averagedData;
 }
 
-// An instance assigns the appropriate radius depending on the hand state
-// Input: A valid hand state
-// Output: A float radius value
+/**
+ * Looks up and returns the appropriate radius for the cursor circle depending
+ * on the hand state provided. If the hand state provided is not recognized, the
+ * default radius that is returned will be the "open" hand state radius.
+ *
+ * @method assignRadius
+ * @static
+ * @param {String} state The state of a hand (open,closed,point,push,pull)
+ *
+ * @return {Number} The radius (in pixels) of the cursor circle
+ */
 function assignRadius(state) {
     switch (state) {
         case "open":
@@ -342,6 +390,19 @@ function assignRadius(state) {
     }
 }
 
+/**
+ * Draws (or redraws) the cursor circles on the canvas layer.
+ *
+ * @method reDraw
+ * @static
+ * @param {Array} lcoord An array of coordinates ```[x,y]``` corresponding to the position
+ * of the left hand in the screen viewport.
+ * @param {Array} rcoord A array of coordinates ```[x,y]``` corresponding to the position
+ * of the right hand in the screen viewport.
+ * @param {String} lhandState The state of the left hand (open,closed,point,push,pull).
+ * @param {String} rhandState The state of the right hand (open,closed,point,push,pull).
+ * @uses assignRadius
+ */
 // An instance redraws the cursor on the overlay layer
 // Input: Array of float x and float y mapped coordinates
 // Output: Unit
@@ -357,22 +418,18 @@ function reDraw(lcoord, lhandState, rcoord, rhandState) {
 
     // Draw the cursors at their new location
     // Left Hand
-    // if (lhandState !== "unknown") {
     ctx.beginPath();
     ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
     ctx.fillStyle = leftColor;
     ctx.fill();
     ctx.closePath();
-    // }
 
     // Right Hand
-    // if (rhandState !== "unknown") {
     ctx.beginPath();
     ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
     ctx.fillStyle = rightColor;
     ctx.fill();
     ctx.closePath();
-    // }
 }
 
 // Write placeholder variables to the console
