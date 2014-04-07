@@ -7,7 +7,7 @@
         "linkNatives": "true",
         "paths": "js",
         "outdir": "docs",
-        "themedir": "yuidoc-bootstrap-theme",
-        "helpers": ["yuidoc-bootstrap-theme/helpers/helpers.js"]
+        "themedir": "yuidoc-theme",
+        "helpers": ["yuidoc-theme/helpers/helpers.js"]
     }
 }

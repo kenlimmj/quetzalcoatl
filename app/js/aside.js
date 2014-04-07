@@ -7,8 +7,25 @@
  * @class text
  */
 
-var textContainer = document.querySelector("aside"),
-    textList = document.querySelectorAll("aside li");
+/**
+ * A handle to the text block.
+ *
+ * @property textContainer
+ * @type Object
+ * @default document.querySelector("aside")
+ * @final
+ */
+var textContainer = document.querySelector("aside");
+
+/**
+ * A handle to the items in the text block.
+ *
+ * @property textList
+ * @type Object
+ * @default document.querySelector("aside li")
+ * @final
+ */
+var textList = document.querySelectorAll("aside li");
 
 /**
  * Highlights a block of text in the side block. If the element passed in as input
@@ -18,7 +35,7 @@ var textContainer = document.querySelector("aside"),
  * @method highlight
  * @static
  * @beta
- * @param {Object} [elem] An object corresponding to a DOM element
+ * @param {Object} elem An object corresponding to a DOM element
  */
 function highlight(elem) {
     // Only do something if the element is in the text block

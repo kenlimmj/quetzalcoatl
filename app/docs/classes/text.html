@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
     <link rel="stylesheet" href="../assets/css/custom.css">
     <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap-responsive.css">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
     <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
 </head>
 <body class="yui3-skin-sam">
@@ -29,7 +30,7 @@
             </li>
         </div>
         <form class="navbar-form pull-right" style="line-height: 40px; height: 40px;">
-            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
+            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/cursor", "classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
         </form>
     </div>
 </div>
@@ -51,6 +52,8 @@
         <div class="tab-content" style="border: 1px solid #DDD; border-top:0;">
             <div class="tab-pane active" id="classes">
                 <ul id="api-classes" class="nav nav-list">
+                    
+                        <li><a href="../classes/cursor.html">cursor</a></li>
                     
                         <li><a href="../classes/gestures.html">gestures</a></li>
                     
@@ -145,6 +148,8 @@ the text content in various ways.</p>
             <li><a data-toggle="tab" href="#methods">Methods</a></li>
         
         
+            <li><a data-toggle="tab" href="#properties">Properties</a></li>
+        
         
         
     </ul>
@@ -182,6 +187,28 @@ the text content in various ways.</p>
             
 
             
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property">
+                                <a href="#" data-tabid="#properties" data-anchor="#property_textContainer" data-tablink="textContainer">textContainer</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#" data-tabid="#properties" data-anchor="#property_textList" data-tablink="textList">textList</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
 
             
 
@@ -202,7 +229,7 @@ the text content in various ways.</p>
             
                 <li class="arg">
                     
-                        <code class="optional">[elem]</code>
+                        <code>elem</code>
                     
                 </li>
             
@@ -237,7 +264,7 @@ the text content in various ways.</p>
             
         
         
-        <a href="../files/js_aside.js.html#l13"><code>js&#x2F;aside.js:13</code></a>
+        <a href="../files/js_aside.js.html#l30"><code>js&#x2F;aside.js:30</code></a>
         
         </p>
 
@@ -262,9 +289,8 @@ highlighted, it remains highlighted.</p>
             
                 <li class="param">
                     
-                        <code class="param-name optional">[elem]</code>
+                        <code class="param-name">elem</code>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
@@ -321,7 +347,7 @@ highlighted, it remains highlighted.</p>
             
         
         
-        <a href="../files/js_aside.js.html#l39"><code>js&#x2F;aside.js:39</code></a>
+        <a href="../files/js_aside.js.html#l56"><code>js&#x2F;aside.js:56</code></a>
         
         </p>
 
@@ -348,6 +374,110 @@ currently highlighted, this function does nothing.</p>
             </div>
         
 
+        
+            <div id="properties" class="tab-pane">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_textContainer" class="property item">
+    <h3 class="name"><code>textContainer</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+    
+
+    
+
+    
+        <span class="flag final">final</span>
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/js_aside.js.html#l10"><code>js&#x2F;aside.js:10</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>A handle to the text block.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> document.querySelector(&quot;aside&quot;)</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_textList" class="property item">
+    <h3 class="name"><code>textList</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+    
+
+    
+
+    
+        <span class="flag final">final</span>
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/js_aside.js.html#l20"><code>js&#x2F;aside.js:20</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>A handle to the items in the text block.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> document.querySelector(&quot;aside li&quot;)</p>
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

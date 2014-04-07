@@ -14,7 +14,6 @@
  * @property zoomState
  * @type Boolean
  * @default false
- * @required
  */
 var zoomState = false;
 
@@ -25,7 +24,6 @@ var zoomState = false;
  * @property highlightState
  * @type Boolean
  * @default false
- * @required
  */
 var highlightState = false;
 
@@ -36,7 +34,6 @@ var highlightState = false;
  * @property collapseState
  * @type Boolean
  * @default false
- * @required
  */
 var collapseState = false;
 
@@ -46,7 +43,6 @@ var collapseState = false;
  * @property prevButton
  * @type Object
  * @default document.getElementById("zoomPrev")
- * @required
  * @final
  */
 var prevButton = document.getElementById("zoomPrev");
@@ -57,7 +53,6 @@ var prevButton = document.getElementById("zoomPrev");
  * @property nextButton
  * @type Object
  * @default document.getElementById("zoomNext")
- * @required
  * @final
  */
 var nextButton = document.getElementById("zoomNext");
@@ -68,7 +63,6 @@ var nextButton = document.getElementById("zoomNext");
  * @property container
  * @type Object
  * @default document.querySelector("main")
- * @required
  * @final
  */
 container = document.querySelector("main");
@@ -79,7 +73,8 @@ container = document.querySelector("main");
  * Mimics a mouse click on the DOM object below the cursor circle
  *
  * @method click
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @static
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function click(arr) {
     // Get the DOM Node below the current cursor location
@@ -99,7 +94,7 @@ function click(arr) {
  *
  * @method pull
  * @static
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function pull(arr) {
     // Get the DOM Node below the current cursor location
@@ -140,7 +135,7 @@ function pull(arr) {
  *
  * @method pull
  * @static
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function push(arr) {
     // Get the DOM Node below the current cursor location
@@ -184,7 +179,7 @@ function push(arr) {
  * @method swipeLeft
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swipeleft(arr) {
     // Get the DOM Node below the current cursor location
@@ -210,7 +205,7 @@ function swipeleft(arr) {
  * @method swipeRight
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swiperight(arr) {
     // Get the DOM Node below the current cursor location
@@ -234,7 +229,7 @@ function swiperight(arr) {
  * @method swipeUp
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swipeUp(arr) {
 
@@ -249,7 +244,7 @@ function swipeUp(arr) {
  * @method swipeDown
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swipeDown(arr) {
 

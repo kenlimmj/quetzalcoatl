@@ -205,9 +205,9 @@ textarea {
 }
 body {
   margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 12px;
-  line-height: 14px;
+  font-family: "Roboto";
+  font-size: 14px;
+  line-height: 22.652px;
   color: #333333;
   background-color: #ffffff;
 }
@@ -810,8 +810,8 @@ address {
 code,
 pre {
   padding: 0 3px 2px;
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
-  font-size: 10px;
+  font-family: "Inconsolata";
+  font-size: 14px;
   color: #333333;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;

@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
     <link rel="stylesheet" href="../assets/css/custom.css">
     <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap-responsive.css">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
     <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
 </head>
 <body class="yui3-skin-sam">
@@ -29,7 +30,7 @@
             </li>
         </div>
         <form class="navbar-form pull-right" style="line-height: 40px; height: 40px;">
-            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
+            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/cursor", "classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
         </form>
     </div>
 </div>
@@ -51,6 +52,8 @@
         <div class="tab-content" style="border: 1px solid #DDD; border-top:0;">
             <div class="tab-pane active" id="classes">
                 <ul id="api-classes" class="nav nav-list">
+                    
+                        <li><a href="../classes/cursor.html">cursor</a></li>
                     
                         <li><a href="../classes/gestures.html">gestures</a></li>
                     
@@ -109,10 +112,21 @@
     
 
     
+        <div class="uses">
+            Requires
+            <ul class="inline commas">
+                
+                    <li>jQuery</li>
+                
+                    <li>HTML5 WebSocket API</li>
+                
+            </ul>
+        </div>
+    
 
     
         <div class="foundat">
-            Defined in: <a href="../files/js_websocket.js.html#l11"><code>js&#x2F;websocket.js:11</code></a>
+            Defined in: <a href="../files/js_websocket.js.html#l12"><code>js&#x2F;websocket.js:12</code></a>
         </div>
     
 
@@ -136,6 +150,12 @@ API found at /server, and the Kinect for Windows V2.</p>
             <p>This module provides the following classes:</p>
 
             <ul class="module-classes">
+            
+                <li class="module-class">
+                    <a href="../classes/cursor.html">
+                        cursor
+                    </a>
+                </li>
             
                 <li class="module-class">
                     <a href="../classes/gestures.html">

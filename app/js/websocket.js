@@ -6,6 +6,7 @@
  * @module quetzalcoatl
  * @author Lim Mingjie, Kenneth
  * @author Leart Albert Ulaj
+ * @requires jQuery, HTML5 WebSocket API
  */
 
 /**

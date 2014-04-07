@@ -1,3 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>js/cursor.js - Quetzalcoatl</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.7.0/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+</head>
+<body class="yui3-skin-sam">
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <h1 class="brand" style="padding: 10px 16px 10px; height: 20px; line-height: 20px; margin-left: 0;">
+        
+	    <img alt="Quetzalcoatl" src="../assets/css/logo.png" style="max-height: 65%;" title="Quetzalcoatl">
+        
+            Quetzalcoatl
+        </h1>
+	<div class="nav">
+            <li class="divider-vertical"></li>
+            <li>
+                <p class="navbar-text">
+                    API Docs for Version: <b>1.0.0</b>
+                </p>
+            </li>
+        </div>
+        <form class="navbar-form pull-right" style="line-height: 40px; height: 40px;">
+            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/cursor", "classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
+        </form>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="span3">
+	    <div>
+    <h3>APIs</h3>
+    <div id="sidebar">
+        <ul id="main-nav" class="nav nav-tabs" style="margin-bottom:0;">
+            <li class="active"><a href="#classes" data-toggle="tab">Classes</a></li>
+            <li><a href="#modules" data-toggle="tab">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" placeholder="Type to filter APIs">
+        </div>
+
+        <div class="tab-content" style="border: 1px solid #DDD; border-top:0;">
+            <div class="tab-pane active" id="classes">
+                <ul id="api-classes" class="nav nav-list">
+                    
+                        <li><a href="../classes/cursor.html">cursor</a></li>
+                    
+                        <li><a href="../classes/gestures.html">gestures</a></li>
+                    
+                        <li><a href="../classes/text.html">text</a></li>
+                    
+                        <li><a href="../classes/websocket.html">websocket</a></li>
+                    
+                </ul>
+            </div>
+
+            <div class="tab-pane" id="modules">
+                <ul id="api-modules" class="nav nav-list">
+                    
+                        <li><a href="../modules/quetzalcoatl.html">quetzalcoatl</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+        <div class="span9">
+                <form id="options-form" class="form-inline pull-right">
+        Show:
+        <label for="api-show-inherited" class="checkbox">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected" class="checkbox">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private" class="checkbox">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated" class="checkbox">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </form>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <div class="page-header">
+    <h1>js/cursor.js <small>File</small></h1>
+</div>
+
+<div class="file">
+    <pre class="prettyprint linenums">
 /**
  * Provides the cursor class. The cursor is displayed on-screen as a pair of circles
  *
@@ -9,14 +121,14 @@
  *
  * @property c
  * @type Object
- * @default document.getElementById("cursor")
+ * @default document.getElementById(&quot;cursor&quot;)
  * @final
  */
-var c = document.getElementById("cursor");
-var ctx = c.getContext("2d");
+var c = document.getElementById(&quot;cursor&quot;);
+var ctx = c.getContext(&quot;2d&quot;);
 
 /**
- * The radius of the cursor circle when the hand is in an "open" state
+ * The radius of the cursor circle when the hand is in an &quot;open&quot; state
  *
  * @property open_radius
  * @type Number
@@ -26,7 +138,7 @@ var ctx = c.getContext("2d");
 var open_radius = 25;
 
 /**
- * The radius of the cursor circle when the hand is in a "closed" state.
+ * The radius of the cursor circle when the hand is in a &quot;closed&quot; state.
  *
  * @property grab_radius
  * @type Number
@@ -36,7 +148,7 @@ var open_radius = 25;
 var grab_radius = open_radius / 1.618;
 
 /**
- * The radius of the cursor circle when the hand is in a "pointing/lasso" state.
+ * The radius of the cursor circle when the hand is in a &quot;pointing/lasso&quot; state.
  *
  * @property point_radius
  * @type Number
@@ -52,10 +164,10 @@ var point_radius = grab_radius / 1.618;
  *
  * @property leftColor
  * @type String
- * @default "#d33682"
+ * @default &quot;#d33682&quot;
  * @final
  */
-var leftColor = "#d33682";
+var leftColor = &quot;#d33682&quot;;
 
 /**
  * The color of the right hand cursor circle. This color is taken from the
@@ -63,13 +175,13 @@ var leftColor = "#d33682";
  *
  * @property rightColor
  * @type String
- * @default "#6c71c4"
+ * @default &quot;#6c71c4&quot;
  * @final
  */
-var rightColor = "#6c71c4";
+var rightColor = &quot;#6c71c4&quot;;
 
 /**
- * The dimensions of the user's screen, which we call the screen viewport.
+ * The dimensions of the user&#x27;s screen, which we call the screen viewport.
  *
  * @property scoord
  * @type Object
@@ -104,7 +216,7 @@ ctx.canvas.height = scoord.ymax - scoord.ymin;
 // Input: (1) A number; (2) An integer multiple which (1) will be rounded to
 // Output: A rounded number
 function stabilizer(x, factor) {
-    return x - (x % factor) + (x % factor > 0 && factor);
+    return x - (x % factor) + (x % factor &gt; 0 &amp;&amp; factor);
 }
 
 // An instance maps Kinect coordinates to Screen coordinates
@@ -113,7 +225,7 @@ function stabilizer(x, factor) {
 // Output: Array of Integer x and Integer y coordinates of the screen viewport
 function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
     // Coordinates of the user viewport. The bottom center of the user viewport is
-    // centered at the user's spine base
+    // centered at the user&#x27;s spine base
     var kcoord = {
         // The leftmost point is one arm length to the left of the spine base
         xmin: sx - screenw / 2,
@@ -129,10 +241,10 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
         y = null;
 
     // Calculate the coordinate space for the incoming x-coordinate
-    if (arr[0] < kcoord.xmin) {
+    if (arr[0] &lt; kcoord.xmin) {
         // If the hand is too far to the left, clip to the left edge of the screen
         x = 0;
-    } else if (arr[0] > kcoord.xmax) {
+    } else if (arr[0] &gt; kcoord.xmax) {
         // If the hand is too far to the right, clip to the right edge of the screen
         x = window.innerWidth;
     } else {
@@ -141,10 +253,10 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
     }
 
     // Calculate the coordinate space for the incoming y-coordinate
-    if (arr[1] < kcoord.ymin) {
+    if (arr[1] &lt; kcoord.ymin) {
         // If the hand is too high up, clip it to the top edge of the screen
         y = 0;
-    } else if (arr[1] > kcoord.ymax) {
+    } else if (arr[1] &gt; kcoord.ymax) {
         // If the hand is too low down, clip it to the bottom edge of the screen
         y = window.innerHeight;
     } else {
@@ -164,21 +276,21 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
 // Output: Unit
 function updateConsole(lcoord, lhandState, rcoord, rhandState) {
     // Initialize handlers for the screen coordinates in the console
-    var lscreenx = document.getElementById("lscreenx"),
-        lscreeny = document.getElementById("lscreeny"),
-        rscreenx = document.getElementById("rscreenx"),
-        rscreeny = document.getElementById("rscreeny");
+    var lscreenx = document.getElementById(&quot;lscreenx&quot;),
+        lscreeny = document.getElementById(&quot;lscreeny&quot;),
+        rscreenx = document.getElementById(&quot;rscreenx&quot;),
+        rscreeny = document.getElementById(&quot;rscreeny&quot;);
 
     // Initialize handlers for the hand states in the console
-    var lstate = document.getElementById("lhstate"),
-        rstate = document.getElementById("rhstate");
+    var lstate = document.getElementById(&quot;lhstate&quot;),
+        rstate = document.getElementById(&quot;rhstate&quot;);
 
     // Write the screen coordinates
-    lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
-    lscreeny.innerText = lcoord[1] + "/" + window.innerHeight;
+    lscreenx.innerText = lcoord[0] + &quot;/&quot; + window.innerWidth;
+    lscreeny.innerText = lcoord[1] + &quot;/&quot; + window.innerHeight;
 
-    rscreenx.innerText = rcoord[0] + "/" + window.innerWidth;
-    rscreeny.innerText = rcoord[1] + "/" + window.innerHeight;
+    rscreenx.innerText = rcoord[0] + &quot;/&quot; + window.innerWidth;
+    rscreeny.innerText = rcoord[1] + &quot;/&quot; + window.innerHeight;
 
     // Write the hand states
     lstate.innerText = lhandState;
@@ -215,16 +327,16 @@ function selectState(arr, key) {
     // Go through the list and count the number of occurrences of each hand state
     arr.forEach(function(entry) {
         switch (entry[key]) {
-            case "open":
+            case &quot;open&quot;:
                 openCount++;
                 break;
-            case "closed":
+            case &quot;closed&quot;:
                 closedCount++;
                 break;
-            case "point":
+            case &quot;point&quot;:
                 pointCount++;
                 break;
-            case "unknown":
+            case &quot;unknown&quot;:
                 unknownCount++;
                 break;
             default:
@@ -233,20 +345,20 @@ function selectState(arr, key) {
     });
 
     // Return the state with the highest occurrence
-    if (openCount > closedCount && openCount > pointCount && openCount > unknownCount) {
-        return "open";
-    } else if (closedCount > pointCount && closedCount > unknownCount) {
-        return "closed";
-    } else if (pointCount > unknownCount) {
-        return "point";
+    if (openCount &gt; closedCount &amp;&amp; openCount &gt; pointCount &amp;&amp; openCount &gt; unknownCount) {
+        return &quot;open&quot;;
+    } else if (closedCount &gt; pointCount &amp;&amp; closedCount &gt; unknownCount) {
+        return &quot;closed&quot;;
+    } else if (pointCount &gt; unknownCount) {
+        return &quot;point&quot;;
     } else {
-        return "unknown";
+        return &quot;unknown&quot;;
     }
 }
 
 // An instance looks up a precision threshold value for the hand state
 function cursorThreshold(state) {
-    if (state === "point") {
+    if (state === &quot;point&quot;) {
         return 1 / 100;
     } else {
         return 1 / 50;
@@ -269,33 +381,33 @@ function averageFrames(coordData, k) {
     k = Math.min(coordData.length, k);
 
     // Pop all the required frames off the stack
-    for (var i = 0; i < k; i++) {
+    for (var i = 0; i &lt; k; i++) {
         holdingArr[i] = coordData[coordData.length - i - 1];
     }
 
     // If the current left hand state is unknown, average the states and return the result
     // Otherwise, return the hand state from the most recent frame
-    if (coordData[coordData.length - 1].lhandState === "unknown") {
-        avglhandstate = selectState(holdingArr, "lhandState");
+    if (coordData[coordData.length - 1].lhandState === &quot;unknown&quot;) {
+        avglhandstate = selectState(holdingArr, &quot;lhandState&quot;);
     } else {
         avglhandstate = coordData[coordData.length - 1].lhandState;
     }
 
     // If the current right hand state is unknown, average the states and return the result
     // Otherwise, return the hand state from the most recent frame
-    if (coordData[coordData.length - 1].rhandState === "unknown") {
-        avgrhandstate = selectState(holdingArr, "rhandState");
+    if (coordData[coordData.length - 1].rhandState === &quot;unknown&quot;) {
+        avgrhandstate = selectState(holdingArr, &quot;rhandState&quot;);
     } else {
         avgrhandstate = coordData[coordData.length - 1].rhandState;
     }
 
     var averagedData = {
-        lx: sumIter(holdingArr, "lx") / k,
-        ly: sumIter(holdingArr, "ly") / k,
-        rx: sumIter(holdingArr, "rx") / k,
-        ry: sumIter(holdingArr, "ry") / k,
-        sx: sumIter(holdingArr, "sx") / k,
-        sy: sumIter(holdingArr, "sy") / k,
+        lx: sumIter(holdingArr, &quot;lx&quot;) / k,
+        ly: sumIter(holdingArr, &quot;ly&quot;) / k,
+        rx: sumIter(holdingArr, &quot;rx&quot;) / k,
+        ry: sumIter(holdingArr, &quot;ry&quot;) / k,
+        sx: sumIter(holdingArr, &quot;sx&quot;) / k,
+        sy: sumIter(holdingArr, &quot;sy&quot;) / k,
         lhandState: avglhandstate,
         rhandState: avgrhandstate
     };
@@ -308,11 +420,11 @@ function averageFrames(coordData, k) {
 // Output: A float radius value
 function assignRadius(state) {
     switch (state) {
-        case "open":
+        case &quot;open&quot;:
             return open_radius;
-        case "closed":
+        case &quot;closed&quot;:
             return grab_radius;
-        case "point":
+        case &quot;point&quot;:
             return point_radius;
         default:
             return open_radius;
@@ -334,7 +446,7 @@ function reDraw(lcoord, lhandState, rcoord, rhandState) {
 
     // Draw the cursors at their new location
     // Left Hand
-    if (lhandState !== "unknown") {
+    if (lhandState !== &quot;unknown&quot;) {
         ctx.beginPath();
         ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
         ctx.fillStyle = leftColor;
@@ -343,7 +455,7 @@ function reDraw(lcoord, lhandState, rcoord, rhandState) {
     }
 
     // Right Hand
-    if (rhandState !== "unknown") {
+    if (rhandState !== &quot;unknown&quot;) {
         ctx.beginPath();
         ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
         ctx.fillStyle = rightColor;
@@ -353,4 +465,21 @@ function reDraw(lcoord, lhandState, rcoord, rhandState) {
 }
 
 // Write placeholder variables to the console
-updateConsole([0, 0], "N/A", [0, 0], "N/A", window.innerWidth, window.innerHeight, window.innerWidth / 2, window.innerHeight);
+updateConsole([0, 0], &quot;N/A&quot;, [0, 0], &quot;N/A&quot;, window.innerWidth, window.innerHeight, window.innerWidth / 2, window.innerHeight);
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/jquery/jquery-1.8.2.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script src="../assets/js/yuidoc-bootstrap.js"></script>
+<script>prettyPrint();</script>
+</body>
+</html>

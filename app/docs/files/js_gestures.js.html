@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
     <link rel="stylesheet" href="../assets/css/custom.css">
     <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap-responsive.css">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
+    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
     <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
 </head>
 <body class="yui3-skin-sam">
@@ -29,7 +30,7 @@
             </li>
         </div>
         <form class="navbar-form pull-right" style="line-height: 40px; height: 40px;">
-            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
+            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/cursor", "classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
         </form>
     </div>
 </div>
@@ -51,6 +52,8 @@
         <div class="tab-content" style="border: 1px solid #DDD; border-top:0;">
             <div class="tab-pane active" id="classes">
                 <ul id="api-classes" class="nav nav-list">
+                    
+                        <li><a href="../classes/cursor.html">cursor</a></li>
                     
                         <li><a href="../classes/gestures.html">gestures</a></li>
                     
@@ -123,7 +126,6 @@
  * @property zoomState
  * @type Boolean
  * @default false
- * @required
  */
 var zoomState = false;
 
@@ -134,7 +136,6 @@ var zoomState = false;
  * @property highlightState
  * @type Boolean
  * @default false
- * @required
  */
 var highlightState = false;
 
@@ -145,7 +146,6 @@ var highlightState = false;
  * @property collapseState
  * @type Boolean
  * @default false
- * @required
  */
 var collapseState = false;
 
@@ -155,7 +155,6 @@ var collapseState = false;
  * @property prevButton
  * @type Object
  * @default document.getElementById(&quot;zoomPrev&quot;)
- * @required
  * @final
  */
 var prevButton = document.getElementById(&quot;zoomPrev&quot;);
@@ -166,7 +165,6 @@ var prevButton = document.getElementById(&quot;zoomPrev&quot;);
  * @property nextButton
  * @type Object
  * @default document.getElementById(&quot;zoomNext&quot;)
- * @required
  * @final
  */
 var nextButton = document.getElementById(&quot;zoomNext&quot;);
@@ -177,7 +175,6 @@ var nextButton = document.getElementById(&quot;zoomNext&quot;);
  * @property container
  * @type Object
  * @default document.querySelector(&quot;main&quot;)
- * @required
  * @final
  */
 container = document.querySelector(&quot;main&quot;);
@@ -188,7 +185,8 @@ container = document.querySelector(&quot;main&quot;);
  * Mimics a mouse click on the DOM object below the cursor circle
  *
  * @method click
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @static
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function click(arr) {
     // Get the DOM Node below the current cursor location
@@ -208,7 +206,7 @@ function click(arr) {
  *
  * @method pull
  * @static
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function pull(arr) {
     // Get the DOM Node below the current cursor location
@@ -249,7 +247,7 @@ function pull(arr) {
  *
  * @method pull
  * @static
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function push(arr) {
     // Get the DOM Node below the current cursor location
@@ -293,7 +291,7 @@ function push(arr) {
  * @method swipeLeft
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swipeleft(arr) {
     // Get the DOM Node below the current cursor location
@@ -319,7 +317,7 @@ function swipeleft(arr) {
  * @method swipeRight
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swiperight(arr) {
     // Get the DOM Node below the current cursor location
@@ -343,7 +341,7 @@ function swiperight(arr) {
  * @method swipeUp
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swipeUp(arr) {
 
@@ -358,7 +356,7 @@ function swipeUp(arr) {
  * @method swipeDown
  * @static
  * @beta
- * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ * @param {Array} arr An array containing x and y coordinates in the screen viewport
  */
 function swipeDown(arr) {
 
