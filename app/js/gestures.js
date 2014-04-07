@@ -42,7 +42,7 @@ var collapseState = false;
  *
  * @property prevButton
  * @type Object
- * @default document.getElementById("zoomPrev")
+ * @default ```document.getElementById("zoomPrev")```
  * @final
  */
 var prevButton = document.getElementById("zoomPrev");
@@ -52,7 +52,7 @@ var prevButton = document.getElementById("zoomPrev");
  *
  * @property nextButton
  * @type Object
- * @default document.getElementById("zoomNext")
+ * @default ```document.getElementById("zoomNext")```
  * @final
  */
 var nextButton = document.getElementById("zoomNext");
@@ -62,7 +62,7 @@ var nextButton = document.getElementById("zoomNext");
  *
  * @property container
  * @type Object
- * @default document.querySelector("main")
+ * @default ```document.querySelector("main")```
  * @final
  */
 container = document.querySelector("main");

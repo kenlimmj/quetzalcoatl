@@ -9,7 +9,7 @@
  *
  * @property c
  * @type Object
- * @default document.getElementById("cursor")
+ * @default ```document.getElementById("cursor")```
  * @final
  */
 var c = document.getElementById("cursor");
@@ -52,7 +52,7 @@ var point_radius = grab_radius / 1.618;
  *
  * @property leftColor
  * @type String
- * @default "#d33682"
+ * @default #d33682
  * @final
  */
 var leftColor = "#d33682";
@@ -63,7 +63,7 @@ var leftColor = "#d33682";
  *
  * @property rightColor
  * @type String
- * @default "#6c71c4"
+ * @default #6c71c4
  * @final
  */
 var rightColor = "#6c71c4";
@@ -304,66 +304,6 @@ function cursorThreshold(state) {
     } else {
         return 1 / 100;
     }
-}
-
-/**
- * Averages incoming frame data across the specified number of frames. If more frames
- * than requested are available, averaging will be performed over all available frames
- * in the stack. The hand state that is returned will be that of the most recent frame,
- * unless the current hand state is unknown, in which case the most commonly occurring
- * hand state across the averaged frames will be returned.
- *
- * @method averageFrames
- * @static
- * @param {Object} coordData A stack of frames
- * @param {Number} k The number of frames to be averaged over
- *
- * @return {Object} An object literal representing a frame
- */
-function averageFrames(coordData, k) {
-    // Initialize a temporary holder for the frame data
-    var holdingArr = [];
-
-    // Initialize temporary holders for the left and right hand states
-    var avglhandstate = null,
-        avgrhandstate = null;
-
-    // Use all available frames in the stack if more frames are requested than available
-    k = Math.min(coordData.length, k);
-
-    // Pop all the required frames off the stack
-    for (var i = 0; i < k; i++) {
-        holdingArr[i] = coordData[coordData.length - i - 1];
-    }
-
-    // If the current left hand state is unknown, average the states and return the result
-    // Otherwise, return the hand state from the most recent frame
-    if (coordData[coordData.length - 1].lhandState === "unknown") {
-        avglhandstate = selectState(holdingArr, "lhandState");
-    } else {
-        avglhandstate = coordData[coordData.length - 1].lhandState;
-    }
-
-    // If the current right hand state is unknown, average the states and return the result
-    // Otherwise, return the hand state from the most recent frame
-    if (coordData[coordData.length - 1].rhandState === "unknown") {
-        avgrhandstate = selectState(holdingArr, "rhandState");
-    } else {
-        avgrhandstate = coordData[coordData.length - 1].rhandState;
-    }
-
-    var averagedData = {
-        lx: sumIter(holdingArr, "lx") / k,
-        ly: sumIter(holdingArr, "ly") / k,
-        rx: sumIter(holdingArr, "rx") / k,
-        ry: sumIter(holdingArr, "ry") / k,
-        sx: sumIter(holdingArr, "sx") / k,
-        sy: sumIter(holdingArr, "sy") / k,
-        lhandState: avglhandstate,
-        rhandState: avgrhandstate
-    };
-
-    return averagedData;
 }
 
 /**

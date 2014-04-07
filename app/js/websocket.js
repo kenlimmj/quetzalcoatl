@@ -18,21 +18,72 @@
  * @class websocket
  */
 
-// Set to true to emit verbose output to the console
+/**
+ * A toggle to switch the program to debugging mode.
+ * True if debug mode is on and false otherwise.
+ *
+ * @property debug
+ * @type Boolean
+ * @default false
+ */
 var debug = true;
 
-// Initialize a stack to hold data from all previous frames
+/**
+ * An array-backed stack that holds all previous frame data
+ *
+ * @property coordData
+ * @type Array
+ */
 var coordData = [];
 
-// Initialize variables to keep track of whether we are in the middle of a pull gesture
-var lpullState = false,
-    rpullState = false;
+/**
+ * A tracker for the current status of a pull gesture on the left hand
+ * True if we are in the middle of a pull gesture, and false otherwise.
+ *
+ * @property lpullState
+ * @type Boolean
+ * @default false
+ */
+var lpullState = false;
 
-// Initialize variables to keep track of whether we're in the middle of a push gesture
-var lpushState = false,
-    rpushState = false;
+/**
+ * A tracker for the current status of a pull gesture on the right hand
+ * True if we are in the middle of a pull gesture, and false otherwise.
+ *
+ * @property rpullState
+ * @type Boolean
+ * @default false
+ */
+var rpullState = false;
 
-// Set the socket address to match the port which the C# WebSocket Server is broadcasting on
+/**
+ * A tracker for the current status of a push gesture on the left hand
+ * True if we are in the middle of a push gesture, and false otherwise.
+ *
+ * @property lpushState
+ * @type Boolean
+ * @default false
+ */
+var lpushState = false;
+
+/**
+ * A tracker for the current status of a push gesture on the right hand
+ * True if we are in the middle of a push gesture, and false otherwise.
+ *
+ * @property rpushState
+ * @type Boolean
+ * @default false
+ */
+var rpushState = false;
+
+/**
+ * The address which the Kinect server is broadcasting on.
+ *
+ * @property socketAddress
+ * @type String
+ * @default ws://localhost:1620/KinectApp
+ * @final
+ */
 var socketAddress = "ws://localhost:1620/KinectApp";
 
 if (debug === false) {
@@ -48,18 +99,22 @@ if (debug === false) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Implements the Exponential Backoff Algorithm to spread out reconnection attempts
-// so we don't flood the server with too many requests in the event that we go offline
-//
-// ALGORITHM SCHEMA:
-// 1. For k attempts, generate a random interval of time between 0 and 2^k - 1.
-// 2. If we are able to reconnect, reset k to 1
-// 3. If reconnection fails, k increases by 1 and the process restarts at step 1.
-// 4. To truncate the max interval, when a certain number of attempts k has
-//    been reached, k stops increasing after each attempt.
-//
-// Input: Unit
-// Output: Unit
+/**
+ * Starts or stops a WebSocket connection to the Kinect server, and handles incoming data.
+ * This function implements the [Exponential Backoff](http://en.wikipedia.org/wiki/Exponential_backoff)
+ * Algorithm to spread out reconnection attempts so we don't flood the server with too many
+ * requests in the event that we go offline.
+ *
+ * ALGORITHM SCHEMA:
+ * 1. For k attempts, generate a random interval of time between 0 and 2^k - 1.
+ * 2. If we are able to reconnect, reset k to 1
+ * 3. If reconnection fails, k increases by 1 and the process restarts at step 1.
+ * 4. To truncate the max interval, when a certain number of attempts k has
+ *    been reached, k stops increasing after each attempt.
+ *
+ * @method createWebSocket
+ * @static
+ */
 function createWebSocket() {
     var attempts = 1;
 
@@ -70,7 +125,11 @@ function createWebSocket() {
 
     var connection = new WebSocket(socketAddress);
 
-    // First-run logic when the connection to the server is initialized
+    /**
+     * Fired when a new connection to the server is opened
+     *
+     * @event onopen
+     */
     connection.onopen = function() {
         // Reset the tries back to 1 since we have a new connection opened
         attempts = 1;
@@ -81,7 +140,11 @@ function createWebSocket() {
         }
     };
 
-    // Logic when a message is received from the server
+    /**
+     * Fired when a new message is received from the server
+     *
+     * @event onmessage
+     */
     connection.onmessage = function(event) {
         if (typeof event.data === "string") {
             // Parse the JSON
@@ -161,6 +224,11 @@ function createWebSocket() {
         }
     };
 
+    /**
+     * Fired when the connection to the server is closed
+     *
+     * @event onclose
+     */
     connection.onclose = function() {
         var time = generateInterval(attempts);
 
@@ -179,9 +247,14 @@ function createWebSocket() {
     };
 }
 
-// An instance generates an back-off interval for making server connections
-// Input: Integer of attempts made at connection
-// Output: Float of back-off interval (in microseconds)
+/**
+ * Generates a back-off interval for making server connections.
+ *
+ * @method generateInterval
+ * @static
+ * @param {Number} k Number of connection attempts.
+ * @return {Number} Back-off interval duration (in micro-seconds).
+ */
 function generateInterval(k) {
     var maxInterval = (Math.pow(2, k) - 1) * 1000;
 
@@ -194,6 +267,13 @@ function generateInterval(k) {
     return Math.random() * maxInterval;
 }
 
+/**
+ * Updates the on-screen console with the connection status
+ *
+ * @method updateConsoleServer
+ * @static
+ * @param {String} state The connection state of the front-end to the server (Connected|Disconneted).
+ */
 // An instance updates the console on the bottom right of the screen with the server status
 // Input: Boolean of server state (connected: true | closed: false)
 // Output: Unit
@@ -208,6 +288,66 @@ function updateConsoleServer(state) {
         serverstatus.innerText = "Disconnected";
         serverstatus.style.color = "#dc322f";
     }
+}
+
+/**
+ * Averages incoming frame data across the specified number of frames. If more frames
+ * than requested are available, averaging will be performed over all available frames
+ * in the stack. The hand state that is returned will be that of the most recent frame,
+ * unless the current hand state is unknown, in which case the most commonly occurring
+ * hand state across the averaged frames will be returned.
+ *
+ * @method averageFrames
+ * @static
+ * @param {Object} coordData A stack of frames
+ * @param {Number} k The number of frames to be averaged over
+ *
+ * @return {Object} An object literal representing a frame
+ */
+function averageFrames(coordData, k) {
+    // Initialize a temporary holder for the frame data
+    var holdingArr = [];
+
+    // Initialize temporary holders for the left and right hand states
+    var avglhandstate = null,
+        avgrhandstate = null;
+
+    // Use all available frames in the stack if more frames are requested than available
+    k = Math.min(coordData.length, k);
+
+    // Pop all the required frames off the stack
+    for (var i = 0; i < k; i++) {
+        holdingArr[i] = coordData[coordData.length - i - 1];
+    }
+
+    // If the current left hand state is unknown, average the states and return the result
+    // Otherwise, return the hand state from the most recent frame
+    if (coordData[coordData.length - 1].lhandState === "unknown") {
+        avglhandstate = selectState(holdingArr, "lhandState");
+    } else {
+        avglhandstate = coordData[coordData.length - 1].lhandState;
+    }
+
+    // If the current right hand state is unknown, average the states and return the result
+    // Otherwise, return the hand state from the most recent frame
+    if (coordData[coordData.length - 1].rhandState === "unknown") {
+        avgrhandstate = selectState(holdingArr, "rhandState");
+    } else {
+        avgrhandstate = coordData[coordData.length - 1].rhandState;
+    }
+
+    var averagedData = {
+        lx: sumIter(holdingArr, "lx") / k,
+        ly: sumIter(holdingArr, "ly") / k,
+        rx: sumIter(holdingArr, "rx") / k,
+        ry: sumIter(holdingArr, "ry") / k,
+        sx: sumIter(holdingArr, "sx") / k,
+        sy: sumIter(holdingArr, "sy") / k,
+        lhandState: avglhandstate,
+        rhandState: avgrhandstate
+    };
+
+    return averagedData;
 }
 
 // Start the web socket connection
