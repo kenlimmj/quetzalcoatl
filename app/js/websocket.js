@@ -148,16 +148,16 @@ function createWebSocket() {
                     rpushState = true;
                 }
             } else {
-                if (data.rp === false) {
+                if (data.rpush === false) {
                     rpushState = false;
                 }
             }
 
             // Draw the cursor on the screen
             // Only redraw if there are no pull gestures being executed on-screen
-            if (lpullState === false && rpullState === false && lpushState === false && rpushState === false) {
-                reDraw(lcoord, averagedData.lhandState, rcoord, averagedData.rhandState);
-            }
+            // if (lpullState === false && rpullState === false && lpushState === false && rpushState === false) {
+            reDraw(lcoord, averagedData.lhandState, rcoord, averagedData.rhandState);
+            // }
         }
     };
 
