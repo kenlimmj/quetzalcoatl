@@ -1,28 +1,75 @@
-// Initialize a boolean to keep track of the zoom state of the main block
-// True if the block is zoomed in, and false otherwise
+/**
+ * A tracker for the zoom state of the main block.
+ * True if the block is zoomed in and false otherwise
+ *
+ * @property zoomState
+ * @type Boolean
+ * @default false
+ * @required
+ */
 var zoomState = false;
 
-// Initialize a boolean to keep track of the highlight state of the side block
-// True if text is highlighted, and false otherwise
+/**
+ * A tracker for the highlight state of the side block.
+ * True if the block is highlighted and false otherwise
+ *
+ * @property highlightState
+ * @type Boolean
+ * @default false
+ * @required
+ */
 var highlightState = false;
 
-// Initialize a boolean to keep track of the collapse state of the side block
-// True if the block is collapsed, and false otherwise
+/**
+ * A tracker for the collapse state of the side block.
+ * True if the block is collapsed and false otherwise
+ *
+ * @property collapseState
+ * @type Boolean
+ * @default false
+ * @required
+ */
 var collapseState = false;
 
-// Initialize a handler to the "Previous" button
+/**
+ * A handle to the "Previous" button in the main block.
+ *
+ * @property prevButton
+ * @type Object
+ * @default document.getElementById("zoomPrev")
+ * @required
+ */
 var prevButton = document.getElementById("zoomPrev");
 
-// Initialize a handler to the "Next" button
+/**
+ * A handle to the "Next" button in the main block.
+ *
+ * @property nextButton
+ * @type Object
+ * @default document.getElementById("zoomNext")
+ * @required
+ */
 var nextButton = document.getElementById("zoomNext");
 
-// Get the DOM Node for the main block
+/**
+ * A handle to the main block itself.
+ *
+ * @property container
+ * @type Object
+ * @default document.querySelector("main")
+ * @required
+ */
 container = document.querySelector("main");
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// An instance mimics a click on the object below the cursor circle
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
+/**
+ * Mimics a mouse click on the DOM object below the cursor circle
+ *
+ * @class click
+ * @static
+ * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ */
 function click(arr) {
     // Get the DOM Node below the current cursor location
     var elem = document.elementFromPoint(arr[0], arr[1]);
@@ -33,11 +80,16 @@ function click(arr) {
     }
 }
 
-// An instance calls a pull gesture on the canvas
-// A pull gesture is a negative change in the z-axis made with a closed hand
-// - Pulling on the main block zooms into the item under the cursor
-// - Pulling on the side block highlights the text under the cursor and fades all other
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
+/**
+ * Performs a "pull" gesture on the DOM object below the cursor circle.
+ * A pull gesture is a negative change in the z-axis made with a closed hand
+ * - Pulling on the main block zooms into the item under the cursor
+ * - Pulling on the side block highlights the text under the cursor and fades all others
+ *
+ * @class pull
+ * @static
+ * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ */
 function pull(arr) {
     // Get the DOM Node below the current cursor location
     var elem = document.elementFromPoint(arr[0], arr[1]);
@@ -69,11 +121,16 @@ function pull(arr) {
     }
 }
 
-// An instance calls a push gesture on the canvas
-// A push gesture is a positive change in the z-axis made with a closed hand
-// - Pushing anywhere on the main block zooms out to the panel view
-// - Pushing anywhere on the side block un-highlights any highlighted text
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
+/**
+ * Performs a "push" gesture on the DOM object below the cursor circle.
+ * A push gesture is a positive change in the z-axis made with a closed hand
+ * - Pushing anywhere on the main block zooms out to the panel view
+ * - Pushing anywhere on the side block un-highlights any highlighted text
+ *
+ * @class pull
+ * @static
+ * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ */
 function push(arr) {
     // Get the DOM Node below the current cursor location
     var elem = document.elementFromPoint(arr[0], arr[1]);
@@ -105,13 +162,19 @@ function push(arr) {
     }
 }
 
-// An instance calls a swipe left gesture on the canvas
-// A swipe left gesture is a negative change in the x-axis made with a closed hand
-// - Swiping left on the main block advances to the next item if the block is currently
-//   in a zoomed state. If the block is not zoomed, swiping does nothing.
-// - Swiping left on the side block collapses the side block if the block is currently
-//   expanded. If the block is not expanded, swiping does nothing.
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
+/**
+ * Performs a "swipe left" gesture on the DOM object below the cursor circle.
+ * A swipe left gesture is a negative change in the x-axis made with an open hand
+ * - Swiping left on the main block advances to the next item if the block is currently
+ *   in a zoomed state. If the block is not zoomed, swiping does nothing.
+ * - Swiping left on the side block collapses the side block if the block is currently
+ *   expanded. If the block is not expanded, swiping does nothing.
+ *
+ * @class swipeLeft
+ * @static
+ * @beta
+ * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ */
 function swipeleft(arr) {
     // Get the DOM Node below the current cursor location
     var elem = document.elementFromPoint(arr[0], arr[1]);
@@ -125,13 +188,19 @@ function swipeleft(arr) {
     }
 }
 
-// An instance calls a swipe right gesture on the canvas
-// A swipe right gesture is a positive change in the x-axis made with a closed hand
-// - Swiping right on the main block backtracks to the previous item if the block is currently
-//   in a zoomed state. If the block is not zoomed, swiping does nothing.
-// - Swiping right on the side block expands the side block if the block is currently
-//   collapsed. If the block is not collapsed, swiping does nothing.
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
+/**
+ * Performs a "swipe right" gesture on the DOM object below the cursor circle.
+ * A swipe left gesture is a positive change in the x-axis made with an open hand
+ * - Swiping right on the main block backtracks to the previous item if the block is currently
+ *   in a zoomed state. If the block is not zoomed, swiping does nothing.
+ * - Swiping right on the side block expands the side block if the block is currently
+ *   collapsed. If the block is not collapsed, swiping does nothing.
+ *
+ * @class swipeRight
+ * @static
+ * @beta
+ * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ */
 function swiperight(arr) {
     // Get the DOM Node below the current cursor location
     var elem = document.elementFromPoint(arr[0], arr[1]);
@@ -145,20 +214,32 @@ function swiperight(arr) {
     }
 }
 
-// An instance calls a swipe up gesture on the canvas
-// A swipe up gesture is a positive change in the y-axis made with a closed hand
-// - Swiping up on the main block scrolls downwards
-// - Swiping up on the side block highlights the next section of text under the cursor
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
+/**
+ * Performs a "swipe up" gesture on the DOM object below the cursor circle.
+ * A swipe up gesture is a positive change in the y-axis made with an open hand
+ * - Swiping up on the main block scrolls downwards
+ * - Swiping up on the side block highlights the next section of text under the cursor
+ *
+ * @class swipeUp
+ * @static
+ * @beta
+ * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ */
 function swipeUp(arr) {
 
 }
 
-// An instance calls a swipe down gesture on the canvas
-// A swipe down gesture is a negative change in the y-axis made with a closed hand
-// - Swiping down on the main block scrolls upwards
-// - Swiping down on the side block highlights the previous section of text under the cursor
-// Input: Array of float x and float y coordinates of the mapped screen coordinates
+/**
+ * Performs a "swipe down" gesture on the DOM object below the cursor circle.
+ * A swipe up gesture is a negative change in the y-axis made with an open hand
+ * - Swiping up on the main block scrolls upwards
+ * - Swiping up on the side block highlights the previous section of text under the cursor
+ *
+ * @class swipeDown
+ * @static
+ * @beta
+ * @param {Array} [arr] An array containing x and y coordinates in the screen viewport
+ */
 function swipeDown(arr) {
 
 }
