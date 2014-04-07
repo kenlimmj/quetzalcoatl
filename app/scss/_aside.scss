@@ -2,42 +2,27 @@ $textwidth: (100/1.618/1.618/1.618) * 1vw;
 
 aside {
   z-index: 1;
-  width: $textwidth;
   overflow-y: scroll;
-  height: 100vh;
   padding: 1rem;
-  font-size: 1.2rem;
+  width: $textwidth;
+  height: 100vh;
   background-color: #fdf6e3;
+  font-size: 1.2rem;
 }
 
 aside > ul {
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
+
+  & > li { transition: color 150ms linear; }
+  & > ol { transition: color 150ms linear; }
 }
 
-aside > ul > li {
-  transition: color 150ms linear;
-}
-
-aside > ul > li:not(:first-child) {
-  margin-top: 6.472rem;
-}
-
+aside > ul > li:not(:first-child),
 aside > ul > ol:not(:first-child) {
   margin-top: 6.472rem;
 }
 
-.text--inactive {
-  color: #eee8d5;
-}
-
-.text--active {
-  color: #657b83;
-}
-
-aside.collapsed {
-  transition: width 150ms linear;
-  width: $textwidth/10;
-}
-
+.text--inactive { color: #eee8d5; }
+.text--active   { color: #657b83; }

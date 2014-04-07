@@ -1,6 +1,7 @@
 * {
   box-sizing: border-box;
   font-family: "Roboto";
+
   color-profile: sRGB;
   rendering-intent: auto;
 }
@@ -25,17 +26,17 @@ body {
 }
 
 p {
-  -moz-font-feature-settings:"lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
-  -moz-font-feature-settings:"lnum=1, frac=1, zero=1, nalt=1, kern=1, liga=1, dlig=1, hlig=1, clig=1";
-  -ms-font-feature-settings:"lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
-  -o-font-feature-settings:"lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
-  -webkit-font-feature-settings:"lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
-  font-feature-settings:"lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
+  -webkit-font-feature-settings: "lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
+     -moz-font-feature-settings: "lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
+     -moz-font-feature-settings: "lnum=1, frac=1, zero=1, nalt=1, kern=1, liga=1, dlig=1, hlig=1, clig=1";
+      -ms-font-feature-settings: "lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
+       -o-font-feature-settings: "lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
+          font-feature-settings: "lnum" 1, "frac" 1, "zero" 1, "nalt" 1, "kern" 1, "liga" 1, "dlig" 1, "hlig" 1, "clig" 1;
 
-  -webkit-font-smoothing: antialiased;        // Make fonts look nice and crisp on WebKit
-  -ms-font-smoothing:     antialiased;        // Make things look barely acceptable on I-bloody-E
-  -o-font-smoothing:      antialiased;        // Make fonts look nice and crisp on Opera
-  font-smoothing:         antialiased;        // Prefix-less fall-back for anti-aliased font rendering
+  -webkit-font-smoothing: antialiased;
+      -ms-font-smoothing: antialiased;
+       -o-font-smoothing: antialiased;
+          font-smoothing: antialiased;
 
   text-rendering: optimizeLegibility;
 
