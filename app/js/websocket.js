@@ -1,5 +1,5 @@
 // Set to true to emit verbose output to the console
-var debug = false;
+var debug = true;
 
 // Initialize a stack to hold data from all previous frames
 var coordData = [];
@@ -15,12 +15,14 @@ if (debug === false) {
     // Initialize a handler for the console element
     var consoleelem = document.getElementById("console");
 
-    // Hide the console if console output is not requested
+    // Hide the console since console output is not requested
     consoleelem.style.display = "none";
 } else {
     // Set the initial state of the server to "Disconnected"
     updateConsoleServer(false);
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 // Implements the Exponential Backoff Algorithm to spread out reconnection attempts
 // so we don't flood the server with too many requests in the event that we go offline
@@ -65,6 +67,7 @@ function createWebSocket() {
             coordData.push(data);
 
             // Average the data over a pair of frames for increased accuracy
+            // FIXME: Dynamically change the framerate depending on what the user is doing
             var averagedData = averageFrames(coordData, 2);
 
             // Calculate the precision threshold value for each hand
@@ -76,14 +79,12 @@ function createWebSocket() {
                 rcoord = mapCoordinates([averagedData.rx, averagedData.ry], data.screenw, data.screenh, data.sx, data.sy, rthreshold);
 
             if (debug === true) {
+                // Update the output on the screen console
                 updateConsole(lcoord, data.lhandState, rcoord, data.rhandState);
             }
 
-            // Draw the cursor on the screen
-            // Here we're using the frame-averaged data for the hand coordinates and viewport
-            // The hand states utilize the current frame data
-            reDraw(lcoord, averagedData.lhandState, rcoord, averagedData.rhandState);
-
+            // FIXME: Temporary code to enable the pull gestures. Will eventually be
+            // abstracted to something more robust
             if (lpullState === false) {
                 if (data.lp === true) {
                     pull(lcoord);
@@ -104,6 +105,12 @@ function createWebSocket() {
                 if (data.rp === false) {
                     rpullState = false;
                 }
+            }
+
+            // Draw the cursor on the screen
+            // Only redraw if there are no pull gestures being executed on-screen
+            if (data.lp === false && data.rp === false) {
+                reDraw(lcoord, averagedData.lhandState, rcoord, averagedData.rhandState);
             }
         }
     };
