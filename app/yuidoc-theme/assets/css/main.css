@@ -25,7 +25,7 @@ html {
 }
 
 body {
-    font: 13px/1.4 'Roboto';
+    font: 14px/1.4 'Roboto';
     margin: 0;
     padding: 0;
     padding-top: 40px;
@@ -133,7 +133,7 @@ pre.terminal, pre.cmd {
 
 /* Don't reduce the font size of <code>/<kbd>/<samp> elements inside <pre>
    blocks. */
-pre code, pre kbd, pre samp { font-size: 100%; }
+/*pre code, pre kbd, pre samp { font-size: 100%; }*/
 
 /* Used to denote text that shouldn't be selectable, such as line numbers or
    shell prompts. Guess which browser this doesn't work in. */
@@ -518,7 +518,7 @@ kbd .cmd { font-family: Monaco, Helvetica; }
 
 .apidocs .index-list {
     border-color: #efefef;
-    font-size: 12px;
+    font-size: 14px;
     list-style: none;
     margin: 0;
     padding: 0;
