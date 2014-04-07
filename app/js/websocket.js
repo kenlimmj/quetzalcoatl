@@ -109,7 +109,7 @@ function createWebSocket() {
 
             // Draw the cursor on the screen
             // Only redraw if there are no pull gestures being executed on-screen
-            if (data.lp === false && data.rp === false) {
+            if (lpullState === false && rpullState === false) {
                 reDraw(lcoord, averagedData.lhandState, rcoord, averagedData.rhandState);
             }
         }
