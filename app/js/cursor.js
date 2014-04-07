@@ -107,36 +107,45 @@ function stabilizer(x, factor) {
  * Maps a pair of coordinates from the Kinect's viewport to the screen viewport.
  * This function first creates the user's viewport via the following method:
  * 1. A box is defined using the user viewport width and height. This data comes
- * from the Kinect, which calculates the width as the distance from the midpoint
- * of the left elbow-wrist joint to the the midpoint of the right elbow-wrist joint.
- * The height is the distance from the top of the head to the spine base.
- * 2.
+ *    from the Kinect, which calculates the width as the distance from the midpoint
+ *    of the left elbow-wrist joint to the the midpoint of the right elbow-wrist joint.
+ *    The height is the distance from the top of the head to the spine base.
+ * 2. As a result of (1), the user viewport is created around the user, centered
+ *    at the user's spine base. When the user's spine base moves, the user viewport moves.
+ * Next, the function looks at the coordinates of the hand in the Kinect viewport and
+ * does one of two things:
+ * 1. If the coordinates are within the user viewport, it does a straightforward linear
+ * mapping from the user's viewport to the screen viewport.
+ * 2. If the coordinates are outside the user viewport, it maps the
  *
- * @method stabilizer
+ * @method mapCoordinates
  * @static
- * @param {Number} x A number to be rounded.
- * @param {Number} factor A number which represents a multiple to which x will be rounded.
- * @return {Number} A rounded number.
+ * @param {Array} arr A set of coordinates (x,y) in the Kinect viewport
+ * @param {Array} screenarr A tuple (width,height) of the width and height of the user viewport
+ * @param {Array} spinearr A set of coordinates (x,y) of the user's spine base in the Kinect viewport
+ * @param {Number} threshold A value to which the final coordinates are rounded.
+ * This value can be obtained from ```cursorThreshold```
+ * @return {Array} A set of coordinates (x,y) in the user viewport
  *
  * @example
- *      stabilizer(92,6) = 96
+ *      mapCoordinates([300,300],[250,250],[400,300],1/100) = [154, 808]
  */
 // An instance maps Kinect coordinates to Screen coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
 // and object literal of coordinates describing the user viewport
 // Output: Array of Integer x and Integer y coordinates of the screen viewport
-function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
+function mapCoordinates(arr, screenarr, spinearr, threshold) {
     // Coordinates of the user viewport. The bottom center of the user viewport is
     // centered at the user's spine base
     var kcoord = {
         // The leftmost point is one arm length to the left of the spine base
-        xmin: sx - screenw / 2,
+        xmin: spinearr[0] - screenarr[0] / 2,
         // The rightmost point is one arm length to the right of the spine base
-        xmax: sx + screenw / 2,
+        xmax: spinearr[0] + screenarr[0] / 2,
         // The topmost point is the spine base minus the user height
-        ymin: sy - screenh,
+        ymin: spinearr[1] - screenarr[1],
         // The bottommost point is the spine base
-        ymax: sy
+        ymax: spinearr[1]
     };
 
     var x = null,
@@ -167,8 +176,8 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
     }
 
     // Threshold the result to minimize jitter
-    var xcoord = stabilizer(x, threshold * window.innerWidth),
-        ycoord = stabilizer(y, threshold * window.innerHeight);
+    var xcoord = stabilizer(x, Math.round(threshold * window.innerWidth)),
+        ycoord = stabilizer(y, Math.round(threshold * window.innerHeight));
 
     return [xcoord, ycoord];
 }
