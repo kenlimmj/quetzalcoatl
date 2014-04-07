@@ -1,3 +1,22 @@
+/**
+ * The main backbone of the Quetzalcoatl front-end. This code must be used in
+ * conjunction with the WebSocket server interfacing with the Kinect for Windows
+ * API found at /server, and the Kinect for Windows V2.
+ *
+ * @module quetzalcoatl
+ * @author Lim Mingjie, Kenneth
+ * @author Leart Albert Ulaj
+ */
+
+/**
+ * Provides the websocket class. Data coming from the Kinect is received by
+ * listening on a WebSocket server running either locally or at an exposed address.
+ * This class provides core functions for connecting to and disconnecting from
+ * the server, as well as helper methods for parsing incoming data.
+ *
+ * @class websocket
+ */
+
 // Set to true to emit verbose output to the console
 var debug = true;
 
@@ -165,4 +184,4 @@ function updateConsoleServer(state) {
 }
 
 // Start the web socket connection
-createWebSocket();
+// createWebSocket();

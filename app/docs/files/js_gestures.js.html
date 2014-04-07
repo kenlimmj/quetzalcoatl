@@ -1,3 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>js/gestures.js - Quetzalcoatl</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.7.0/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap-responsive.css">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+</head>
+<body class="yui3-skin-sam">
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <h1 class="brand" style="padding: 10px 16px 10px; height: 20px; line-height: 20px; margin-left: 0;">
+        
+	    <img alt="Quetzalcoatl" src="../assets/css/logo.png" style="max-height: 65%;" title="Quetzalcoatl">
+        
+            Quetzalcoatl
+        </h1>
+	<div class="nav">
+            <li class="divider-vertical"></li>
+            <li>
+                <p class="navbar-text">
+                    API Docs for Version: <b>1.0.0</b>
+                </p>
+            </li>
+        </div>
+        <form class="navbar-form pull-right" style="line-height: 40px; height: 40px;">
+            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='["classes/gestures", "classes/text", "classes/websocket", "modules/quetzalcoatl"]'>
+        </form>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="span3">
+	    <div>
+    <h3>APIs</h3>
+    <div id="sidebar">
+        <ul id="main-nav" class="nav nav-tabs" style="margin-bottom:0;">
+            <li class="active"><a href="#classes" data-toggle="tab">Classes</a></li>
+            <li><a href="#modules" data-toggle="tab">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" placeholder="Type to filter APIs">
+        </div>
+
+        <div class="tab-content" style="border: 1px solid #DDD; border-top:0;">
+            <div class="tab-pane active" id="classes">
+                <ul id="api-classes" class="nav nav-list">
+                    
+                        <li><a href="../classes/gestures.html">gestures</a></li>
+                    
+                        <li><a href="../classes/text.html">text</a></li>
+                    
+                        <li><a href="../classes/websocket.html">websocket</a></li>
+                    
+                </ul>
+            </div>
+
+            <div class="tab-pane" id="modules">
+                <ul id="api-modules" class="nav nav-list">
+                    
+                        <li><a href="../modules/quetzalcoatl.html">quetzalcoatl</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+        <div class="span9">
+                <form id="options-form" class="form-inline pull-right">
+        Show:
+        <label for="api-show-inherited" class="checkbox">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected" class="checkbox">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private" class="checkbox">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated" class="checkbox">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </form>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <div class="page-header">
+    <h1>js/gestures.js <small>File</small></h1>
+</div>
+
+<div class="file">
+    <pre class="prettyprint linenums">
 /**
  * Provides the gesture class. Gestures are detected by the Kinect API running
  * on the WebSocket server. Handles to detected gestures (in the form of handStates)
@@ -41,37 +150,37 @@ var highlightState = false;
 var collapseState = false;
 
 /**
- * A handle to the "Previous" button in the main block.
+ * A handle to the &quot;Previous&quot; button in the main block.
  *
  * @property prevButton
  * @type Object
- * @default document.getElementById("zoomPrev")
+ * @default document.getElementById(&quot;zoomPrev&quot;)
  * @required
  * @final
  */
-var prevButton = document.getElementById("zoomPrev");
+var prevButton = document.getElementById(&quot;zoomPrev&quot;);
 
 /**
- * A handle to the "Next" button in the main block.
+ * A handle to the &quot;Next&quot; button in the main block.
  *
  * @property nextButton
  * @type Object
- * @default document.getElementById("zoomNext")
+ * @default document.getElementById(&quot;zoomNext&quot;)
  * @required
  * @final
  */
-var nextButton = document.getElementById("zoomNext");
+var nextButton = document.getElementById(&quot;zoomNext&quot;);
 
 /**
  * A handle to the main block itself.
  *
  * @property container
  * @type Object
- * @default document.querySelector("main")
+ * @default document.querySelector(&quot;main&quot;)
  * @required
  * @final
  */
-container = document.querySelector("main");
+container = document.querySelector(&quot;main&quot;);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +201,7 @@ function click(arr) {
 }
 
 /**
- * Performs a "pull" gesture on the DOM object below the cursor circle.
+ * Performs a &quot;pull&quot; gesture on the DOM object below the cursor circle.
  * A pull gesture is a negative change in the z-axis made with a closed hand
  * - Pulling on the main block zooms into the item under the cursor
  * - Pulling on the side block highlights the text under the cursor and fades all others
@@ -106,7 +215,7 @@ function pull(arr) {
     var elem = document.elementFromPoint(arr[0], arr[1]);
 
     if (jQuery.contains(container, elem)) {
-        // Only do something if we're not currently zoomed in
+        // Only do something if we&#x27;re not currently zoomed in
         if (zoomState === false) {
             // Dynamically mimic a click event on the element
             // The behavior that causes the zoom is coded separately
@@ -114,18 +223,18 @@ function pull(arr) {
                 elem.click();
             }
 
-            // If the element the cursor is currently over is in the main block, we've
+            // If the element the cursor is currently over is in the main block, we&#x27;ve
             // zoomed into an item, and zoomState is now true
             zoomState = true;
         }
     } else {
-        // Only do something if we're not currently highlighted
+        // Only do something if we&#x27;re not currently highlighted
         if (highlightState === false) {
             // Dynamically mimic a click event on the element
             // The behavior that causes the highlight is coded separately
             highlight(elem);
 
-            // Otherwise, the cursor must be over an element in the side block, and we've
+            // Otherwise, the cursor must be over an element in the side block, and we&#x27;ve
             // highlighted an item, so highlightState is now true
             highlightState = true;
         }
@@ -133,7 +242,7 @@ function pull(arr) {
 }
 
 /**
- * Performs a "push" gesture on the DOM object below the cursor circle.
+ * Performs a &quot;push&quot; gesture on the DOM object below the cursor circle.
  * A push gesture is a positive change in the z-axis made with a closed hand
  * - Pushing anywhere on the main block zooms out to the panel view
  * - Pushing anywhere on the side block un-highlights any highlighted text
@@ -147,7 +256,7 @@ function push(arr) {
     var elem = document.elementFromPoint(arr[0], arr[1]);
 
     if (jQuery.contains(container, elem)) {
-        // Only do something if we're currently zoomed in
+        // Only do something if we&#x27;re currently zoomed in
         if (zoomState === true) {
             // Dynamically mimic a click event on the element
             // The behavior that causes the zoom is coded separately
@@ -155,18 +264,18 @@ function push(arr) {
                 elem.click();
             }
 
-            // If the element the cursor is currently over is in the main block, we've
+            // If the element the cursor is currently over is in the main block, we&#x27;ve
             // zoomed out of an item, and zoomState is now false
             zoomState = false;
         }
     } else {
-        // Only do something if we're currently highlighted
+        // Only do something if we&#x27;re currently highlighted
         if (highlightState === true) {
             // Dynamically mimic a click event on the element
             // The behavior that causes the highlight is coded separately
             unHighlight();
 
-            // Otherwise, the cursor must be over an element in the side block, and we've
+            // Otherwise, the cursor must be over an element in the side block, and we&#x27;ve
             // un-highlighted an item, so highlightState is now false
             highlightState = false;
         }
@@ -174,7 +283,7 @@ function push(arr) {
 }
 
 /**
- * Performs a "swipe left" gesture on the DOM object below the cursor circle.
+ * Performs a &quot;swipe left&quot; gesture on the DOM object below the cursor circle.
  * A swipe left gesture is a negative change in the x-axis made with an open hand
  * - Swiping left on the main block advances to the next item if the block is currently
  *   in a zoomed state. If the block is not zoomed, swiping does nothing.
@@ -200,7 +309,7 @@ function swipeleft(arr) {
 }
 
 /**
- * Performs a "swipe right" gesture on the DOM object below the cursor circle.
+ * Performs a &quot;swipe right&quot; gesture on the DOM object below the cursor circle.
  * A swipe left gesture is a positive change in the x-axis made with an open hand
  * - Swiping right on the main block backtracks to the previous item if the block is currently
  *   in a zoomed state. If the block is not zoomed, swiping does nothing.
@@ -226,7 +335,7 @@ function swiperight(arr) {
 }
 
 /**
- * Performs a "swipe up" gesture on the DOM object below the cursor circle.
+ * Performs a &quot;swipe up&quot; gesture on the DOM object below the cursor circle.
  * A swipe up gesture is a positive change in the y-axis made with an open hand
  * - Swiping up on the main block scrolls downwards
  * - Swiping up on the side block highlights the next section of text under the cursor
@@ -241,7 +350,7 @@ function swipeUp(arr) {
 }
 
 /**
- * Performs a "swipe down" gesture on the DOM object below the cursor circle.
+ * Performs a &quot;swipe down&quot; gesture on the DOM object below the cursor circle.
  * A swipe up gesture is a negative change in the y-axis made with an open hand
  * - Swiping up on the main block scrolls upwards
  * - Swiping up on the side block highlights the previous section of text under the cursor
@@ -254,3 +363,20 @@ function swipeUp(arr) {
 function swipeDown(arr) {
 
 }
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/jquery/jquery-1.8.2.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script src="../assets/js/yuidoc-bootstrap.js"></script>
+<script>prettyPrint();</script>
+</body>
+</html>

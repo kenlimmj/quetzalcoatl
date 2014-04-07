@@ -1,3 +1,12 @@
+/**
+ * Provides the text class. The text block is located on the left-hand side of
+ * the UI, and displays texts, lists, quotes, code, or equations that annotate
+ * content in the main block. This class contains helper functions for manipulating
+ * the text content in various ways.
+ *
+ * @class text
+ */
+
 var textContainer = document.querySelector("aside"),
     textList = document.querySelectorAll("aside li");
 
@@ -6,7 +15,7 @@ var textContainer = document.querySelector("aside"),
  * is not in the side block, this function does nothing. If the element is already
  * highlighted, it remains highlighted.
  *
- * @class highlight
+ * @method highlight
  * @static
  * @beta
  * @param {Object} [elem] An object corresponding to a DOM element
@@ -31,7 +40,7 @@ function highlight(elem) {
  * Removes highlights from all blocks of text in the side block. If nothing is
  * currently highlighted, this function does nothing.
  *
- * @class unHighlight
+ * @method unHighlight
  * @static
  */
 function unHighlight() {

@@ -1,0 +1,13 @@
+{
+    "name": "Quetzalcoatl",
+    "description": "Next Generation Kinect Gesture Interface",
+    "version": "1.0.0",
+    "url": "http://github.com/kenlimmj/quetzalcoatl",
+    "options": {
+        "linkNatives": "true",
+        "paths": "js",
+        "outdir": "docs",
+        "themedir": "yuidoc-bootstrap-theme",
+        "helpers": ["yuidoc-bootstrap-theme/helpers/helpers.js"]
+    }
+}
