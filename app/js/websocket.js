@@ -99,8 +99,8 @@ function createWebSocket() {
                 rthreshold = cursorThreshold(averagedData.rhandState);
 
             // Map the coordinates from the Kinect space to screen space
-            var lcoord = mapCoordinates([averagedData.lx, averagedData.ly], data.screenw, data.screenh, data.sx, data.sy, lthreshold),
-                rcoord = mapCoordinates([averagedData.rx, averagedData.ry], data.screenw, data.screenh, data.sx, data.sy, rthreshold);
+            var lcoord = mapCoordinates([averagedData.lx, averagedData.ly], [data.screenw, data.screenh], [data.sx, data.sy], lthreshold),
+                rcoord = mapCoordinates([averagedData.rx, averagedData.ry], [data.screenw, data.screenh], [data.sx, data.sy], rthreshold);
 
             if (debug === true) {
                 // Update the output on the screen console
@@ -110,40 +110,40 @@ function createWebSocket() {
             // FIXME: Temporary code to enable the pull gestures. Will eventually be
             // abstracted to something more robust
             if (lpullState === false) {
-                if (data.lp === true) {
+                if (data.lpull === true) {
                     pull(lcoord);
                     lpullState = true;
                 }
             } else {
-                if (data.lp === false) {
+                if (data.lpull === false) {
                     lpullState = false;
                 }
             }
 
             if (rpullState === false) {
-                if (data.rp === true) {
+                if (data.rpull === true) {
                     pull(rcoord);
                     rpullState = true;
                 }
             } else {
-                if (data.rp === false) {
+                if (data.rpull === false) {
                     rpullState = false;
                 }
             }
 
             if (lpushState === false) {
-                if (data.lp === true) {
+                if (data.lpush === true) {
                     push(lcoord);
                     lpushState = true;
                 }
             } else {
-                if (data.lp === false) {
+                if (data.lpush === false) {
                     lpushState = false;
                 }
             }
 
             if (rpushState === false) {
-                if (data.rp === true) {
+                if (data.rpush === true) {
                     push(rcoord);
                     rpushState = true;
                 }
