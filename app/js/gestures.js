@@ -38,6 +38,7 @@ var collapseState = false;
  * @type Object
  * @default document.getElementById("zoomPrev")
  * @required
+ * @final
  */
 var prevButton = document.getElementById("zoomPrev");
 
@@ -48,6 +49,7 @@ var prevButton = document.getElementById("zoomPrev");
  * @type Object
  * @default document.getElementById("zoomNext")
  * @required
+ * @final
  */
 var nextButton = document.getElementById("zoomNext");
 
@@ -58,6 +60,7 @@ var nextButton = document.getElementById("zoomNext");
  * @type Object
  * @default document.querySelector("main")
  * @required
+ * @final
  */
 container = document.querySelector("main");
 
