@@ -6,7 +6,7 @@
  * @module quetzalcoatl
  * @author Lim Mingjie, Kenneth
  * @author Leart Albert Ulaj
- * @requires jQuery, HTML5 WebSocket API
+ * @requires jQuery, HTML5 WebSocket API, HTML5 Canvas
  */
 
 /**
@@ -27,6 +27,10 @@ var coordData = [];
 // Initialize variables to keep track of whether we are in the middle of a pull gesture
 var lpullState = false,
     rpullState = false;
+
+// Initialize variables to keep track of whether we're in the middle of a push gesture
+var lpushState = false,
+    rpushState = false;
 
 // Set the socket address to match the port which the C# WebSocket Server is broadcasting on
 var socketAddress = "ws://localhost:1620/KinectApp";
@@ -127,9 +131,31 @@ function createWebSocket() {
                 }
             }
 
+            if (lpushState === false) {
+                if (data.lp === true) {
+                    push(lcoord);
+                    lpushState = true;
+                }
+            } else {
+                if (data.lp === false) {
+                    lpushState = false;
+                }
+            }
+
+            if (rpushState === false) {
+                if (data.rp === true) {
+                    push(rcoord);
+                    rpushState = true;
+                }
+            } else {
+                if (data.rp === false) {
+                    rpushState = false;
+                }
+            }
+
             // Draw the cursor on the screen
             // Only redraw if there are no pull gestures being executed on-screen
-            if (lpullState === false && rpullState === false) {
+            if (lpullState === false && rpullState === false && lpushState === false && rpushState === false) {
                 reDraw(lcoord, averagedData.lhandState, rcoord, averagedData.rhandState);
             }
         }
