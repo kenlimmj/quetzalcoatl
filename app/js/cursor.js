@@ -153,8 +153,8 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
     }
 
     // Threshold the result to minimize jitter
-    var xcoord = stabilizer(x, threshold * window.innerWidth),
-        ycoord = stabilizer(y, threshold * window.innerHeight);
+    var xcoord = stabilizer(x, Math.round(threshold * window.innerWidth)),
+        ycoord = stabilizer(y, Math.round(threshold * window.innerHeight));
 
     return [xcoord, ycoord];
 }
@@ -249,7 +249,7 @@ function cursorThreshold(state) {
     if (state === "point") {
         return 1 / 100;
     } else {
-        return 1 / 50;
+        return 1 / 100;
     }
 }
 
@@ -334,22 +334,22 @@ function reDraw(lcoord, lhandState, rcoord, rhandState) {
 
     // Draw the cursors at their new location
     // Left Hand
-    if (lhandState !== "unknown") {
-        ctx.beginPath();
-        ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
-        ctx.fillStyle = leftColor;
-        ctx.fill();
-        ctx.closePath();
-    }
+    // if (lhandState !== "unknown") {
+    ctx.beginPath();
+    ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
+    ctx.fillStyle = leftColor;
+    ctx.fill();
+    ctx.closePath();
+    // }
 
     // Right Hand
-    if (rhandState !== "unknown") {
-        ctx.beginPath();
-        ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
-        ctx.fillStyle = rightColor;
-        ctx.fill();
-        ctx.closePath();
-    }
+    // if (rhandState !== "unknown") {
+    ctx.beginPath();
+    ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
+    ctx.fillStyle = rightColor;
+    ctx.fill();
+    ctx.closePath();
+    // }
 }
 
 // Write placeholder variables to the console
