@@ -8,6 +8,7 @@ var open_radius = 25,
     point_radius = grab_radius / 1.618;
 
 // Set the colors for the cursor circles
+// These colors are taken from the 5-color palette from the Solarized color scheme
 var leftColor = "#d33682",
     rightColor = "#6c71c4";
 
@@ -20,8 +21,8 @@ var scoord = {
 };
 
 // Set the width and height of the canvas to be the size of the window
-ctx.canvas.width = window.innerWidth;
-ctx.canvas.height = window.innerHeight;
+ctx.canvas.width = scoord.xmax - scoord.xmin;
+ctx.canvas.height = scoord.ymax - scoord.ymin;
 
 // An instance rounds a number to some multiple. This is used to stabilize the cursor jitter
 // Input: (1) A number; (2) An integer multiple which (1) will be rounded to
@@ -32,10 +33,10 @@ function stabilizer(x, factor) {
 
 // An instance maps Kinect coordinates to Screen coordinates
 // Input: Array of float x and float y coordinates of the depth data from the Kinect
-// and object literal of coordinates describing the viable space
-// Output: Array of Integer x and Integer y coordinates of the screen
+// and object literal of coordinates describing the user viewport
+// Output: Array of Integer x and Integer y coordinates of the screen viewport
 function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
-    // Coordinates of the viable space. The bottom center of the viable space is
+    // Coordinates of the user viewport. The bottom center of the user viewport is
     // centered at the user's spine base
     var kcoord = {
         // The leftmost point is one arm length to the left of the spine base
@@ -47,9 +48,6 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
         // The bottommost point is the spine base
         ymax: sy
     };
-
-    // var xcoord = null,
-    //     ycoord = null;
 
     var x = null,
         y = null;
@@ -63,7 +61,6 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
         x = window.innerWidth;
     } else {
         // Otherwise, translate it so it fits within the viable space
-        // xcoord = arr[0] - kcoord.xmin;
         x = (arr[0] - kcoord.xmin) / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin);
     }
 
@@ -76,12 +73,14 @@ function mapCoordinates(arr, screenw, screenh, sx, sy, threshold) {
         y = window.innerHeight;
     } else {
         // Otherwise, translate it so it fits within the viable space
-        // ycoord = arr[1] - kcoord.ymin;
         y = (arr[1] - kcoord.ymin) / (kcoord.ymax - kcoord.ymin) * (scoord.ymax - scoord.ymin);
     }
 
     // Threshold the result to minimize jitter
-    return [stabilizer(x, threshold * window.innerWidth), stabilizer(y, threshold * window.innerHeight)];
+    var xcoord = stabilizer(x, threshold * window.innerWidth),
+        ycoord = stabilizer(y, threshold * window.innerHeight);
+
+    return [xcoord, ycoord];
 }
 
 // An instance updates the console on the bottom right of the screen with cursor coordinates
@@ -252,7 +251,9 @@ function reDraw(lcoord, lhandState, rcoord, rhandState) {
     var lradius = assignRadius(lhandState),
         rradius = assignRadius(rhandState);
 
-    // Clear the canvas
+    // Clear the entire canvas
+    // TODO: Only clear the part of the canvas that contains the old cursor circles
+    // In addition, only do it on a per-hand basis, rather than for both circles
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     // Draw the cursors at their new location
