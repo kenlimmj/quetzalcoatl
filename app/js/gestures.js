@@ -60,7 +60,7 @@ function pull(arr) {
         if (highlightState === false) {
             // Dynamically mimic a click event on the element
             // The behavior that causes the highlight is coded separately
-            elem.click();
+            highlight(elem);
 
             // Otherwise, the cursor must be over an element in the side block, and we've
             // highlighted an item, so highlightState is now true
@@ -96,7 +96,7 @@ function push(arr) {
         if (highlightState === true) {
             // Dynamically mimic a click event on the element
             // The behavior that causes the highlight is coded separately
-            elem.click();
+            unHighlight();
 
             // Otherwise, the cursor must be over an element in the side block, and we've
             // un-highlighted an item, so highlightState is now false
