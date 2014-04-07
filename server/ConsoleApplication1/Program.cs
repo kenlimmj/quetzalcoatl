@@ -223,7 +223,7 @@ namespace Kinect.Server
 			private void CheckZoom (HandState lstate, HandState rstate, Point rhand, Point lhand, Point rshoulder, Point lshoulder, Point bspine, Point head)
 			{
 				if (lstate == HandState.Closed && rstate == HandState.Closed) {
-					if (lhand.Y >= head.Y && lhand.Y <= bspine.Y && rhand.Y >= head.Y && rhand.Y <= bspine.Y) {
+					if (lhand.Y >= head.Y && lhand.Y <= bspine.Y && lhand.X <= bspine.X && rhand.X >= bspine.X && rhand.Y >= head.Y && rhand.Y <= bspine.Y) {
 						if (zoominit == 0) {
 							zoominit = Math.Pow ((Math.Pow (Math.Abs (rhand.X - lhand.X), 2) + Math.Pow (Math.Abs (rhand.Y - lhand.Y), 2)), 0.5);
 						}
