@@ -23,18 +23,17 @@ namespace Kinect.Server
 
 		static void Main (string[] args)
 		{
-			// Start the Kinect Server when the program loads
 			InitializeServer ();
 		}
 
-		/// An instance starts the Kinect server
-		/// Input: Unit
-		/// Output: Unit
 		private static void InitializeServer ()
-		{
+		{	
+			// Start the KinectService process. This is required for any Kinect application to run.
+			var KinectService = System.Diagnostics.Process.Start (@"C:\Windows\System32\KinectService.exe");
+
 			// Initialize a server at the address specified
-			System.Diagnostics.Process.Start (@"C:\Windows\System32\KinectService.exe");
 			var server = new WebSocketServer ("ws://localhost:1620");
+
 			server.Start (socket => {
 				socket.OnOpen = () => {
 					Console.WriteLine ("Opening a new socket...");
@@ -50,13 +49,14 @@ namespace Kinect.Server
 				};
 			});
 
-			// Logic to allow for a soft quit of the server when "Exit" is input at the CLI
+			// Logic to allow for a soft quit of the server when "exit" is input at the CLI
 			var input = Console.ReadLine ();
-			while (input != "exit") {
-				foreach (var socket in allSockets.ToList()) {
-					socket.Send (input);
+			if (input == "exit") {
+				KinectService.Kill;
+			} else {
+				while (input != "exit") {
+					input = Console.ReadLine ();
 				}
-				input = Console.ReadLine ();
 			}
 		}
 
@@ -74,10 +74,10 @@ namespace Kinect.Server
 			private int lframecount = 0;
 			private float zright = 0;
 			private float zleft = 0;
-            private float pushzright = 0;
-            private float pushzleft = 0;
-            private bool rpush = false;
-            private bool lpush = false;
+			private float pushzright = 0;
+			private float pushzleft = 0;
+			private bool rpush = false;
+			private bool lpush = false;
 			private bool rpull = false;
 			private bool lpull = false;
 			private double zoominit = 0;
@@ -90,7 +90,6 @@ namespace Kinect.Server
 
 				if (this.kinectSensor != null) {
 					Console.WriteLine ("Kinect detected. Awaiting start gesture...");
-					allSockets.ToList ().ForEach (s => s.Send ("Kinect detected. Awaiting start gesture..."));
 
 					// Get the coordinate mapper
 					// The Kinect depth sensor measures in millimeters. CoordinateMapper converts millimeters to pixels.
@@ -113,7 +112,6 @@ namespace Kinect.Server
 			}
 
 			/// An instance handles the body frame data arriving from the sensor
-			/// Input: Object sending the event and any event arguments
 			private void Reader_FrameArrived (object sender, BodyFrameArrivedEventArgs e)
 			{
 				BodyFrameReference frameReference = e.FrameReference;
@@ -141,10 +139,10 @@ namespace Kinect.Server
 											if (this.rframecount >= 45) {
 												rframecount = 0;
 											}
-                                            rpush = CheckPush(body.Joints[JointType.HandRight].Position.Z, "right", rframecount);
+											rpush = CheckPush (body.Joints [JointType.HandRight].Position.Z, "right", rframecount);
 											rpull = CheckPull (body.Joints [JointType.HandRight].Position.Z, "right", rframecount);
 										} else {
-                                            rpush = false;
+											rpush = false;
 											rpull = false;
 										}
 
@@ -152,10 +150,10 @@ namespace Kinect.Server
 											if (this.lframecount >= 45) {
 												lframecount = 0;
 											}
-                                            lpush = CheckPush(body.Joints[JointType.HandLeft].Position.Z, "left", lframecount);
+											lpush = CheckPush (body.Joints [JointType.HandLeft].Position.Z, "left", lframecount);
 											lpull = CheckPull (body.Joints [JointType.HandLeft].Position.Z, "left", lframecount);
 										} else {
-                                            lpush = false;
+											lpush = false;
 											lpull = false;
 										}
 
@@ -176,7 +174,7 @@ namespace Kinect.Server
 										double height = Math.Abs (bSpine.Y - neck.Y) + 2 * (neck.Y - head.Y);
 
 										string packet = MakeJson (body.HandRightState, jointPoints [JointType.HandRight], body.HandLeftState, jointPoints [JointType.HandLeft], 
-                                            jointPoints [JointType.SpineBase], width, height, rpull, lpull, rpush, lpush, zoomscale);
+											                jointPoints [JointType.SpineBase], width, height, rpull, lpull, rpush, lpush, zoomscale);
 										allSockets.ToList ().ForEach (s => s.Send (packet));
 										Console.WriteLine (packet);
 
@@ -203,7 +201,10 @@ namespace Kinect.Server
 
 			private void CheckStartStop (Point rShoulder, Point rElbow, Point rWrist, Point lHand, Point rHand, Point bSpine)
 			{
-				if (rShoulder.X <= rWrist.X && rWrist.X <= rElbow.X && rShoulder.Y >= rWrist.Y && rWrist.Y <= rElbow.Y) {
+				if (rShoulder.X <= rWrist.X &&
+				    rWrist.X <= rElbow.X &&
+				    rShoulder.Y >= rWrist.Y &&
+				    rWrist.Y <= rElbow.Y) {
 					engaged = true;
 				} else if (lHand.Y >= bSpine.Y && rHand.Y >= bSpine.Y) {
 					engaged = false;
@@ -229,37 +230,34 @@ namespace Kinect.Server
 				return false;
 			}
 
-            private bool CheckPush(float pushcurrentz, string parity, int framenum)
-            {
-                if (parity == "right")
-                {
-                    if (framenum == 0)
-                    {
-                        pushzright = pushcurrentz;
-                    }
-                    else if (pushcurrentz <= pushzright - .102)
-                    {
-                        return true;
-                    }
-                }
-                if (parity == "left")
-                {
-                    if (framenum == 0)
-                    {
-                        pushzleft = pushcurrentz;
-                    }
-                    else if (pushcurrentz <= zleft - .102)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
+			private bool CheckPush (float pushcurrentz, string parity, int framenum)
+			{
+				if (parity == "right") {
+					if (framenum == 0) {
+						pushzright = pushcurrentz;
+					} else if (pushcurrentz <= pushzright - .102) {
+						return true;
+					}
+				}
+				if (parity == "left") {
+					if (framenum == 0) {
+						pushzleft = pushcurrentz;
+					} else if (pushcurrentz <= zleft - .102) {
+						return true;
+					}
+				}
+				return false;
+			}
 
 			private void CheckZoom (HandState lstate, HandState rstate, Point rhand, Point lhand, Point rshoulder, Point lshoulder, Point bspine, Point head)
 			{
 				if (lstate == HandState.Closed && rstate == HandState.Closed) {
-					if (lhand.Y >= head.Y && lhand.Y <= bspine.Y && lhand.X <= bspine.X && rhand.X >= bspine.X && rhand.Y >= head.Y && rhand.Y <= bspine.Y) {
+					if (lhand.Y >= head.Y &&
+					    lhand.Y <= bspine.Y &&
+					    lhand.X <= bspine.X &&
+					    rhand.X >= bspine.X &&
+					    rhand.Y >= head.Y &&
+					    rhand.Y <= bspine.Y) {
 						if (zoominit == 0) {
 							zoominit = Math.Pow ((Math.Pow (Math.Abs (rhand.X - lhand.X), 2) + Math.Pow (Math.Abs (rhand.Y - lhand.Y), 2)), 0.5);
 						}
@@ -274,7 +272,7 @@ namespace Kinect.Server
 			}
 
 			/// An instance is a constructor for the JSON packet
-			private class Info
+			private class Packet
 			{
 				/// Right Hand Coordinates
 				public double rx { get; set; }
@@ -298,19 +296,16 @@ namespace Kinect.Server
 
 				///Arm Length
 				public double screenw { get; set; }
-
 				//Torso Height
 				public double screenh { get; set; }
-
 				//Push/Pull Detection
 				public bool rpull { get; set; }
 
 				public bool lpull { get; set; }
 
-                public bool rpush { get; set; }
+				public bool rpush { get; set; }
 
-                public bool lpush { get; set; }
-
+				public bool lpush { get; set; }
 				//Zoom Scale
 				public double scale { get; set; }
 			}
@@ -319,7 +314,7 @@ namespace Kinect.Server
 			/// Input: Left and right hand coordinates, and left and right hand states
 			/// Output: Formatted JSON packet
 			public string MakeJson (HandState rightstate, Point rightpos, HandState leftstate, Point leftpos, Point spinebase, double width, 
-                double height, bool rightpull, bool leftpull, bool rightpush, bool leftpush, double zoom)
+			                        double height, bool rightpull, bool leftpull, bool rightpush, bool leftpush, double zoom)
 			{
 				// Initialize placeholder variables for the left and right hand states
 				String rstateval = "";
@@ -357,7 +352,7 @@ namespace Kinect.Server
 					break;
 				}
 
-				Info body = new Info {
+				Packet bodyData = new Packet {
 					rx = rightpos.X,
 					ry = rightpos.Y,
 
@@ -375,14 +370,14 @@ namespace Kinect.Server
 
 					rpull = rightpull,
 					lpull = leftpull,
-                    rpush = rightpush,
-                    lpush = leftpush,
+					rpush = rightpush,
+					lpush = leftpush,
 
 					scale = zoom
 				};
 
 				// Create a nicely formatted JSON from the hand object
-				string json = JsonConvert.SerializeObject (body, Formatting.Indented);
+				string json = JsonConvert.SerializeObject (bodyData, Formatting.Indented);
 				return json;
 			}
 		}
