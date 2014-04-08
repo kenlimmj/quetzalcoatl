@@ -256,11 +256,11 @@ function createWebSocket() {
  * @return {Number} Back-off interval duration (in micro-seconds).
  */
 function generateInterval(k) {
-    var maxInterval = (Math.pow(2, k) - 1) * 1000;
+    var maxInterval = (Math.pow(2, k) - 1) * 5000;
 
     // If the generated interval is more than 30 seconds, truncate it down to 30 seconds
-    if (maxInterval > 30 * 1000) {
-        maxInterval = 30 * 1000;
+    if (maxInterval > 30 * 5000) {
+        maxInterval = 30 * 5000;
     }
 
     // Generate the interval as a random number between 0 and the maxInterval determined from above
@@ -350,5 +350,7 @@ function averageFrames(coordData, k) {
     return averagedData;
 }
 
-// Start the web socket connection
-// createWebSocket();
+// Starts the websocket server when Shift + C is pressed
+Mousetrap.bind('shift+c', function() {
+    createWebSocket();
+});
