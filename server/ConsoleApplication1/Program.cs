@@ -281,7 +281,7 @@ namespace Quetzalcoatl
                                         {
                                             rHandState = "pull";
                                         }
-                                        else if (lpush == true)
+                                        else if (rpush == true)
                                         {
                                             rHandState = "push";
                                         }
@@ -400,6 +400,7 @@ namespace Quetzalcoatl
                         return true;
                     }
                 }
+
                 if (parity == "left")
                 {
                     if (framenum == 0)
@@ -411,6 +412,7 @@ namespace Quetzalcoatl
                         return true;
                     }
                 }
+
                 return false;
             }
 
