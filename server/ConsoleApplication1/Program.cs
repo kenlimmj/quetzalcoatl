@@ -32,7 +32,7 @@ namespace Quetzalcoatl
         static WebSocketServer server = new WebSocketServer("ws://localhost:1620");
 
         // Debugging switch. Set to true for verbose output.
-        static Boolean debug = false;
+        static Boolean debug = true;
 
         static void Main(string[] args)
         {
@@ -117,6 +117,10 @@ namespace Quetzalcoatl
             private double zoominit = 0;
             private double zoomscale = 0;
 
+            private bool startStatement = false;
+
+            private bool engaged = false;
+
             public void InitializeKinect()
             {
                 // Initialize the Kinect itself. Since we're running the Dev API, there's support for only one Kinect.
@@ -177,15 +181,20 @@ namespace Quetzalcoatl
                                     }
 
                                     // Define handles to each hand
-                                    Point lhand = jointPoints[JointType.HandLeft];
-                                    Point rhand = jointPoints[JointType.HandRight];
+                                    Point lHand = jointPoints[JointType.HandLeft];
+                                    Point rHand = jointPoints[JointType.HandRight];
 
                                     // Define handles to each shoulder
-                                    Point rshoulder = jointPoints[JointType.ShoulderRight];
-                                    Point lshoulder = jointPoints[JointType.ShoulderLeft];
+                                    Point lShoulder = jointPoints[JointType.ShoulderLeft];
+                                    Point rShoulder = jointPoints[JointType.ShoulderRight];
+                                    
+                                    // Define handles to each wrist
+                                    Point lWrist = jointPoints[JointType.WristLeft];
+                                    Point rWrist = jointPoints[JointType.WristRight];
 
-                                    Point rwrist = jointPoints[JointType.WristRight];
-                                    Point relbow = jointPoints[JointType.ElbowRight];
+                                    // Define handles to each elbow
+                                    Point lElbow = jointPoints[JointType.ElbowLeft];
+                                    Point rElbow = jointPoints[JointType.ElbowRight];
 
                                     // Define handle to the base of the spine
                                     Point bSpine = jointPoints[JointType.SpineBase];
@@ -196,6 +205,8 @@ namespace Quetzalcoatl
 
                                     if (engaged == true)
                                     {
+                                        startStatement = false; 
+
                                         if (body.HandRightState == HandState.Closed)
                                         {
                                             if (this.rframecount >= 45)
@@ -226,39 +237,44 @@ namespace Quetzalcoatl
                                             lpull = false;
                                         }
 
-                                        CheckZoom(body.HandLeftState, body.HandRightState, rhand, lhand, rshoulder, lshoulder, bSpine, head);
+                                        CheckZoom(body.HandLeftState, body.HandRightState, rHand, lHand, rShoulder, lShoulder, bSpine, head);
 
                                         // Calculate the distance from the midpoint of the left elbow-wrist joint to the midpoint of the right elbow-wrist joint
-                                        double width = (Math.Pow((Math.Pow(Math.Abs(rshoulder.X - relbow.X), 2) + Math.Pow(Math.Abs(rshoulder.Y - relbow.Y), 2)), 0.5) + (Math.Pow((Math.Pow(Math.Abs(relbow.X - rwrist.X), 2) + Math.Pow(Math.Abs(relbow.Y - rwrist.Y), 2)), 0.5) / 2)) * 2 + Math.Abs(rshoulder.X - lshoulder.X);
+                                        double width = (Math.Pow((Math.Pow(Math.Abs(rShoulder.X - rElbow.X), 2) + Math.Pow(Math.Abs(rShoulder.Y - rElbow.Y), 2)), 0.5) + (Math.Pow((Math.Pow(Math.Abs(rElbow.X - rWrist.X), 2) + Math.Pow(Math.Abs(rElbow.Y - rWrist.Y), 2)), 0.5) / 2)) * 2 + Math.Abs(rShoulder.X - lShoulder.X);
                                         
                                         // Calculate the distance from the base of the spine to the top of the head
                                         double height = Math.Abs(bSpine.Y - neck.Y) + 2 * (neck.Y - head.Y);
 
                                         // Create a JSON packet of all the data to be sent to the client
-                                        string result = MakeJson(body.HandRightState, jointPoints[JointType.HandRight], body.HandLeftState, jointPoints[JointType.HandLeft],
-                                                            jointPoints[JointType.SpineBase], width, height, rpull, lpull, rpush, lpush, zoomscale);
+                                        string result = MakeJson(body.HandRightState, rHand, body.HandLeftState, lHand,
+                                                            bSpine, width, height, rpull, lpull, rpush, lpush, zoomscale);
+
+                                        // Send the data to the client
                                         allSockets.ToList().ForEach(s => s.Send(result));
 
                                         if (debug == true)
                                         {
                                             Console.WriteLine(result);
                                         }
-                                        
 
-                                        this.CheckStartStop(jointPoints[JointType.ShoulderRight], jointPoints[JointType.ElbowRight], jointPoints[JointType.WristRight],
-                                            jointPoints[JointType.HandLeft], jointPoints[JointType.HandRight], jointPoints[JointType.SpineBase]);
+                                        // Check if the user is in a start/stop position
+                                        this.CheckStartStop(rShoulder, rElbow, rWrist, lHand, rHand, bSpine);
 
-                                        rframecount += 1;
-                                        lframecount += 1;
+                                        // Increment the frame counts
+                                        rframecount++;
+                                        lframecount++;
                                     }
                                     else
                                     {
-                                        if (debug == true)
+                                        if (debug == true && startStatement == false)
                                         {
-                                            Console.WriteLine("Awaiting start gesture");
+                                            Console.WriteLine("Awaiting start gesture...");
+
+                                            startStatement = true;
                                         }
-                                        this.CheckStartStop(jointPoints[JointType.ShoulderRight], jointPoints[JointType.ElbowRight], jointPoints[JointType.WristRight],
-                                            jointPoints[JointType.HandLeft], jointPoints[JointType.HandRight], jointPoints[JointType.SpineBase]);
+
+                                        // Check if the user is in a start/stop position
+                                        this.CheckStartStop(rShoulder, rElbow, rWrist, lHand, rHand, bSpine);
                                     }
                                 }
                             }
@@ -267,11 +283,9 @@ namespace Quetzalcoatl
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Frame data unavailable");
+                    Console.WriteLine("Frame data unavailable...");
                 }
             }
-
-            public bool engaged = false;
 
             private void CheckStartStop(Point rShoulder, Point rElbow, Point rWrist, Point lHand, Point rHand, Point bSpine)
             {
@@ -375,37 +389,31 @@ namespace Quetzalcoatl
             {
                 /// Right Hand Coordinates
                 public double rx { get; set; }
-
                 public double ry { get; set; }
 
                 /// Left Hand Coordinates
                 public double lx { get; set; }
-
                 public double ly { get; set; }
 
                 /// Left and Right Hand States
                 public string rhandState { get; set; }
-
                 public string lhandState { get; set; }
 
                 ///Spine Base Coordinates
                 public double sx { get; set; }
-
                 public double sy { get; set; }
 
-                ///Arm Length
+                // User Viewport Dimensions
                 public double screenw { get; set; }
-                //Torso Height
                 public double screenh { get; set; }
+
                 //Push/Pull Detection
                 public bool rpull { get; set; }
-
                 public bool lpull { get; set; }
-
                 public bool rpush { get; set; }
-
                 public bool lpush { get; set; }
-                //Zoom Scale
+
+                // Zoom Scale
                 public double scale { get; set; }
             }
 
