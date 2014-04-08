@@ -155,7 +155,7 @@ function createWebSocket() {
 
             // Average the data over a pair of frames for increased accuracy
             // FIXME: Dynamically change the framerate depending on what the user is doing
-            var averagedData = averageFrames(coordData, 25);
+            var averagedData = averageFrames(coordData, 2);
 
             // Calculate the precision threshold value for each hand
             var lthreshold = cursorThreshold(averagedData.lhandState),
