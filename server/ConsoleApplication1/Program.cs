@@ -114,6 +114,9 @@ namespace Quetzalcoatl
             private bool rpull = false;
             private bool lpull = false;
 
+            private String lHandState = "";
+            private String rHandState = "";
+
             private double zoominit = 0;
             private double zoomscale = 0;
 
@@ -245,9 +248,64 @@ namespace Quetzalcoatl
                                         // Calculate the distance from the base of the spine to the top of the head
                                         double height = Math.Abs(bSpine.Y - neck.Y) + 2 * (neck.Y - head.Y);
 
+                                        // Text-ify the left hand state
+                                        if (lpull == true)
+                                        {
+                                            lHandState = "pull";
+                                        }
+                                        else if (lpush == true)
+                                        {
+                                            lHandState = "push";
+                                        }
+                                        else
+                                        {
+                                            switch (body.HandLeftState)
+                                            {
+                                                case HandState.Open:
+                                                    lHandState = "open";
+                                                    break;
+                                                case HandState.Closed:
+                                                    lHandState = "closed";
+                                                    break;
+                                                case HandState.Lasso:
+                                                    lHandState = "point";
+                                                    break;
+                                                default:
+                                                    lHandState = "unknown";
+                                                    break;
+                                            }
+                                        }
+
+                                        // Text-ify the right hand state
+                                        if (rpull == true)
+                                        {
+                                            rHandState = "pull";
+                                        }
+                                        else if (lpush == true)
+                                        {
+                                            rHandState = "push";
+                                        }
+                                        else
+                                        {
+                                            switch (body.HandRightState)
+                                            {
+                                                case HandState.Open:
+                                                    rHandState = "open";
+                                                    break;
+                                                case HandState.Closed:
+                                                    rHandState = "closed";
+                                                    break;
+                                                case HandState.Lasso:
+                                                    rHandState = "point";
+                                                    break;
+                                                default:
+                                                    rHandState = "unknown";
+                                                    break;
+                                            }
+                                        }
+
                                         // Create a JSON packet of all the data to be sent to the client
-                                        string result = MakeJson(body.HandRightState, rHand, body.HandLeftState, lHand,
-                                                            bSpine, width, height, rpull, lpull, rpush, lpush, zoomscale);
+                                        string result = MakeJson(rHandState, rHand,lHandState, lHand,bSpine, width, height, zoomscale);
 
                                         // Send the data to the client
                                         allSockets.ToList().ForEach(s => s.Send(result));
@@ -407,12 +465,6 @@ namespace Quetzalcoatl
                 public double screenw { get; set; }
                 public double screenh { get; set; }
 
-                //Push/Pull Detection
-                public bool rpull { get; set; }
-                public bool lpull { get; set; }
-                public bool rpush { get; set; }
-                public bool lpush { get; set; }
-
                 // Zoom Scale
                 public double scale { get; set; }
             }
@@ -420,68 +472,24 @@ namespace Quetzalcoatl
             /// An instance constructs a JSON from a list of parameters
             /// Input: Left and right hand coordinates, and left and right hand states
             /// Output: Formatted JSON packet
-            public string MakeJson(HandState rightstate, Point rightpos, HandState leftstate, Point leftpos, Point spinebase, double width,
-                                    double height, bool rightpull, bool leftpull, bool rightpush, bool leftpush, double zoom)
+            public string MakeJson(String rightstate, Point rightpos, String leftstate, Point leftpos, Point spinebase, double width, double height, double zoom)
             {
-                // Initialize placeholder variables for the left and right hand states
-                String rstateval = "";
-                String lstateval = "";
-
-                // Text-ify the right hand state
-                switch (rightstate)
-                {
-                    case HandState.Open:
-                        rstateval = "open";
-                        break;
-                    case HandState.Closed:
-                        rstateval = "closed";
-                        break;
-                    case HandState.Lasso:
-                        rstateval = "point";
-                        break;
-                    default:
-                        rstateval = "unknown";
-                        break;
-                }
-
-                // Text-ify the left hand state
-                switch (leftstate)
-                {
-                    case HandState.Open:
-                        lstateval = "open";
-                        break;
-                    case HandState.Closed:
-                        lstateval = "closed";
-                        break;
-                    case HandState.Lasso:
-                        lstateval = "point";
-                        break;
-                    default:
-                        lstateval = "unknown";
-                        break;
-                }
-
                 Packet bodyData = new Packet
                 {
-                    rx = rightpos.X,
-                    ry = rightpos.Y,
+                    rx = Math.Round(rightpos.X),
+                    ry = Math.Round(rightpos.Y),
 
-                    lx = leftpos.X,
-                    ly = leftpos.Y,
+                    lx = Math.Round(leftpos.X),
+                    ly = Math.Round(leftpos.Y),
 
-                    rhandState = rstateval,
-                    lhandState = lstateval,
+                    rhandState = rightstate,
+                    lhandState = leftstate,
 
-                    sx = spinebase.X,
-                    sy = spinebase.Y,
+                    sx = Math.Round(spinebase.X),
+                    sy = Math.Round(spinebase.Y),
 
-                    screenw = width,
-                    screenh = height,
-
-                    rpull = rightpull,
-                    lpull = leftpull,
-                    rpush = rightpush,
-                    lpush = leftpush,
+                    screenw = Math.Round(width),
+                    screenh = Math.Round(height),
 
                     scale = zoom
                 };
