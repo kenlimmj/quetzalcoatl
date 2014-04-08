@@ -23,41 +23,46 @@ namespace Kinect.Server
 
 		static void Main (string[] args)
 		{
-			InitializeServer ();
-		}
+            // Start the KinectService process. This is required for any Kinect application to run.
+            Process KinectService;
+            KinectService = Process.Start(@"C:\Windows\System32\KinectService.exe");
 
-		private static void InitializeServer ()
-		{	
-			// Start the KinectService process. This is required for any Kinect application to run.
-			var KinectService = System.Diagnostics.Process.Start (@"C:\Windows\System32\KinectService.exe");
+            // Initialize a server at the address specified
+            var server = new WebSocketServer("ws://localhost:1620");
 
-			// Initialize a server at the address specified
-			var server = new WebSocketServer ("ws://localhost:1620");
+            server.Start(socket =>
+            {
+                socket.OnOpen = () =>
+                {
+                    Console.WriteLine("Opening a new socket...");
+                    allSockets.Add(socket);
 
-			server.Start (socket => {
-				socket.OnOpen = () => {
-					Console.WriteLine ("Opening a new socket...");
-					allSockets.Add (socket);
+                    // Initialize a new Kinect object
+                    Kinect alpha = new Kinect();
+                    alpha.InitializeKinect();
+                };
+                socket.OnClose = () =>
+                {
+                    Console.WriteLine("Closing all connections...");
+                    allSockets.Remove(socket);
+                };
+            });
 
-					// Initialize a new Kinect object
-					Kinect alpha = new Kinect ();
-					alpha.InitializeKinect ();
-				};
-				socket.OnClose = () => {
-					Console.WriteLine ("Closing all connections...");
-					allSockets.Remove (socket);
-				};
-			});
-
-			// Logic to allow for a soft quit of the server when "exit" is input at the CLI
-			var input = Console.ReadLine ();
-			if (input == "exit") {
-				KinectService.Kill;
-			} else {
-				while (input != "exit") {
-					input = Console.ReadLine ();
-				}
-			}
+            // Logic to allow for a soft quit of the server when "exit" is input at the CLI
+            var input = Console.ReadLine();
+            if (input == "exit")
+            {
+                KinectService.CloseMainWindow();
+                KinectService.Close();
+                System.Environment.Exit(0);
+            }
+            else
+            {
+                while (input != "exit")
+                {
+                    input = Console.ReadLine();
+                }
+            }
 		}
 
 		public class Kinect
