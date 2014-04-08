@@ -24,8 +24,9 @@ namespace Kinect.Server
 		static void Main (string[] args)
 		{
             // Start the KinectService process. This is required for any Kinect application to run.
-            Process KinectService;
-            KinectService = Process.Start(@"C:\Windows\System32\KinectService.exe");
+            ProcessStartInfo KinectService = new ProcessStartInfo(@"C:\Windows\System32\KinectService.exe");
+            KinectService.WindowStyle = ProcessWindowStyle.Minimized;
+            Process KinectProcess = Process.Start(KinectService);
 
             // Initialize a server at the address specified
             var server = new WebSocketServer("ws://localhost:1620");
@@ -52,8 +53,8 @@ namespace Kinect.Server
             var input = Console.ReadLine();
             if (input == "exit")
             {
-                KinectService.CloseMainWindow();
-                KinectService.Close();
+                KinectProcess.CloseMainWindow();
+                KinectProcess.Close();
                 System.Environment.Exit(0);
             }
             else
