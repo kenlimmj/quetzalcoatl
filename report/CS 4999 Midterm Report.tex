@@ -1,0 +1,58 @@
+\documentclass{scrartcl}
+\usepackage{dominatrix}
+\subject{CS 4999 Independent Research}
+\title{Midterm Report}
+\subtitle{Cornell University Program for Computer Graphics}
+\author{Kenneth Lim (\href{mailto:kl545@cornell.edu}{kl545}), Leart Albert Ulaj (\href{mailto:lau8@cornell.edu}{lau8})}
+\date{\today}
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \newpage
+  \section{Overview}
+    Microsoft's new Kinect for Windows, released under the Kinect for Windows Development (K4WDev) Program incorporates a time-of-flight (TOF) laser for depth-sensing at an effective range of 1--15 feet. The higher level of precision and increased range achieved by the TOF laser (compared to the older Kinect, which uses a pseudo-random infrared dot pattern) makes the new Kinect a suitable candidate for gesture-recognition applications in
+    \begin{inparaenum}[(1)]
+      \item environments where it is not always possible for the user to be situated immediately in front of the sensor; and in
+      \item environments where the user may not be the only body in the sensor's field-of-view (FOV).
+    \end{inparaenum}
+    \subsection{Objectives}
+    \subsection{Literature Review}
+  \section{Project Specifications}
+    The software is conceptualized as a hybrid client capable of supporting multiple connections. The back-end is written in a low-level language that interfaces directly with the Kinect (via the Kinect API) and uses the workstation's GPU to convert raw sensor data into well-formed intermediate output. The intention is to offload processor-intensive computations to the workstation, and stream the output to the front-end, which is a lightweight application with little to no dependencies. The front-end consumes the output and renders graphical content to the user's display.
+    \subsection{Hardware}
+      We utilize the new Kinect sensor, provided to the Cornell Program of Computer Graphics by Microsoft under the K4WDev program. Interaction with the application was done on an 82-inch Perceptive Pixels Inc. (PPI) touchscreen display at HD resolution. Testing was performed on a secondary, 52-inch PPI touchscreen display at 4K resolution.
+
+      % TODO: Describe classroom layout, Kinect positioning and use of tracking tripod mount
+    \subsection{Back-End}
+      % TODO: Describe C# formulation, use of Fleck WS server
+    \subsection{Front-End}
+      Content schema and human interaction feedback were rendered in real-time in a modern web browser. The application leverages the HTML5 WebSockets API to connect to the back-end, then renders incoming data on a GPU-accelerated HTML canvas layer overlaid on the application user interface. Serving the application via a web interface eliminates the need for users to install any software on their devices (since all assets can be hosted on a remote server) and allows for multiple connection instances without additional infrastructure overhead.
+
+      % TODO: Describe application UI
+  \section{Road-map}
+    \subsection{Phase I --- Core Functionality}
+      % TODO: Describe use of Kinect API to track bodies and joints
+    \subsection{Phase II --- Establishing Coherence}
+      % TODO: Describe WebSockets connection
+    \subsection{Phase III --- Gestural Interaction}
+      % TODO: Describe types of gestures -- arm level and hand level
+    \subsection{Phase IV --- Content Development}
+      % TODO: Describe ways of representing content
+    \subsection{Phase V --- Testing and Robustness Evaluation}
+      % TODO: Describe use of Kinect Fusion/QUnit for front/back-end testing
+    \subsection{Phase VI --- User Recognition}
+      % TODO: Describe use Kinect Audio Beam-forming/IR Facial Recognition for saliency and recognition
+  \section{Deliverables}
+    \subsection{27 January}
+      % Literature Review and familiarization with Kinect API
+    \subsection{24 February}
+      % Phase I completion
+    \subsection{31 March}
+      % Phase II completion
+    \subsection{28 April}
+      % Phase III/IV completion
+    \subsection{End of Semester}
+      % Phase V/VI Exploration
+  \section{Extensions}
+    % Gesture Learning using ML
+\end{document}
