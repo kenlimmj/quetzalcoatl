@@ -173,45 +173,45 @@ function createWebSocket() {
             // FIXME: Temporary code to enable the pull gestures. Will eventually be
             // abstracted to something more robust
             if (lpullState === false) {
-                if (data.lpull === true) {
+                if (data.lhandState === "pull") {
                     pull(lcoord);
                     lpullState = true;
                 }
             } else {
-                if (data.lpull === false) {
+                if (data.lhandState !== "pull") {
                     lpullState = false;
                 }
             }
 
             if (rpullState === false) {
-                if (data.rpull === true) {
+                if (data.rhandState === "pull") {
                     pull(rcoord);
                     rpullState = true;
                 }
             } else {
-                if (data.rpull === false) {
+                if (data.rhandState !== "pull") {
                     rpullState = false;
                 }
             }
 
             if (lpushState === false) {
-                if (data.lpush === true) {
+                if (data.lhandState === "push") {
                     push(lcoord);
                     lpushState = true;
                 }
             } else {
-                if (data.lpush === false) {
+                if (data.lhandState !== "push") {
                     lpushState = false;
                 }
             }
 
             if (rpushState === false) {
-                if (data.rpush === true) {
+                if (data.rhandState === "push") {
                     push(rcoord);
                     rpushState = true;
                 }
             } else {
-                if (data.rpush === false) {
+                if (data.rhandState !== "push") {
                     rpushState = false;
                 }
             }
