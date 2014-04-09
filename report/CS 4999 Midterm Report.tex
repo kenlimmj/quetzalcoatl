@@ -7,22 +7,35 @@
 \date{\today}
 \begin{document}
   \maketitle
+  \begin{abstract}
+    Lorem Ipsum
+  \end{abstract}
   \tableofcontents
   \newpage
   \section{Overview}
-    Microsoft's new Kinect for Windows, released under the Kinect for Windows Development (K4WDev) Program incorporates a time-of-flight (TOF) laser for depth-sensing at an effective range of 1--15 feet. The higher level of precision and increased range achieved by the TOF laser (compared to the older Kinect, which uses a pseudo-random infrared dot pattern) makes the new Kinect a suitable candidate for gesture-recognition applications in
-    \begin{inparaenum}[(1)]
-      \item environments where it is not always possible for the user to be situated immediately in front of the sensor; and in
-      \item environments where the user may not be the only body in the sensor's field-of-view (FOV).
+    Microsoft's new Kinect for Windows, released under the Kinect for Windows Development (K4WDev) Program\footnote{\url{http://www.microsoft.com/en-us/kinectforwindowsdev/newdevkit.aspx}} incorporates a time-of-flight (TOF) laser for depth-sensing at an effective range of 1--15 feet (0.3--4.5 meters). The higher level of precision and increased range of the TOF laser (compared to the older Kinect, which uses a pseudo-random infrared dot pattern) makes the new Kinect a suitable candidate for gesture-recognition applications in:\begin{inparaenum}[(1)]
+      \item environments where it is not always possible for the user to be situated in front of the sensor such that depth detection is optimized;
+      \item environments where the user may be one of multiple bodies in the sensor's field-of-view (FOV), of which it is difficult to disambiguate the actions and gestures of the other non-participatory bodies and the number of bodies far exceeds the number that can be tracked by the Kinect; and
+      \item environments which are not well-lit.
     \end{inparaenum}
+
+    Although the Kinect's target field of application is video gaming, the robustness of its 3-D capture data has encouraged both research at the academic level, and independent projects of varying scale at the amateur/enthusiast level. Most approaches to gesture-based interfaces, however, rely on joint-tracking rather than recognition. A set of parameters, e.g.~velocities and accelerations, or user-defined ``action regions'' in the sensor's FOV are specified for the purpose of localizing and tracking movement. For example, a number of applications have been developed using USC's Flexible Action and Articulated Skeleton Toolkit (FAAST) and SigmaRD's SigmaNIL Hand Recognition Framework, among others. Although many approaches have been shown to work well in scripted scenarios, one would expect difficulties deploying these approaches in real-world scenarios due to differences in users' body parameters and movement styles.
+
+    In this paper, we describe the use of a supervised constraint-based algorithm for robust gesture detection using the new Kinect. The algorithm is simple, extensible, and computationally efficient. We also describe the use of temporal averaging methods in the design of a user interface that consumes processed data from the Kinect.
     \subsection{Objectives}
     \subsection{Literature Review}
   \section{Project Specifications}
-    The software is conceptualized as a hybrid client capable of supporting multiple connections. The back-end is written in a low-level language that interfaces directly with the Kinect (via the Kinect API) and uses the workstation's GPU to convert raw sensor data into well-formed intermediate output. The intention is to offload processor-intensive computations to the workstation, and stream the output to the front-end, which is a lightweight application with little to no dependencies. The front-end consumes the output and renders graphical content to the user's display.
-    \subsection{Hardware}
-      We utilize the new Kinect sensor, provided to the Cornell Program of Computer Graphics by Microsoft under the K4WDev program. Interaction with the application was done on an 82-inch Perceptive Pixels Inc. (PPI) touchscreen display at HD resolution. Testing was performed on a secondary, 52-inch PPI touchscreen display at 4K resolution.
+    \begin{figure}[ht!]
+      \centering
+      \caption{Data Pipeline from the Kinect sensor to front-end clients\label{fig:pipeline}}
+    \end{figure}
+    The software is conceptualized as a hybrid client capable of supporting multiple connections. The back-end is written in a low-level language that interfaces directly with the Kinect (via the Microsoft Kinect API) and uses the workstation's graphical processing unit (GPU) to convert raw sensor data into well-formed intermediate output. The intention is to offload processor-intensive computations to the workstation and stream the output to the front-end, which is a modular, lightweight application with little to no dependencies. The front-end consumes the output and renders graphical content to the user's display. Figure~\ref{fig:pipeline} depicts the flow of data from the Kinect sensor to the server, where it is interpreted before being piped to connected user clients.
 
-      % TODO: Describe classroom layout, Kinect positioning and use of tracking tripod mount
+    Establishing the software as a dichotomy of a front-end and back-end allows for the front-end to be adapted for different applications, treating the output from the server as a black-boxed ``bag-of-features''. In addition, since the Microsoft Kinect API is still under development, new changes can be slipstreamed into the back-end without further modification to the rest of the software infrastructure.
+    \subsection{Hardware}
+      We utilize the new Kinect sensor, provided to the Cornell Program of Computer Graphics (PCG) by Microsoft under the K4WDev program. Interaction with the application was done on an 82-inch Perceptive Pixels Inc. (PPI) touchscreen display at HD resolution ($1920 \times 1080$). Testing was performed on a secondary, 52-inch PPI touchscreen display at 4K resolution ($3840 \times 2160$).
+
+      % TODO: Describe classroom layout, Kinect positioning and use of tracking tripod mount: Soloshot
     \subsection{Back-End}
       % TODO: Describe C# formulation, use of Fleck WS server
     \subsection{Front-End}
@@ -30,29 +43,40 @@
 
       % TODO: Describe application UI
   \section{Road-map}
-    \subsection{Phase I --- Core Functionality}
+    \renewcommand{\thesubsection}{\Roman{subsection}}
+    \subsection{Core Functionality\label{phase1}}
       % TODO: Describe use of Kinect API to track bodies and joints
-    \subsection{Phase II --- Establishing Coherence}
-      % TODO: Describe WebSockets connection
-    \subsection{Phase III --- Gestural Interaction}
+    \subsection{Establishing Coherence\label{phase2}}
+      \subsubsection{HTML5 WebSockets API}
+      \subsubsection{Fleck WebSockets Server}
+    \subsection{Gestural Interaction\label{phase3}}
+      The Kinect SDK tracks 21 3-D joint coordinates of the human skeleton model in real-time (30 frames/sec), corresponding to the spatial location of a user in the Kinect sensor's FOV. This polling rate generates $21 \times 30 \times 3 = 1890$ real-valued skeleton model coordinates per second. In addition, the skeleton model is robust to variation in the shape and size of the human body, color and texture of clothing, and objects or surfaces in the background, thus we omit consideration for these variables (otherwise considered anomalies) in the design of our action model representation.
+
+      Since our implementation is gesture-based, we simplify the skeleton model by focusing only on coordinates above the base of the spine. Specifically, the most pertinent joints are the left and right hand, left and right wrist, left and right elbow, and left and right shoulder.
+      \subsubsection{Cursor Manipulation}
+      \subsubsection{Hand States}
+      \subsubsection{Pulling and Pushing}
+      \subsubsection{Swiping}
       % TODO: Describe types of gestures -- arm level and hand level
-    \subsection{Phase IV --- Content Development}
+    \subsection{Content Development\label{phase4}}
       % TODO: Describe ways of representing content
-    \subsection{Phase V --- Testing and Robustness Evaluation}
+    \subsection{Testing and Robustness Evaluation\label{phase5}}
       % TODO: Describe use of Kinect Fusion/QUnit for front/back-end testing
-    \subsection{Phase VI --- User Recognition}
+    \subsection{User Recognition\label{phase6}}
       % TODO: Describe use Kinect Audio Beam-forming/IR Facial Recognition for saliency and recognition
   \section{Deliverables}
     \subsection{27 January}
       % Literature Review and familiarization with Kinect API
     \subsection{24 February}
-      % Phase I completion
+      Phase~\ref{phase1} is expected to be completed by this time.
     \subsection{31 March}
-      % Phase II completion
+      Phase~\ref{phase2} is expected to be completed by this time.
     \subsection{28 April}
-      % Phase III/IV completion
+      Phases~\ref{phase3} and~\ref{phase4} is expected to be completed by this time.
     \subsection{End of Semester}
-      % Phase V/VI Exploration
+      Phase~\ref{phase5} is expected to be completed by this time. % Phase 6 exploration.
   \section{Extensions}
     % Gesture Learning using ML
+  \section{Acknowledgments}
+    The authors are indebted to Donald Greenberg, Joe Kider, John Decorato, and Jeremy Newlin for advice and assistance rendered throughout the course of the project. This work was supported by the Cornell Program of Computer Graphics.
 \end{document}
