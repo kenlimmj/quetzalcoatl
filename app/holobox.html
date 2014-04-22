@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Camera Obscura</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="css/holobox.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="world">
+    <div id="room">
+      <!-- The back wall which holds our content -->
+      <div id="back"></div>
+
+      <!-- The translucent front wall -->
+      <div id="front"></div>
+
+      <!-- The remaining walls of the box -->
+      <div id="wall-left"></div>
+      <div id="wall-right"></div>
+      <div id="wall-top"></div>
+      <div id="wall-bottom"></div>
+
+      <!-- A plane below the box which is used to simulate a shadow -->
+      <div id="shadow"></div>
+    </div>
+  </div>
+</body>
+<script src="js/holobox.js"></script>
+</html>

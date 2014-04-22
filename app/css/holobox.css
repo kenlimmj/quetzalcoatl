@@ -1,0 +1,124 @@
+html, body
+{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    color: #eee;
+    background: #eee;
+}
+
+#world
+{
+    width: 100%;
+    height: 100%;
+
+    -webkit-perspective: 500px;
+    -webkit-perspective-origin: 50% 50%;
+}
+#room
+{
+    position: absolute;
+    top: 45%;
+    left: 50%;
+
+    width: 600px;
+    height: 500px;
+    margin-top: -250px;
+    margin-left: -300px;
+}
+#back, #front, #wall-left, #wall-right, #wall-top, #wall-bottom
+{
+    position: absolute;
+
+    -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
+       -moz-box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
+            box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
+
+         -o-box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
+}
+#back
+{
+    width: 600px;
+    height: 500px;
+
+    -webkit-transform: translateZ(-49px);
+    text-align: center;
+
+    background: url('../img/vermeer.jpg') no-repeat center;
+    background-size: 600px 500px;
+}
+#front
+{
+    width: 600px;
+    height: 500px;
+
+    -webkit-transform: translateZ(50px);
+}
+#wall-left
+{
+    left: 0;
+
+    width: 100px;
+    height: 500px;
+
+    -webkit-transform: translateX(-50px) rotate3d(0, 50, 0, 90deg);
+
+    background: url('../img/vermeer.jpg') no-repeat left;
+    background-size: auto 500px;
+    backface-visibility: hidden;
+}
+#wall-right
+{
+    right: 0;
+
+    width: 100px;
+    height: 500px;
+
+    -webkit-transform: translateX(50px) rotate3d(0, 50, 0, -90deg);
+
+    background: url('../img/vermeer.jpg') no-repeat right;
+    background-size: auto 500px;
+}
+#wall-top
+{
+    top: 0;
+
+    width: 600px;
+    height: 100px;
+
+    -webkit-transform: translateY(-50px) rotate3d(50, 0, 0, 90deg);
+
+    background: url('../img/vermeer.jpg') no-repeat top;
+    background-size: 600px;
+}
+#wall-bottom
+{
+    bottom: 0;
+
+    width: 600px;
+    height: 100px;
+
+    -webkit-transform: translateY(50px) rotate3d(50, 0, 0, -90deg);
+
+    background: url('../img/vermeer.jpg') no-repeat bottom;
+    background-size: 600px;
+}
+#shadow
+{
+    position: absolute;
+
+    width: 600px;
+    height: 100px;
+
+    -webkit-transform: translate3d(0, 550px, -10px) rotateX(70deg);
+
+    border-radius: 8px;
+    background: rgba(0, 0, 0, .2);
+    -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, .45);
+       -moz-box-shadow: 0 0 20px rgba(0, 0, 0, .45);
+            box-shadow: 0 0 20px rgba(0, 0, 0, .45);
+
+         -o-box-shadow: 0 0 20px rgba(0, 0, 0, .45);
+}
