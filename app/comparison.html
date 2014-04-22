@@ -1,30 +1,53 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Kinect Test</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link rel="stylesheet" href="css/style.css"> -->
-    <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
-    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
-  </head>
-  <body>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Kinect Test</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" href="css/style.css"> -->
+  <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
+</head>
+
+<body>
   <div class="twentytwenty-container">
-  <!-- The before image is first -->
-  <img src="img/apple.jpg" width="800"/>
-  <!-- The after image is last -->
-  <img src="img/apple_color.jpg" width="800"/>
+    <img id="input" src="img/apple.jpg" />
+    <img id="output" src="img/apple.jpg" />
   </div>
-  </body>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-  <script src="js/jquery.event.move.js"></script>
-  <script src="js/jquery.twentytwenty.js"></script>
-  <script>
-  $(window).load(function(){
-    $(".twentytwenty-container").twentytwenty();
+</body>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="js/jquery.event.move.js"></script>
+<script src="js/jquery.twentytwenty.js"></script>
+<script src="js/Color.Vision.Daltonize.js"></script>
+<script src="js/Color.Vision.Simulate.js"></script>
+<script>
+// Convert the stock image into a color-blind version
+Simulate('input','output','Deuteranope');
+
+$(window).load(function() {
+  $(".twentytwenty-container").twentytwenty();
+});
+
+// Simulate color blindness on an image
+// The image is returned as a base64 URI
+// Type: Protanope, Deuteranope or Tritanope
+function Simulate(input_elem,output_elem,type) {
+  var image = new Image();
+  image.src = document.getElementById(input_elem).src;
+  debugger;
+  Color.Vision.Simulate(image, {
+    type: type,
+    amount: 1.0,
+    callback: function(canvas) {
+      document.getElementById(output_elem).src = canvas.toDataURL("image/jpeg",1.0);
+    }
   });
-  </script>
-  </html>
+};
+</script>
+
+</html>

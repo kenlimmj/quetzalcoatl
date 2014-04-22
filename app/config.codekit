@@ -2,11 +2,27 @@
 "CodeKitInfo": "This is a CodeKit 2.x project configuration file. It is designed to sync project settings across multiple machines. MODIFYING THE CONTENTS OF THIS FILE IS A POOR LIFE DECISION. If you do so, you will likely cause CodeKit to crash. This file is not useful unless accompanied by the project that created it in CodeKit 2. This file is not backwards-compatible with CodeKit 1.x. For more information, see: http:\/\/incident57.com\/codekit",
 "creatorBuild": "16877",
 "files": {
+	"\/comparison.html": {
+		"fileType": 8192,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/comparison.html",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsSetByUser": 0
+		},
 	"\/css\/style.css": {
 		"fileType": 16,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/css\/style.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/twentytwenty.css": {
+		"fileType": 16,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/twentytwenty.css",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsSetByUser": 0
 		},
@@ -362,6 +378,46 @@
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsSetByUser": 0
 		},
+	"\/img\/apple.jpg": {
+		"fileType": 16384,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 576216,
+		"inputAbbreviatedPath": "\/img\/apple.jpg",
+		"outputAbbreviatedPath": "\/img\/apple.jpg",
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
+	"\/img\/apple_color.jpg": {
+		"fileType": 16384,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 3.94136e+06,
+		"inputAbbreviatedPath": "\/img\/apple_color.jpg",
+		"outputAbbreviatedPath": "\/img\/apple_color.jpg",
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
+	"\/img\/green_apple.png": {
+		"fileType": 32768,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 1.70223e+06,
+		"inputAbbreviatedPath": "\/img\/green_apple.png",
+		"outputAbbreviatedPath": "\/img\/green_apple.png",
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
+	"\/img\/green_apple_color.jpg": {
+		"fileType": 16384,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 1.70475e+06,
+		"inputAbbreviatedPath": "\/img\/green_apple_color.jpg",
+		"outputAbbreviatedPath": "\/img\/green_apple_color.jpg",
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
 	"\/index.html": {
 		"fileType": 8192,
 		"ignore": 0,
@@ -376,6 +432,26 @@
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/js\/aside.js",
 		"outputAbbreviatedPath": "\/js\/min\/aside-ck.js",
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 2,
+		"syntaxCheckerStyle": 1
+		},
+	"\/js\/Color.Vision.Daltonize.js": {
+		"fileType": 64,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/js\/Color.Vision.Daltonize.js",
+		"outputAbbreviatedPath": "\/js\/Color.Vision.Daltonize.min.js",
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 2,
+		"syntaxCheckerStyle": 1
+		},
+	"\/js\/Color.Vision.Simulate.js": {
+		"fileType": 64,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/js\/Color.Vision.Simulate.js",
+		"outputAbbreviatedPath": "\/js\/Color.Vision.Simulate.min.js",
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
 		"syntaxCheckerStyle": 1
@@ -396,6 +472,26 @@
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/js\/gestures.js",
 		"outputAbbreviatedPath": "\/js\/min\/gestures-ck.js",
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 2,
+		"syntaxCheckerStyle": 1
+		},
+	"\/js\/jquery.event.move.js": {
+		"fileType": 64,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/js\/jquery.event.move.js",
+		"outputAbbreviatedPath": "\/js\/jquery.event.move.min.js",
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 2,
+		"syntaxCheckerStyle": 1
+		},
+	"\/js\/jquery.twentytwenty.js": {
+		"fileType": 64,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/js\/jquery.twentytwenty.js",
+		"outputAbbreviatedPath": "\/js\/jquery.twentytwenty.min.js",
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
 		"syntaxCheckerStyle": 1
