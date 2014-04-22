@@ -4,13 +4,10 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Kinect Test</title>
+  <title>Color Blindness Simulation</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- <link rel="stylesheet" href="css/style.css"> -->
-  <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
-  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
-  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
+  <link href="css/colorblindness.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -39,7 +36,6 @@ $(window).load(function() {
 function Simulate(input_elem,output_elem,type) {
   var image = new Image();
   image.src = document.getElementById(input_elem).src;
-  debugger;
   Color.Vision.Simulate(image, {
     type: type,
     amount: 1.0,

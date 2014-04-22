@@ -388,36 +388,6 @@
 		"outputPathIsSetByUser": 0,
 		"processed": 0
 		},
-	"\/img\/apple_color.jpg": {
-		"fileType": 16384,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"initialSize": 3.94136e+06,
-		"inputAbbreviatedPath": "\/img\/apple_color.jpg",
-		"outputAbbreviatedPath": "\/img\/apple_color.jpg",
-		"outputPathIsSetByUser": 0,
-		"processed": 0
-		},
-	"\/img\/green_apple.png": {
-		"fileType": 32768,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"initialSize": 1.70223e+06,
-		"inputAbbreviatedPath": "\/img\/green_apple.png",
-		"outputAbbreviatedPath": "\/img\/green_apple.png",
-		"outputPathIsSetByUser": 0,
-		"processed": 0
-		},
-	"\/img\/green_apple_color.jpg": {
-		"fileType": 16384,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"initialSize": 1.70475e+06,
-		"inputAbbreviatedPath": "\/img\/green_apple_color.jpg",
-		"outputAbbreviatedPath": "\/img\/green_apple_color.jpg",
-		"outputPathIsSetByUser": 0,
-		"processed": 0
-		},
 	"\/index.html": {
 		"fileType": 8192,
 		"ignore": 0,
@@ -493,8 +463,8 @@
 		"inputAbbreviatedPath": "\/js\/jquery.twentytwenty.js",
 		"outputAbbreviatedPath": "\/js\/jquery.twentytwenty.min.js",
 		"outputPathIsSetByUser": 0,
-		"outputStyle": 2,
-		"syntaxCheckerStyle": 1
+		"outputStyle": 0,
+		"syntaxCheckerStyle": 0
 		},
 	"\/js\/jquery.zoomooz.min.js": {
 		"fileType": 64,
@@ -1873,7 +1843,7 @@
 	"sassUseLibsass": 1,
 	"shouldRunAutoprefixer": 0,
 	"shouldRunBless": 0,
-	"skippedItemsString": ".svn, .git, .hg, log, _logs, _cache, cache, logs",
+	"skippedItemsString": "_cache, logs, _logs, cache, .git, log, .svn, .hg",
 	"slimAutoOutputPathRelativePath": "",
 	"slimAutoOutputPathReplace1": "",
 	"slimAutoOutputPathReplace2": "",

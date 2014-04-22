@@ -1,3 +1,8 @@
+html,body
+{
+    margin: 0;
+    padding: 0;
+}
 .twentytwenty-horizontal .twentytwenty-handle:before, .twentytwenty-horizontal .twentytwenty-handle:after, .twentytwenty-vertical .twentytwenty-handle:before, .twentytwenty-vertical .twentytwenty-handle:after
 {
     position: absolute;
@@ -56,12 +61,12 @@
     overflow: hidden;
 
     box-sizing: content-box;
+    width: 100%;
 
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-    ;
 }
 .twentytwenty-container img
 {
@@ -69,6 +74,8 @@
     top: 0;
 
     display: block;
+
+    height: 100vh;
 }
 .twentytwenty-container *
 {
