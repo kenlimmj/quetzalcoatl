@@ -32,7 +32,7 @@ namespace Quetzalcoatl
         static WebSocketServer server = new WebSocketServer("ws://localhost:1620");
 
         // Debugging switch. Set to true for verbose output.
-        static Boolean debug = true;
+        static Boolean debug = false;
 
         static void Main(string[] args)
         {
@@ -102,9 +102,13 @@ namespace Quetzalcoatl
 
             private int rframecount = 0;
             private int lframecount = 0;
+            private int startcount = 0;
+            private int endcount = 0;
 
             private float zright = 0;
             private float zleft = 0;
+            private float ssright = 0;
+            private float ssleft = 0;
 
             private float pushzright = 0;
             private float pushzleft = 0;
@@ -123,6 +127,8 @@ namespace Quetzalcoatl
             private bool startStatement = false;
 
             private bool engaged = false;
+
+            private ulong mainBodyId = 0;
 
             public void InitializeKinect()
             {
@@ -166,11 +172,30 @@ namespace Quetzalcoatl
                         if (frame != null)
                         {
                             // Get the data for all the bodies detected by the Kinect
-                            frame.GetAndRefreshBodyData(this.bodies);
+                            frame.GetAndRefreshBodyData(this.bodies); 
+
+                            // Extract only the bodies that are tracked
+                            var trackedBodies = this.bodies.Where(c => c.IsTracked).ToArray();
+
+                            // Initialize a blank array for storing body IDs
+                            var bodyIdArray = new ulong[trackedBodies.Count()];
+
+                            // Populate the ID array with the IDs of all tracked bodies
+                            for(int k = 0; k < trackedBodies.Count(); k++) {
+                                bodyIdArray[k] = trackedBodies[k].TrackingId;
+                            }
+
+                            // Set the body to be tracked. If the ID is empty, or if the last tracked body is not in the Kinect viewport,
+                            // the first body that is detected will be assigned to be tracked. Otherwise, it maintains priority of the
+                            // original body
+                            if (mainBodyId == 0 || Array.IndexOf(bodyIdArray, mainBodyId) == -1)
+                            {
+                                mainBodyId = bodyIdArray[0];
+                            }
 
                             foreach (Body body in this.bodies)
                             {
-                                if (body.IsTracked)
+                                if (body.IsTracked && body.TrackingId == mainBodyId)
                                 {
                                     // Store all the joint data to a Dictionary for easy access later
                                     IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
@@ -190,7 +215,7 @@ namespace Quetzalcoatl
                                     // Define handles to each shoulder
                                     Point lShoulder = jointPoints[JointType.ShoulderLeft];
                                     Point rShoulder = jointPoints[JointType.ShoulderRight];
-                                    
+
                                     // Define handles to each wrist
                                     Point lWrist = jointPoints[JointType.WristLeft];
                                     Point rWrist = jointPoints[JointType.WristRight];
@@ -208,7 +233,7 @@ namespace Quetzalcoatl
 
                                     if (engaged == true)
                                     {
-                                        startStatement = false; 
+                                        startStatement = false;
 
                                         if (body.HandRightState == HandState.Closed)
                                         {
@@ -244,7 +269,7 @@ namespace Quetzalcoatl
 
                                         // Calculate the distance from the midpoint of the left elbow-wrist joint to the midpoint of the right elbow-wrist joint
                                         double width = (Math.Pow((Math.Pow(Math.Abs(rShoulder.X - rElbow.X), 2) + Math.Pow(Math.Abs(rShoulder.Y - rElbow.Y), 2)), 0.5) + (Math.Pow((Math.Pow(Math.Abs(rElbow.X - rWrist.X), 2) + Math.Pow(Math.Abs(rElbow.Y - rWrist.Y), 2)), 0.5) / 2)) * 2 + Math.Abs(rShoulder.X - lShoulder.X);
-                                        
+
                                         // Calculate the distance from the base of the spine to the top of the head
                                         double height = Math.Abs(bSpine.Y - neck.Y) + 2 * (neck.Y - head.Y);
 
@@ -305,7 +330,7 @@ namespace Quetzalcoatl
                                         }
 
                                         // Create a JSON packet of all the data to be sent to the client
-                                        string result = MakeJson(rHandState, rHand,lHandState, lHand,bSpine, width, height, zoomscale);
+                                        string result = MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale);
 
                                         // Send the data to the client
                                         allSockets.ToList().ForEach(s => s.Send(result));
@@ -316,11 +341,17 @@ namespace Quetzalcoatl
                                         }
 
                                         // Check if the user is in a start/stop position
-                                        this.CheckStartStop(rShoulder, rElbow, rWrist, lHand, rHand, bSpine);
+
+                                        if (lHand.Y <= bSpine.Y && rHand.Y <= bSpine.Y)
+                                        {
+                                            endcount = 0;
+                                        }
+                                        this.CheckStartStop(body.Joints[JointType.HandRight].Position.Z, body.Joints[JointType.HandLeft].Position.Z, startcount, endcount, lHand, rHand, bSpine);
 
                                         // Increment the frame counts
                                         rframecount++;
                                         lframecount++;
+                                        endcount++;
                                     }
                                     else
                                     {
@@ -332,7 +363,15 @@ namespace Quetzalcoatl
                                         }
 
                                         // Check if the user is in a start/stop position
-                                        this.CheckStartStop(rShoulder, rElbow, rWrist, lHand, rHand, bSpine);
+                                        if (body.HandLeftState == HandState.Closed && body.HandRightState == HandState.Closed)
+                                        {
+                                            if (startcount > 45)
+                                            {
+                                                startcount = 0;
+                                            }
+                                            this.CheckStartStop(body.Joints[JointType.HandRight].Position.Z, body.Joints[JointType.HandLeft].Position.Z, startcount, endcount, lHand, rHand, bSpine);
+                                        }
+                                        startcount++;
                                     }
                                 }
                             }
@@ -345,18 +384,26 @@ namespace Quetzalcoatl
                 }
             }
 
-            private void CheckStartStop(Point rShoulder, Point rElbow, Point rWrist, Point lHand, Point rHand, Point bSpine)
+            private void CheckStartStop(float rightz, float leftz, int startframe, int endframe, Point lHand, Point rHand, Point bSpine)
             {
-                if (rShoulder.X <= rWrist.X &&
-                    rWrist.X <= rElbow.X &&
-                    rShoulder.Y >= rWrist.Y &&
-                    rWrist.Y <= rElbow.Y)
+                if (startframe == 0)
+                {
+                    ssright = rightz;
+                    ssleft = leftz;
+                }
+                else if (rightz >= ssright + .102 && leftz >= ssleft + .102)
                 {
                     engaged = true;
+                    ssleft = 6;
+                    ssright = 6;
                 }
                 else if (lHand.Y >= bSpine.Y && rHand.Y >= bSpine.Y)
                 {
-                    engaged = false;
+                    Console.WriteLine("Hands below waist for " + endframe + " frames.");
+                    if (endframe > 150)
+                    {
+                        engaged = false;
+                    }
                 }
             }
 
