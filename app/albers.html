@@ -24,166 +24,20 @@
 
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.1/kinetic.min.js"></script>
+<script src="js/albers1.js"></script>
+<script src="js/albers2.js"></script>
 <script src="js/kontext.js"></script>
 <script>
 var k = kontext(document.querySelector('.kontext'));
+
+// Initialize the views
+stage1Init();
+stage2Init();
 
 document.addEventListener('keyup', function(event) {
   if (event.keyCode === 37) k.prev();
   if (event.keyCode === 39) k.next();
 }, false);
-</script>
-<script defer="defer">
-var width = document.getElementById("container1").offsetWidth,
-  height = document.getElementById("container1").offsetHeight;
-
-var big_width = 0.3 * width,
-  small_width = 0.2 * width,
-  box_width = 0.1 * width;
-
-var stage1 = new Kinetic.Stage({
-  container: 'container1',
-  width: width,
-  height: height
-});
-
-var stage1_dragLayer = new Kinetic.Layer(),
-  stage1_background = new Kinetic.Layer();
-
-var stage1_background_left = new Kinetic.Rect({
-  x: 0,
-  y: 0,
-  width: big_width,
-  height: height,
-  fill: "#FF8601"
-});
-
-var stage1_background_right = new Kinetic.Rect({
-  x: (width - big_width),
-  y: 0,
-  width: big_width,
-  height: height,
-  fill: "#418BB5"
-});
-
-var stage1_middle_left = new Kinetic.Rect({
-  x: big_width,
-  y: 0,
-  width: small_width,
-  height: height,
-  fill: "#FFF724"
-});
-
-var stage1_middle_right = new Kinetic.Rect({
-  x: (width - big_width - small_width),
-  y: 0,
-  width: small_width,
-  height: height,
-  fill: "#2B2C67"
-});
-
-var stage1_left_box = new Kinetic.Rect({
-  x: (big_width - box_width),
-  y: (height / 2 - box_width / 2),
-  width: box_width,
-  height: box_width,
-  fill: '#AC5B0E',
-  draggable: true
-});
-
-var stage1_right_box = new Kinetic.Rect({
-  x: (width - big_width),
-  y: (height / 2 - box_width / 2),
-  width: box_width,
-  height: box_width,
-  fill: '#AC5B0E',
-  draggable: true
-});
-
-stage1_left_box.on('mouseover', function() {
-  document.body.style.cursor = 'pointer';
-});
-stage1_left_box.on('mouseout', function() {
-  document.body.style.cursor = 'default';
-});
-
-stage1_right_box.on('mouseover', function() {
-  document.body.style.cursor = 'pointer';
-});
-stage1_right_box.on('mouseout', function() {
-  document.body.style.cursor = 'default';
-});
-
-stage1_background.add(stage1_background_left);
-stage1_background.add(stage1_background_right);
-stage1_background.add(stage1_middle_left);
-stage1_background.add(stage1_middle_right);
-
-stage1_dragLayer.add(stage1_left_box);
-stage1_dragLayer.add(stage1_right_box);
-
-stage1.add(stage1_dragLayer);
-stage1.add(stage1_background);
-
-stage1_background.moveToBottom();
-stage1_background.draw();
-
-var half_width = 0.5 * width;
-
-var stage2 = new Kinetic.Stage({
-  container: 'container2',
-  width: width,
-  height: height
-});
-
-var stage2_dragLayer = new Kinetic.Layer(),
-  stage2_background = new Kinetic.Layer();
-
-var stage2_background_left = new Kinetic.Rect({
-  x: 0,
-  y: 0,
-  width: half_width,
-  height: height,
-  fill: "#AEE60B"
-});
-
-var stage2_background_right = new Kinetic.Rect({
-  x: (width - half_width),
-  y: 0,
-  width: half_width,
-  height: height,
-  fill: "#B97E16"
-});
-
-var stage2_left_box = new Kinetic.Rect({
-  x: (big_width - box_width),
-  y: (height / 2 - box_width / 2),
-  width: box_width,
-  height: box_width,
-  fill: '#A0CA36',
-  draggable: true
-});
-
-var stage2_right_box = new Kinetic.Rect({
-  x: (width - big_width),
-  y: (height / 2 - box_width / 2),
-  width: box_width,
-  height: box_width,
-  fill: '#A0CA36',
-  draggable: true
-});
-
-stage2_background.add(stage2_background_left);
-stage2_background.add(stage2_background_right);
-
-stage2_dragLayer.add(stage2_left_box);
-stage2_dragLayer.add(stage2_right_box);
-
-stage2.add(stage2_dragLayer);
-stage2.add(stage2_background);
-
-stage2_background.moveToBottom();
-stage2_background.draw();
 </script>
 
 </html>
