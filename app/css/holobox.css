@@ -5,10 +5,8 @@ html, body
     margin: 0;
     padding: 0;
 
-    color: #eee;
     background: #eee;
 }
-
 #world
 {
     width: 100%;
