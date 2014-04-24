@@ -21,6 +21,10 @@ var ws = {
             nav.drawScreenView();
             nav.drawUserView();
 
+            // FIXME: Testing code. To be deleted
+            nav.setUserSpineBase(nav.uSpineX, nav.uSpineY);
+            nav.setUserView(nav.uWidth, nav.uHeight);
+
             // Draw the cursor reticules on the overlay
             cursor.init();
         }

@@ -1,4 +1,15 @@
 var cursor = {
+    leftX: null,
+    leftY: null,
+    rightX: null,
+    rightY: null,
+
+    // FIXME: Test values that will be deleted eventually
+    leftX: 150,
+    leftY: 200,
+    rightX: 300,
+    rightY: 200,
+
     open_radius: 25,
     grab_radius: 15.45,
     pull_radius: 9.55,
@@ -8,26 +19,53 @@ var cursor = {
         var leftCursorLayer = new Kinetic.Layer(),
             rightCursorLayer = new Kinetic.Layer();
 
-        var leftCursor = new Kinetic.Circle({
-            x: nav.sWidth / 3,
-            y: nav.sHeight / 2,
+        var mappedLeftCursor = cursor.map(cursor.leftX, cursor.leftY),
+            mappedRightCursor = cursor.map(cursor.rightX, cursor.rightY);
+
+        var leftScreenCursor = new Kinetic.Circle({
+            x: mappedLeftCursor[0],
+            y: mappedLeftCursor[1],
             radius: cursor.open_radius,
-            fill: "#d33682",
+            fill: "#d33682"
         });
 
-        var rightCursor = new Kinetic.Circle({
-            x: nav.sWidth * 2 / 3,
-            y: nav.sHeight / 2,
+        var leftUserCursor = new Kinetic.Circle({
+            x: cursor.leftX,
+            y: cursor.leftY,
             radius: cursor.open_radius,
-            fill: "#6c71c4",
+            fill: "#d33682"
+        });
+
+        var rightScreenCursor = new Kinetic.Circle({
+            x: mappedRightCursor[0],
+            y: mappedRightCursor[1],
+            radius: cursor.open_radius,
+            fill: "#6c71c4"
+        });
+
+        var rightUserCursor = new Kinetic.Circle({
+            x: cursor.rightX,
+            y: cursor.rightY,
+            radius: cursor.open_radius,
+            fill: "#6c71c4"
         });
 
         // Add each cursor reticule to its respective layer
-        leftCursorLayer.add(leftCursor);
-        rightCursorLayer.add(rightCursor);
+        leftCursorLayer.add(leftScreenCursor).add(leftUserCursor);
+        rightCursorLayer.add(rightScreenCursor).add(rightUserCursor);
 
         // Add both layers to the navigation overlay
         nav.overlay.add(leftCursorLayer).add(rightCursorLayer);
+    },
+
+    setLeftCursor: function(x, y) {
+        cursor.leftX = x;
+        cursor.leftY = y;
+    },
+
+    setRightCursor: function(x, y) {
+        cursor.rightX = x;
+        cursor.rightY = y;
     },
 
     get_radius: function(handState) {
