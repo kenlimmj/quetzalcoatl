@@ -130,6 +130,10 @@ namespace Quetzalcoatl
 
             private ulong mainBodyId = 0;
 
+            private Point[] lpos = new Point[5];
+            private Point[] rpos = new Point[5];
+            private string swipe = "none";
+
             public void InitializeKinect()
             {
                 // Initialize the Kinect itself. Since we're running the Dev API, there's support for only one Kinect.
@@ -235,6 +239,28 @@ namespace Quetzalcoatl
                                     {
                                         startStatement = false;
 
+                                        for (int i = 3; i >= 0; i--)
+                                        {
+                                            rpos[i + 1] = rpos[i];
+                                            lpos[i + 1] = lpos[i];
+                                        }
+                                        rpos[0] = rHand;
+                                        lpos[0] = lHand;
+
+                                        if (rpos[4].X!=0 && rpos[4].Y!=0)
+                                        {
+                                            swipe = CheckSwipe(rpos[0], rpos[4], lpos[0], lpos[4]);
+                                        }
+                                        if (rpos[4].X==0 && lpos[4].X==0)
+                                        {
+                                            swipe = "none";
+                                        }
+                                        if (!(swipe.Equals("none")))
+                                        {
+                                            Array.Clear(rpos, 0, rpos.Length);
+                                            Array.Clear(lpos, 0, lpos.Length);
+                                        }
+
                                         if (body.HandRightState == HandState.Closed)
                                         {
                                             if (this.rframecount >= 45)
@@ -330,7 +356,7 @@ namespace Quetzalcoatl
                                         }
 
                                         // Create a JSON packet of all the data to be sent to the client
-                                        string result = MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale);
+                                        string result = MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale, swipe);
 
                                         // Send the data to the client
                                         allSockets.ToList().ForEach(s => s.Send(result));
@@ -399,7 +425,6 @@ namespace Quetzalcoatl
                 }
                 else if (lHand.Y >= bSpine.Y && rHand.Y >= bSpine.Y)
                 {
-                    Console.WriteLine("Hands below waist for " + endframe + " frames.");
                     if (endframe > 150)
                     {
                         engaged = false;
@@ -491,6 +516,30 @@ namespace Quetzalcoatl
                 }
             }
 
+            private string CheckSwipe(Point rfirst, Point rlast, Point lfirst, Point llast)
+            {
+                if (rfirst.X>rlast.X+85 || lfirst.X>llast.X+85)
+                {
+                    return "right";
+                }
+                else if (rfirst.X<rlast.X-85 || lfirst.X<llast.X-85)
+                {
+                    return "left";
+                }
+                else if (rfirst.Y<rlast.Y-85 || lfirst.Y<llast.Y-85)
+                {
+                    return "up";
+                }
+                else if (rfirst.Y>rlast.Y+85 || lfirst.Y>llast.Y+85)
+                {
+                    return "down";
+                }
+                else
+                {
+                    return "none";
+                }
+            }
+
             /// An instance is a constructor for the JSON packet
             private class Packet
             {
@@ -516,12 +565,15 @@ namespace Quetzalcoatl
 
                 // Zoom Scale
                 public double scale { get; set; }
+
+                //Swipe Value
+                public string swipeval { get; set; }
             }
 
             /// An instance constructs a JSON from a list of parameters
             /// Input: Left and right hand coordinates, and left and right hand states
             /// Output: Formatted JSON packet
-            public string MakeJson(String rightstate, Point rightpos, String leftstate, Point leftpos, Point spinebase, double width, double height, double zoom)
+            public string MakeJson(String rightstate, Point rightpos, String leftstate, Point leftpos, Point spinebase, double width, double height, double zoom, string zoomdir)
             {
                 Packet bodyData = new Packet
                 {
@@ -540,7 +592,9 @@ namespace Quetzalcoatl
                     screenw = Math.Round(width),
                     screenh = Math.Round(height),
 
-                    scale = zoom
+                    scale = zoom,
+
+                    swipeval = zoomdir
                 };
 
                 // Create a nicely formatted JSON from the hand object
