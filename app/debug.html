@@ -3,29 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self'">
     <title>Debugger</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Roboto:300">
-    <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Inconsolata:400">
+    <link rel="stylesheet" href="css/debug.css">
   </head>
   <body>
-    <canvas id="cursor"></canvas>
-    <div id="console">
-      <p>Status: <span id="serverstatus"></span></p>
-      <hr>
-      <p>LH Screen x: <span id="lscreenx"></span></p>
-      <p>LH Screen y: <span id="lscreeny"></span></p>
-      <p>LH State: <span id="lhstate"></span></p>
-      <hr>
-      <p>RH Screen x: <span id="rscreenx"></span></p>
-      <p>RH Screen y: <span id="rscreeny"></span></p>
-      <p>RH State: <span id="rhstate"></span></p>
-    </div>
+    <div id="nav"></div>
   </body>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-  <script src="js/cursor.js"></script>
-  <script src="js/gestures.js"></script>
-  <script src="js/websocket.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.1/kinetic.min.js"></script>
+  <script src="js/mousetrap.min.js"></script>
+  <script src="js/websocket-test.js"></script>
+  <script src="js/viewport.js"></script>
 </html>
