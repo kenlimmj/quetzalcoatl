@@ -4,7 +4,7 @@ var nav = {
     sHeight: window.innerHeight,
 
     // Dimensions of the Kinect viewport
-    kWidth: 520,
+    kWidth: 512,
     kHeight: 424,
 
     // Location of the user's spine base
@@ -15,13 +15,23 @@ var nav = {
     uWidth: null,
     uHeight: null,
 
+    // FIXME: Test values that will be deleted eventually
+    uSpineX: 200,
+    uSpineY: 300,
+    uWidth: 300,
+    uHeight: 250,
+
     init: function() {
-        nav.overlay: new Kinetic.Stage({
+        nav.overlay = new Kinetic.Stage({
             container: 'nav',
             width: document.querySelector("#nav").offsetWidth,
             height: document.querySelector("#nav").offsetHeight
-        }),
-    }
+        });
+
+        nav.userViewLayer = new Kinetic.Layer();
+        nav.kinectViewLayer = new Kinetic.Layer();
+        nav.screenViewLayer = new Kinetic.Layer();
+    },
 
     setScreenView: function(x, y) {
         nav.sWidth = x;
@@ -46,100 +56,92 @@ var nav = {
         nav.uxMax = nav.uSpineX + nav.uWidth / 2;
         nav.uyMin = nav.uSpineY - nav.uHeight;
         nav.uyMax = nav.uHeight;
-    }
-}
+    },
 
-var cursor = {
-    open_radius: 25,
-    grab_radius: 15.45,
-    pull_radius: 9.55,
-    point_radius: 5.9,
-
-    init: function() {
-        var leftCursorLayer = new Kinetic.Layer(),
-            rightCursorLayer = new Kinetic.Layer();
-
-        var leftCursor = new Kinetic.Circle({
-            x: nav.sWidth / 3,
-            y: nav.sHeight / 2,
-            radius: cursor.open_radius,
-            fill: "#d33682",
+    drawKinectView: function() {
+        nav.kinectView = new Kinetic.Rect({
+            x: nav.sWidth / 2 - nav.kWidth / 2,
+            y: nav.sHeight / 2 - nav.kHeight / 2,
+            width: nav.kWidth,
+            height: nav.kHeight,
+            stroke: "#444",
+            strokeWidth: 1.618,
         });
 
-        var rightCursor = new Kinetic.Circle({
-            x: nav.sWidth * 2 / 3,
-            y: nav.sHeight / 2,
-            radius: cursor.open_radius,
-            fill: "#6c71c4",
+        nav.kinectViewLabel = new Kinetic.Text({
+            x: nav.sWidth / 2 - nav.kWidth / 2,
+            y: nav.sHeight / 2 + nav.kHeight / 2 + 5,
+            width: nav.kWidth,
+            align: "right",
+            text: "Kinect Viewport\n" + nav.kWidth + "x" + nav.kHeight,
+            fontSize: 14,
+            fill: "#444"
         });
 
-        // Add each cursor reticule to its respective layer
-        leftCursorLayer.add(leftCursor);
-        rightCursorLayer.add(rightCursor);
-
-        // Add both layers to the navigation overlay
-        nav.overlay.add(leftCursorLayer).add(rightCursorLayer);
+        // Draw the Kinect viewport on-screen
+        nav.kinectViewLayer.add(nav.kinectView).add(nav.kinectViewLabel);
+        nav.overlay.add(nav.kinectViewLayer);
     },
 
-    get_radius: function(handState) {
-        switch (handState) {
-            case "open":
-                return cursor.open_radius;
-            case "grab":
-                return cursor.grab_radius;
-            case "pull":
-                return cursor.pull_radius;
-            case "point":
-                return cursor.point_radius;
-            default:
-                return cursor.open_radius;
-        }
+    drawUserView: function() {
+        nav.userView = new Kinetic.Rect({
+            x: nav.uSpineX - nav.uWidth / 2 + nav.kinectView.getX(),
+            y: nav.uSpineY - nav.uHeight + nav.kinectView.getY(),
+            width: nav.uWidth,
+            height: nav.uHeight,
+            stroke: "#444",
+            strokeWidth: 1.618
+        });
+
+        nav.userSpineBase = new Kinetic.Circle({
+            x: nav.uSpineX + nav.kinectView.getX(),
+            y: nav.uSpineY + nav.kinectView.getY(),
+            radius: 8.09,
+            fill: "#444"
+        });
+
+        nav.userSpineConnector = new Kinetic.Line({
+            points: [nav.userSpineBase.getX(), nav.userSpineBase.getY(), nav.screenSpineBase.getX(), nav.screenSpineBase.getY()],
+            stroke: "#444",
+            strokeWidth: 1.618,
+            lineJoin: "round",
+            dash: [10, 5]
+        });
+
+        nav.userViewLabel = new Kinetic.Text({
+            x: nav.uSpineX - nav.uWidth / 2 + nav.kinectView.getX(),
+            y: nav.uSpineY + nav.kinectView.getY() + 5,
+            width: nav.uWidth,
+            align: "right",
+            text: "User Viewport\n" + nav.uWidth + "x" + nav.uHeight,
+            fontSize: 14,
+            fill: "#444"
+        });
+
+        // Draw the user viewport box on-screen
+        nav.userViewLayer.add(nav.userView).add(nav.userSpineBase).add(nav.userSpineConnector).add(nav.userViewLabel);
+        nav.overlay.add(nav.userViewLayer);
     },
 
-    get_threshold: function(handState) {
-        switch (handState) {
-            case "open":
-                return 1 / 100
-            case "grab":
-                return 1 / 100
-            case "pull":
-                return 1 / 100
-            case "point":
-                return 1 / 200
-            default:
-                return 1 / 100
-        }
-    },
+    drawScreenView: function() {
+        nav.screenSpineBase = new Kinetic.Circle({
+            x: nav.sWidth / 2,
+            y: nav.sHeight,
+            radius: 11.326,
+            fill: "#444"
+        });
 
-    stabilize: function(x, factor) {
-        return x - (x % factor) + (x % factor > 0 && factor);
-    },
+        nav.screenViewLabel = new Kinetic.Text({
+            x: 0,
+            y: nav.sHeight - 30,
+            width: nav.sWidth - 10,
+            align: "right",
+            text: "Screen Viewport\n" + nav.sWidth + "x" + nav.sHeight,
+            fontSize: 14,
+            fill: "#444"
+        });
 
-    map: function(x, y) {
-        // Calculate the coordinate space for the incoming x-coordinate
-        if (x < nav.uxMin) {
-            // If the hand is too far to the left, clip to the left edge of the screen
-            screenX = 0;
-        } else if (x > nav.uxMax) {
-            // If the hand is too far to the right, clip to the right edge of the screen
-            screenX = nav.sWidth;
-        } else {
-            // Otherwise, translate it so it fits within the viable space
-            screenX = (x - nav.uxMin) / nav.uWidth * nav.sWidth;
-        }
-
-        // Calculate the coordinate space for the incoming y-coordinate
-        if (y < nav.uyMin) {
-            // If the hand is too high up, clip it to the top edge of the screen
-            screenY = 0;
-        } else if (y > nav.uyMax) {
-            // If the hand is too low down, clip it to the bottom edge of the screen
-            screenY = nav.sHeight;
-        } else {
-            // Otherwise, translate it so it fits within the viable space
-            screenY = (y - nav.uyMin) / nav.uHeight * nav.sHeight;
-        }
-
-        return [screenX, screenY];
+        nav.screenViewLayer.add(nav.screenSpineBase).add(nav.screenViewLabel);
+        nav.overlay.add(nav.screenViewLayer);
     }
 }

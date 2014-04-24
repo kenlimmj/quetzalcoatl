@@ -17,6 +17,9 @@ var ws = {
 
             // Initialize the navigation overlay
             nav.init();
+            nav.drawKinectView();
+            nav.drawScreenView();
+            nav.drawUserView();
 
             // Draw the cursor reticules on the overlay
             cursor.init();
@@ -37,6 +40,7 @@ var ws = {
                 nav.setUserView(data.screenw, data.screenh);
 
                 // Pass control to the gesture detection state machine
+
             }
         }
 
