@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Security-Policy" content="connect-src 'self'">
   <title>Color Blindness Simulation</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,7 +25,7 @@
 <script src="js/Color.Vision.Simulate.js"></script>
 <script>
 // Convert the stock image into a color-blind version
-Simulate('input','output','Deuteranope');
+Simulate('input','output','Protanope');
 
 $(window).load(function() {
   $(".twentytwenty-container").twentytwenty();
@@ -36,6 +37,7 @@ $(window).load(function() {
 function Simulate(input_elem,output_elem,type) {
   var image = new Image();
   image.src = document.getElementById(input_elem).src;
+
   Color.Vision.Simulate(image, {
     type: type,
     amount: 1.0,
