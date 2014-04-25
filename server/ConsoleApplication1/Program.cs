@@ -32,7 +32,7 @@ namespace Quetzalcoatl
         static WebSocketServer server = new WebSocketServer("ws://localhost:1620");
 
         // Debugging switch. Set to true for verbose output.
-        static Boolean debug = false;
+        static Boolean debug = true;
 
         static void Main(string[] args)
         {
@@ -176,7 +176,7 @@ namespace Quetzalcoatl
                         if (frame != null)
                         {
                             // Get the data for all the bodies detected by the Kinect
-                            frame.GetAndRefreshBodyData(this.bodies); 
+                            frame.GetAndRefreshBodyData(this.bodies);
 
                             // Extract only the bodies that are tracked
                             var trackedBodies = this.bodies.Where(c => c.IsTracked).ToArray();
@@ -185,7 +185,8 @@ namespace Quetzalcoatl
                             var bodyIdArray = new ulong[trackedBodies.Count()];
 
                             // Populate the ID array with the IDs of all tracked bodies
-                            for(int k = 0; k < trackedBodies.Count(); k++) {
+                            for (int k = 0; k < trackedBodies.Count(); k++)
+                            {
                                 bodyIdArray[k] = trackedBodies[k].TrackingId;
                             }
 
@@ -247,11 +248,11 @@ namespace Quetzalcoatl
                                         rpos[0] = rHand;
                                         lpos[0] = lHand;
 
-                                        if (rpos[4].X!=0 && rpos[4].Y!=0)
+                                        if (rpos[4].X != 0 && rpos[4].Y != 0)
                                         {
                                             swipe = CheckSwipe(rpos[0], rpos[4], lpos[0], lpos[4]);
                                         }
-                                        if (rpos[4].X==0 && lpos[4].X==0)
+                                        if (rpos[4].X == 0 && lpos[4].X == 0)
                                         {
                                             swipe = "none";
                                         }
@@ -518,19 +519,19 @@ namespace Quetzalcoatl
 
             private string CheckSwipe(Point rfirst, Point rlast, Point lfirst, Point llast)
             {
-                if (rfirst.X>rlast.X+85 || lfirst.X>llast.X+85)
+                if (rfirst.X > rlast.X + 85 || lfirst.X > llast.X + 85)
                 {
                     return "right";
                 }
-                else if (rfirst.X<rlast.X-85 || lfirst.X<llast.X-85)
+                else if (rfirst.X < rlast.X - 85 || lfirst.X < llast.X - 85)
                 {
                     return "left";
                 }
-                else if (rfirst.Y<rlast.Y-85 || lfirst.Y<llast.Y-85)
+                else if (rfirst.Y < rlast.Y - 85 || lfirst.Y < llast.Y - 85)
                 {
                     return "up";
                 }
-                else if (rfirst.Y>rlast.Y+85 || lfirst.Y>llast.Y+85)
+                else if (rfirst.Y > rlast.Y + 85 || lfirst.Y > llast.Y + 85)
                 {
                     return "down";
                 }
