@@ -1,4 +1,6 @@
 var nav = {
+    debug: false,
+
     // Dimensions of the screen viewport
     sWidth: window.innerWidth,
     sHeight: window.innerHeight,
@@ -22,9 +24,11 @@ var nav = {
             height: document.querySelector("#nav").offsetHeight
         });
 
-        nav.userViewLayer = new Kinetic.Layer();
-        nav.kinectViewLayer = new Kinetic.Layer();
-        nav.screenViewLayer = new Kinetic.Layer();
+        if (debug === true) {
+            nav.userViewLayer = new Kinetic.Layer();
+            nav.kinectViewLayer = new Kinetic.Layer();
+            nav.screenViewLayer = new Kinetic.Layer();
+        }
     },
 
     setScreenView: function(x, y) {

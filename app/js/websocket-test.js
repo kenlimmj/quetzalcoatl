@@ -1,8 +1,9 @@
 var ws = {
+    debug: false,
+
     socketAddress: "ws://localhost:1620/KinectApp",
     connectionAttempts: 1,
     frameData: [],
-    debug: false,
 
     init: function() {
         try {
@@ -17,12 +18,18 @@ var ws = {
 
             // Initialize the navigation overlay
             nav.init();
-            nav.drawKinectView();
-            nav.drawScreenView();
-            nav.drawUserView();
+
+            if (debug === true) {
+                nav.drawKinectView();
+                nav.drawScreenView();
+                nav.drawUserView();
+            }
 
             // Draw the cursor reticules on the overlay
             cursor.init();
+
+            // Initialize gesture detection
+            gesture.init();
         }
 
         connection.onmessage = function(packet) {
@@ -39,19 +46,21 @@ var ws = {
                 // Update the dimensions of the user viewport
                 nav.setUserView(data.screenw, data.screenh);
 
-                // Update the user view
-                nav.updateUserView();
+                if (debug === true) {
+                    // Update the user view
+                    nav.updateUserView();
+                }
 
-                // Update the left-hand location
-                cursor.setLeftCursor(data.lx, data.ly);
-                cursor.updateLeftCursor();
+                // Update the left-hand data and draw it
+                cursor.setLeftHand(data.lx, data.ly);
+                gesture.setLeftHand(data.lhandState);
 
-                // Update the right-hand location
-                cursor.setRightCursor(data.rx, data.ry);
-                cursor.updateRightCursor();
+                // Update the right-hand data and draw it
+                cursor.setRightHand(data.rx, data.ry);
+                gesture.setRightHand(data.rhandState);
 
                 // Pass control to the gesture detection state machine
-
+                gesture.process();
             }
         }
 
