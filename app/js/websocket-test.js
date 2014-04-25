@@ -30,7 +30,7 @@ var ws = {
         }
 
         connection.onmessage = function(packet) {
-            if (typeof(packet.data) === string) {
+            if (typeof(packet.data) === "string") {
                 // Parse the JSON
                 var data = JSON.parse(packet.data);
 
@@ -43,15 +43,15 @@ var ws = {
                 // Update the dimensions of the user viewport
                 nav.setUserView(data.screenw, data.screenh);
 
+                nav.updateUserView();
+
                 // Update the left-hand location
                 cursor.setLeftCursor(data.lx, data.ly);
+                cursor.updateLeftCursor();
 
                 // Update the right-hand location
                 cursor.setRightCursor(data.rx, data.ry);
-
-                cursor.update("left");
-
-                cursor.update("right");
+                cursor.updateRightCursor();
 
                 // Pass control to the gesture detection state machine
 

@@ -123,6 +123,25 @@ var nav = {
         nav.overlay.add(nav.userViewLayer);
     },
 
+    updateUserView: function() {
+        nav.userView.setX(nav.uSpineX - nav.uWidth / 2 + nav.kinectView.getX());
+        nav.userView.setY(nav.uSpineY - nav.uHeight + nav.kinectView.getY());
+        nav.userView.setWidth(nav.uWidth);
+        nav.userView.setHeight(nav.uHeight);
+
+        nav.userSpineBase.setX(nav.uSpineX + nav.kinectView.getX());
+        nav.userSpineBase.setY(nav.uSpineY + nav.kinectView.getY());
+
+        nav.userSpineConnector.setPoints([nav.userSpineBase.getX(), nav.userSpineBase.getY(), nav.screenSpineBase.getX(), nav.screenSpineBase.getY()]);
+
+        nav.userViewLabel.setX(nav.uSpineX - nav.uWidth / 2 + nav.kinectView.getX());
+        nav.userViewLabel.setY(nav.uSpineY + nav.kinectView.getY() + 5);
+        nav.userViewLabel.setWidth(nav.uWidth);
+        nav.userViewLabel.setText("User Viewport\n" + nav.uWidth + "x" + nav.uHeight);
+
+        nav.userViewLayer.batchDraw();
+    },
+
     drawScreenView: function() {
         nav.screenSpineBase = new Kinetic.Circle({
             x: nav.sWidth / 2,

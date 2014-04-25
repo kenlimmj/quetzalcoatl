@@ -184,14 +184,50 @@ var cursor = {
             screenY = (y - nav.uyMin) / nav.uHeight * nav.sHeight;
         }
 
-        return [screenX, screenY];
+        return [Math.round(screenX), Math.round(screenY)];
     },
 
-    update: function(handSide) {
-        if (handSide === "left") {
-            cursor.leftCursorLayer.batchDraw();
-        } else {
-            cursor.rightCursorLayer.batchDraw();
-        }
+    updateLeftCursor: function() {
+        var mappedLeftCursor = cursor.map(cursor.leftX, cursor.leftY);
+
+        cursor.leftScreenCursor.setX(mappedLeftCursor[0]);
+        cursor.leftScreenCursor.setY(mappedLeftCursor[1]);
+
+        cursor.leftScreenCursorLabel.setX(cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius());
+        cursor.leftScreenCursorLabel.setY(cursor.leftScreenCursor.getY() + cursor.leftScreenCursor.radius());
+        cursor.leftScreenCursorLabel.setText(cursor.leftScreenCursor.getX() + "\n" + cursor.leftScreenCursor.getY());
+
+        cursor.leftUserCursor.setX(cursor.leftX + nav.kinectView.getX());
+        cursor.leftUserCursor.setY(cursor.leftY + nav.kinectView.getY());
+
+        cursor.leftUserCursorLabel.setX(cursor.leftUserCursor.getX() + cursor.leftUserCursor.radius());
+        cursor.leftUserCursorLabel.setY(cursor.leftUserCursor.getY() + cursor.leftUserCursor.radius());
+        cursor.leftUserCursorLabel.setText(cursor.leftX + "\n" + cursor.leftY);
+
+        cursor.leftCursorConnector.setPoints([cursor.leftUserCursor.getX(), cursor.leftUserCursor.getY(), cursor.leftScreenCursor.getX(), cursor.leftScreenCursor.getY()]);
+
+        cursor.leftCursorLayer.batchDraw();
+    },
+
+    updateRightCursor: function() {
+        var mappedRightCursor = cursor.map(cursor.rightX, cursor.rightY);
+
+        cursor.rightScreenCursor.setX(mappedRightCursor[0]);
+        cursor.rightScreenCursor.setY(mappedRightCursor[1]);
+
+        cursor.rightScreenCursorLabel.setX(cursor.rightScreenCursor.getX() + cursor.rightScreenCursor.radius());
+        cursor.rightScreenCursorLabel.setY(cursor.rightScreenCursor.getY() + cursor.rightScreenCursor.radius());
+        cursor.rightScreenCursorLabel.setText(cursor.rightScreenCursor.getX() + "\n" + cursor.rightScreenCursor.getY());
+
+        cursor.rightUserCursor.setX(cursor.rightX + nav.kinectView.getX());
+        cursor.rightUserCursor.setY(cursor.rightY + nav.kinectView.getY());
+
+        cursor.rightUserCursorLabel.setX(cursor.rightUserCursor.getX() + cursor.rightUserCursor.radius());
+        cursor.rightUserCursorLabel.setY(cursor.rightUserCursor.getY() + cursor.rightUserCursor.radius());
+        cursor.rightUserCursorLabel.setText(cursor.rightX + "\n" + cursor.rightY);
+
+        cursor.rightCursorConnector.setPoints([cursor.rightUserCursor.getX(), cursor.rightUserCursor.getY(), cursor.rightScreenCursor.getX(), cursor.rightScreenCursor.getY()]);
+
+        cursor.rightCursorLayer.batchDraw();
     }
 }
