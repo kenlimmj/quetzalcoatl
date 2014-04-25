@@ -4,12 +4,6 @@ var cursor = {
     rightX: null,
     rightY: null,
 
-    // FIXME: Test values that will be deleted eventually
-    // leftX: 150,
-    // leftY: 200,
-    // rightX: 300,
-    // rightY: 200,
-
     open_radius: 25,
     grab_radius: 15.45,
     pull_radius: 9.55,

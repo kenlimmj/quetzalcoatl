@@ -21,10 +21,6 @@ var ws = {
             nav.drawScreenView();
             nav.drawUserView();
 
-            // FIXME: Testing code. To be deleted
-            // nav.setUserSpineBase(nav.uSpineX, nav.uSpineY);
-            // nav.setUserView(nav.uWidth, nav.uHeight);
-
             // Draw the cursor reticules on the overlay
             cursor.init();
         }
@@ -43,6 +39,7 @@ var ws = {
                 // Update the dimensions of the user viewport
                 nav.setUserView(data.screenw, data.screenh);
 
+                // Update the user view
                 nav.updateUserView();
 
                 // Update the left-hand location

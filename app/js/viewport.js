@@ -15,12 +15,6 @@ var nav = {
     uWidth: null,
     uHeight: null,
 
-    // FIXME: Test values that will be deleted eventually
-    // uSpineX: 200,
-    // uSpineY: 300,
-    // uWidth: 300,
-    // uHeight: 250,
-
     init: function() {
         nav.overlay = new Kinetic.Stage({
             container: 'nav',
