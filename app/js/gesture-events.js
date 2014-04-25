@@ -1,11 +1,19 @@
-document.querySelector("body").addEventListener("pull", function() {
-    console.log("Pull detected!");
+addEventListener("leftPull", function() {
+    console.log("Left Pull detected!");
 });
 
-document.querySelector("body").addEventListener("push", function() {
-    console.log("Push detected!");
+addEventListener("leftPush", function() {
+    console.log("Left Push detected!");
 });
 
-document.querySelector("body").addEventListener("zoom", function() {
+addEventListener("rightPull", function() {
+    console.log("Right Pull detected!");
+});
+
+addEventListener("rightPush", function() {
+    console.log("Right Push detected!");
+});
+
+addEventListener("zoom", function() {
     console.log("Zoom detected!");
 });
