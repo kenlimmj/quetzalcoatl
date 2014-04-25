@@ -22,7 +22,7 @@ html, body
     left: 50%;
 
     width: 600px;
-    height: 500px;
+    height: 600px;
     margin-top: -250px;
     margin-left: -300px;
 }
@@ -39,56 +39,54 @@ html, body
 #back
 {
     width: 600px;
-    height: 500px;
+    height: 600px;
 
-    -webkit-transform: translateZ(-49px);
-    text-align: center;
+    -webkit-transform: translateZ(-98px);
 
-    background: url('../img/vermeer.jpg') no-repeat center;
-    background-size: 600px 500px;
+    background: url('../img/piazza-back.jpg') no-repeat;
+    background-size: 600px 600px;
 }
 #front
 {
     width: 600px;
-    height: 500px;
+    height: 600px;
 
-    -webkit-transform: translateZ(50px);
+    -webkit-transform: translateZ(100px);
 }
 #wall-left
 {
     left: 0;
 
-    width: 100px;
-    height: 500px;
+    width: 200px;
+    height: 600px;
 
-    -webkit-transform: translateX(-50px) rotate3d(0, 50, 0, 90deg);
+    -webkit-transform: translateX(-100px) rotate3d(0, 100, 0, 90deg);
 
-    background: url('../img/vermeer.jpg') no-repeat left;
-    background-size: auto 500px;
-    backface-visibility: hidden;
+    background: url('../img/piazza-left.jpg') no-repeat left;
+    background-size: auto 600px;
 }
 #wall-right
 {
     right: 0;
 
-    width: 100px;
-    height: 500px;
+    width: 200px;
+    height: 600px;
 
-    -webkit-transform: translateX(50px) rotate3d(0, 50, 0, -90deg);
+    -webkit-transform: translateX(100px) rotate3d(0, 100, 0, -90deg);
 
-    background: url('../img/vermeer.jpg') no-repeat right;
-    background-size: auto 500px;
+    background: url('../img/piazza-right.jpg') no-repeat right;
+    background-size: auto 600px;
 }
 #wall-top
 {
     top: 0;
 
     width: 600px;
-    height: 100px;
+    height: 200px;
 
-    -webkit-transform: translateY(-50px) rotate3d(50, 0, 0, 90deg);
+    -webkit-transform: translateY(-100px) rotate3d(100, 0, 0, 90deg);
 
-    background: url('../img/vermeer.jpg') no-repeat top;
+    background: url('../img/piazza-top.jpg') no-repeat top;
     background-size: 600px;
 }
 #wall-bottom
@@ -96,11 +94,11 @@ html, body
     bottom: 0;
 
     width: 600px;
-    height: 100px;
+    height: 200px;
 
-    -webkit-transform: translateY(50px) rotate3d(50, 0, 0, -90deg);
+    -webkit-transform: translateY(100px) rotate3d(100, 0, 0, -90deg);
 
-    background: url('../img/vermeer.jpg') no-repeat bottom;
+    background: url('../img/piazza-bottom.jpg') no-repeat center;
     background-size: 600px;
 }
 #shadow
@@ -108,7 +106,7 @@ html, body
     position: absolute;
 
     width: 600px;
-    height: 100px;
+    height: 200px;
 
     -webkit-transform: translate3d(0, 550px, -10px) rotateX(70deg);
 

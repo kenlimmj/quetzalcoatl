@@ -34,8 +34,8 @@ var Holobox = (function() {
         perspective.cy += (perspective.ty - perspective.cy) * 0.1;
 
         // Apply the current perspective
-        world.style.webkitPerspectiveOrigin = Math.max(29, Math.min(71, perspective.cx)) + '% ' + Math.max(13, Math.min(47, perspective.cy)) + '%';
-        world.style.perspectiveOrigin = Math.min(47, perspective.cx) + '% ' + Math.min(14, perspective.cy) + '%';
+        world.style.webkitPerspectiveOrigin = perspective.cx + '% ' + perspective.cy + '%';
+        world.style.PerspectiveOrigin = perspective.cx + '% ' + perspective.cy + '%';
 
         // Used to control z-indices of our elements, first item == bottom
         var stack = [back, wallLeft, wallRight, wallTop, wallBottom];
