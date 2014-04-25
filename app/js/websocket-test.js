@@ -22,8 +22,8 @@ var ws = {
             nav.drawUserView();
 
             // FIXME: Testing code. To be deleted
-            nav.setUserSpineBase(nav.uSpineX, nav.uSpineY);
-            nav.setUserView(nav.uWidth, nav.uHeight);
+            // nav.setUserSpineBase(nav.uSpineX, nav.uSpineY);
+            // nav.setUserView(nav.uWidth, nav.uHeight);
 
             // Draw the cursor reticules on the overlay
             cursor.init();
@@ -42,6 +42,16 @@ var ws = {
 
                 // Update the dimensions of the user viewport
                 nav.setUserView(data.screenw, data.screenh);
+
+                // Update the left-hand location
+                cursor.setLeftCursor(data.lx, data.ly);
+
+                // Update the right-hand location
+                cursor.setRightCursor(data.rx, data.ry);
+
+                cursor.update("left");
+
+                cursor.update("right");
 
                 // Pass control to the gesture detection state machine
 

@@ -5,10 +5,10 @@ var cursor = {
     rightY: null,
 
     // FIXME: Test values that will be deleted eventually
-    leftX: 150,
-    leftY: 200,
-    rightX: 300,
-    rightY: 200,
+    // leftX: 150,
+    // leftY: 200,
+    // rightX: 300,
+    // rightY: 200,
 
     open_radius: 25,
     grab_radius: 15.45,
@@ -16,46 +16,103 @@ var cursor = {
     point_radius: 5.9,
 
     init: function() {
-        var leftCursorLayer = new Kinetic.Layer(),
-            rightCursorLayer = new Kinetic.Layer();
+        cursor.leftCursorLayer = new Kinetic.Layer(),
+        cursor.rightCursorLayer = new Kinetic.Layer();
 
         var mappedLeftCursor = cursor.map(cursor.leftX, cursor.leftY),
             mappedRightCursor = cursor.map(cursor.rightX, cursor.rightY);
 
-        var leftScreenCursor = new Kinetic.Circle({
+        cursor.leftScreenCursor = new Kinetic.Circle({
             x: mappedLeftCursor[0],
             y: mappedLeftCursor[1],
             radius: cursor.open_radius,
             fill: "#d33682"
         });
 
-        var leftUserCursor = new Kinetic.Circle({
-            x: cursor.leftX,
-            y: cursor.leftY,
-            radius: cursor.open_radius,
+        cursor.leftScreenCursorLabel = new Kinetic.Text({
+            x: cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius(),
+            y: cursor.leftScreenCursor.getY() + cursor.leftScreenCursor.radius(),
+            align: "left",
+            text: cursor.leftScreenCursor.getX() + "\n" + cursor.leftScreenCursor.getY(),
+            fontSize: 14,
             fill: "#d33682"
         });
 
-        var rightScreenCursor = new Kinetic.Circle({
+        cursor.leftUserCursor = new Kinetic.Circle({
+            x: cursor.leftX + nav.kinectView.getX(),
+            y: cursor.leftY + nav.kinectView.getY(),
+            radius: cursor.open_radius / 1.618,
+            fill: "#d33682"
+        });
+
+        cursor.leftUserCursorLabel = new Kinetic.Text({
+            x: cursor.leftUserCursor.getX() + cursor.leftUserCursor.radius(),
+            y: cursor.leftUserCursor.getY() + cursor.leftUserCursor.radius(),
+            align: "left",
+            text: cursor.leftX + "\n" + cursor.leftY,
+            fontSize: 11,
+            fill: "#d33682"
+        });
+
+        cursor.rightScreenCursor = new Kinetic.Circle({
             x: mappedRightCursor[0],
             y: mappedRightCursor[1],
             radius: cursor.open_radius,
             fill: "#6c71c4"
         });
 
-        var rightUserCursor = new Kinetic.Circle({
-            x: cursor.rightX,
-            y: cursor.rightY,
-            radius: cursor.open_radius,
+        cursor.rightScreenCursorLabel = new Kinetic.Text({
+            x: cursor.rightScreenCursor.getX() + cursor.rightScreenCursor.radius(),
+            y: cursor.rightScreenCursor.getY() + cursor.rightScreenCursor.radius(),
+            align: "left",
+            text: cursor.rightScreenCursor.getX() + "\n" + cursor.rightScreenCursor.getY(),
+            fontSize: 14,
             fill: "#6c71c4"
         });
 
+        cursor.rightUserCursor = new Kinetic.Circle({
+            x: cursor.rightX + nav.kinectView.getX(),
+            y: cursor.rightY + nav.kinectView.getY(),
+            radius: cursor.open_radius / 1.618,
+            fill: "#6c71c4"
+        });
+
+        cursor.rightUserCursorLabel = new Kinetic.Text({
+            x: cursor.rightUserCursor.getX() + cursor.rightUserCursor.radius(),
+            y: cursor.rightUserCursor.getY() + cursor.rightUserCursor.radius(),
+            align: "left",
+            text: cursor.rightX + "\n" + cursor.rightY,
+            fontSize: 11,
+            fill: "#6c71c4"
+        });
+
+        cursor.leftCursorConnector = new Kinetic.Line({
+            points: [cursor.leftUserCursor.getX(), cursor.leftUserCursor.getY(), cursor.leftScreenCursor.getX(), cursor.leftScreenCursor.getY()],
+            stroke: "#d33682",
+            strokeWidth: 1.618,
+            lineJoin: "round",
+            dash: [10, 5]
+        });
+
+        cursor.rightCursorConnector = new Kinetic.Line({
+            points: [cursor.rightUserCursor.getX(), cursor.rightUserCursor.getY(), cursor.rightScreenCursor.getX(), cursor.rightScreenCursor.getY()],
+            stroke: "#6c71c4",
+            strokeWidth: 1.618,
+            lineJoin: "round",
+            dash: [10, 5]
+        });
+
         // Add each cursor reticule to its respective layer
-        leftCursorLayer.add(leftScreenCursor).add(leftUserCursor);
-        rightCursorLayer.add(rightScreenCursor).add(rightUserCursor);
+        cursor.leftCursorLayer.add(cursor.leftScreenCursor).add(cursor.leftScreenCursorLabel);
+        cursor.leftCursorLayer.add(cursor.leftUserCursor).add(cursor.leftUserCursorLabel);
+        cursor.leftCursorLayer.add(cursor.leftCursorConnector);
+
+        cursor.rightCursorLayer.add(cursor.rightScreenCursor).add(cursor.rightScreenCursorLabel);
+        cursor.rightCursorLayer.add(cursor.rightUserCursor).add(cursor.rightUserCursorLabel);
+        cursor.rightCursorLayer.add(cursor.rightCursorConnector);
 
         // Add both layers to the navigation overlay
-        nav.overlay.add(leftCursorLayer).add(rightCursorLayer);
+        nav.overlay.add(cursor.leftCursorLayer).add(cursor.rightCursorLayer);
     },
 
     setLeftCursor: function(x, y) {
@@ -130,10 +187,11 @@ var cursor = {
         return [screenX, screenY];
     },
 
-    update: function(x, y, handSide) {
-        // Map the coordinates from the user viewport to the screen viewport
-        sCoord = cursor.map(x, y);
-
-        // Stuff here to move the cursor on its layer
+    update: function(handSide) {
+        if (handSide === "left") {
+            cursor.leftCursorLayer.batchDraw();
+        } else {
+            cursor.rightCursorLayer.batchDraw();
+        }
     }
 }
