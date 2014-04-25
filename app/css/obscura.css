@@ -18,7 +18,7 @@ html, body
 #room
 {
     position: absolute;
-    top: 45%;
+    top: 42.5%;
     left: 50%;
 
     width: 600px;
@@ -30,11 +30,11 @@ html, body
 {
     position: absolute;
 
-    -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
-       -moz-box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
-            box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
+    -webkit-box-shadow: 0 0 40px rgba(0, 0, 0, .45) inset;
+       -moz-box-shadow: 0 0 40px rgba(0, 0, 0, .45) inset;
+            box-shadow: 0 0 40px rgba(0, 0, 0, .45) inset;
 
-         -o-box-shadow: 0 0 20px rgba(0, 0, 0, .45) inset;
+         -o-box-shadow: 0 0 40px rgba(0, 0, 0, .45) inset;
 }
 #back
 {
@@ -62,7 +62,7 @@ html, body
 
     -webkit-transform: translateX(-100px) rotate3d(0, 100, 0, 90deg);
 
-    background: url('../img/piazza-left.jpg') no-repeat left;
+    background: url('../img/piazza-left.jpg') no-repeat;
     background-size: auto 600px;
 }
 #wall-right
@@ -74,7 +74,7 @@ html, body
 
     -webkit-transform: translateX(100px) rotate3d(0, 100, 0, -90deg);
 
-    background: url('../img/piazza-right.jpg') no-repeat right;
+    background: url('../img/piazza-right.jpg') no-repeat;
     background-size: auto 600px;
 }
 #wall-top
@@ -86,7 +86,7 @@ html, body
 
     -webkit-transform: translateY(-100px) rotate3d(100, 0, 0, 90deg);
 
-    background: url('../img/piazza-top.jpg') no-repeat top;
+    background: url('../img/piazza-top.jpg') no-repeat;
     background-size: 600px;
 }
 #wall-bottom
@@ -98,7 +98,7 @@ html, body
 
     -webkit-transform: translateY(100px) rotate3d(100, 0, 0, -90deg);
 
-    background: url('../img/piazza-bottom.jpg') no-repeat center;
+    background: url('../img/piazza-bottom.jpg') no-repeat;
     background-size: 600px;
 }
 #shadow

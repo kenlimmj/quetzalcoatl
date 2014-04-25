@@ -1,4 +1,4 @@
-var Holobox = (function() {
+var Obscura = (function() {
 
     var world = document.getElementById('world'),
         back = document.getElementById('back'),
@@ -18,12 +18,21 @@ var Holobox = (function() {
 
     function initialize() {
         // Capture mouse movement for PC's
-        addEventListener('mousemove', onMouseMove, false);
+        addEventListener('mousemove', onMouseMove);
+
+        // Capture Kinect motion
+        addEventListener('cursorMove', onCursorMove);
 
         update();
     }
 
+    function onCursorMove() {
+        perspective.tx = Math.round((event.leftX / window.innerWidth) * 100);
+        perspective.ty = Math.round((event.leftY / window.innerHeight) * 100);
+    }
+
     function onMouseMove(event) {
+        console.log(event);
         perspective.tx = Math.round((event.clientX / window.innerWidth) * 100);
         perspective.ty = Math.round((event.clientY / window.innerHeight) * 100);
     }

@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta http-equiv="Content-Security-Policy" content="connect-src 'self'">
   <title>Camera Obscura</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="css/holobox.css" rel="stylesheet" />
+  <link href="css/obscura.css" rel="stylesheet" />
 </head>
 
 <body>
+<div id="nav"></div>
   <div id="world">
     <div id="room">
       <!-- The back wall which holds our content -->
@@ -31,5 +31,12 @@
     </div>
   </div>
 </body>
-<script src="js/holobox.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.1/kinetic.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
+<script src="js/websocket-test.js"></script>
+<script src="js/cursor-test.js"></script>
+<script src="js/gesture-test.js"></script>
+<script src="js/gesture-events.js"></script>
+<script src="js/viewport.js"></script>
+<script src="js/obscura.js"></script>
 </html>
