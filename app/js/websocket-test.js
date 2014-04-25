@@ -19,7 +19,7 @@ var ws = {
             // Initialize the navigation overlay
             nav.init();
 
-            if (debug === true) {
+            if (ws.debug === true) {
                 nav.drawKinectView();
                 nav.drawScreenView();
                 nav.drawUserView();
@@ -46,7 +46,7 @@ var ws = {
                 // Update the dimensions of the user viewport
                 nav.setUserView(data.screenw, data.screenh);
 
-                if (debug === true) {
+                if (ws.debug === true) {
                     // Update the user view
                     nav.updateUserView();
                 }

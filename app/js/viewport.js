@@ -24,7 +24,7 @@ var nav = {
             height: document.querySelector("#nav").offsetHeight
         });
 
-        if (debug === true) {
+        if (nav.debug === true) {
             nav.userViewLayer = new Kinetic.Layer();
             nav.kinectViewLayer = new Kinetic.Layer();
             nav.screenViewLayer = new Kinetic.Layer();

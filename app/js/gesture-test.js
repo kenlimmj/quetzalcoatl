@@ -5,7 +5,7 @@ var gesture = {
     rightHand: null,
 
     init: function() {
-        gesture.pullEvent = new CustomEvent("pull", {
+        gesture.pull = new CustomEvent("pull", {
             detail: {
                 value: "10"
             },
@@ -13,7 +13,7 @@ var gesture = {
             cancelable: true
         });
 
-        gesture.pushEvent = new CustomEvent("push", {
+        gesture.push = new CustomEvent("push", {
             detail: {
                 value: "10"
             },
@@ -21,7 +21,7 @@ var gesture = {
             cancelable: true
         });
 
-        gesture.zoomEvent = new CustomEvent("zoom", {
+        gesture.zoom = new CustomEvent("zoom", {
             detail: {
                 value: "10"
             },
@@ -45,19 +45,21 @@ var gesture = {
             case "point":
                 cursor.updateLeftHand();
                 break;
-            case "grab":
+            case "closed":
                 cursor.updateLeftHand();
                 break;
             case "pull":
-                leftHandElement.dispatchEvent("pull");
+                leftHandElement.dispatchEvent(gesture.pull);
                 break;
             case "push":
-                leftHandElement.dispatchEvent("push");
+                leftHandElement.dispatchEvent(gesture.push);
                 break;
             case "zoom":
-                leftHandElement.dispatchEvent("zoom");
+                leftHandElement.dispatchEvent(gesture.zoom);
                 break;
             default:
+                cursor.updateLeftHand();
+                break;
         }
 
         var rightHandElement = cursor.getElement(cursor.rightX, cursor.rightY);
@@ -66,19 +68,21 @@ var gesture = {
             case "point":
                 cursor.updateRightHand();
                 break;
-            case "grab":
+            case "closed":
                 cursor.updateRightHand();
                 break;
             case "pull":
-                rightHandElement.dispatchEvent("pull");
+                rightHandElement.dispatchEvent(gesture.pull);
                 break;;
             case "push":
-                rightHandElement.dispatchEvent("push");
+                rightHandElement.dispatchEvent(gesture.push);
                 break;;
             case "zoom":
-                rightHandElement.dispatchEvent("zoom");
+                rightHandElement.dispatchEvent(gesture.zoom);
                 break;;
             default:
+                cursor.updateRightHand();
+                break;
         }
     }
 }

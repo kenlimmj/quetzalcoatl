@@ -39,7 +39,7 @@ var cursor = {
             fill: "#6c71c4"
         });
 
-        if (debug === true) {
+        if (cursor.debug === true) {
             // Add a tooltip label to the left cursor in the screen viewport
             cursor.leftScreenCursorLabel = new Kinetic.Text({
                 x: cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius(),
@@ -119,7 +119,7 @@ var cursor = {
         cursor.leftCursorLayer.add(cursor.leftScreenCursor);
         cursor.rightCursorLayer.add(cursor.rightScreenCursor);
 
-        if (debug === true) {
+        if (cursor.debug === true) {
             cursor.leftCursorLayer.add(cursor.leftScreenCursorLabel);
             cursor.leftCursorLayer.add(cursor.leftUserCursor).add(cursor.leftUserCursorLabel);
             cursor.leftCursorLayer.add(cursor.leftCursorConnector);
@@ -147,7 +147,7 @@ var cursor = {
         switch (handState) {
             case "open":
                 return cursor.open_radius;
-            case "grab":
+            case "closed":
                 return cursor.grab_radius;
             case "point":
                 return cursor.point_radius;
@@ -160,7 +160,7 @@ var cursor = {
         switch (handState) {
             case "open":
                 return 1 / 100
-            case "grab":
+            case "closed":
                 return 1 / 100
             case "pull":
                 return 1 / 100
@@ -178,7 +178,7 @@ var cursor = {
     getElement: function(x, y) {
         var mappedCursor = cursor.map(x, y);
         return document.elementFromPoint(mappedCursor[0], mappedCursor[1]);
-    }
+    },
 
     map: function(x, y) {
         // Calculate the coordinate space for the incoming x-coordinate
@@ -213,9 +213,9 @@ var cursor = {
 
         cursor.leftScreenCursor.setX(mappedLeftCursor[0]);
         cursor.leftScreenCursor.setY(mappedLeftCursor[1]);
-        cursor.leftScreenCursor.setRadius(gesture.leftHand);
+        cursor.leftScreenCursor.setRadius(cursor.get_radius(gesture.leftHand));
 
-        if (debug === true) {
+        if (cursor.debug === true) {
             cursor.leftScreenCursorLabel.setX(cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius());
             cursor.leftScreenCursorLabel.setY(cursor.leftScreenCursor.getY() + cursor.leftScreenCursor.radius());
             cursor.leftScreenCursorLabel.setText(gesture.leftHand + "\n" + cursor.leftScreenCursor.getX() + "\n" + cursor.leftScreenCursor.getY());
@@ -238,9 +238,9 @@ var cursor = {
 
         cursor.rightScreenCursor.setX(mappedRightCursor[0]);
         cursor.rightScreenCursor.setY(mappedRightCursor[1]);
-        cursor.rightScreenCursor.setRadius(gesture.rightHand);
+        cursor.rightScreenCursor.setRadius(cursor.get_radius(gesture.rightHand));
 
-        if (debug === true) {
+        if (cursor.debug === true) {
             cursor.rightScreenCursorLabel.setX(cursor.rightScreenCursor.getX() + cursor.rightScreenCursor.radius());
             cursor.rightScreenCursorLabel.setY(cursor.rightScreenCursor.getY() + cursor.rightScreenCursor.radius());
             cursor.rightScreenCursorLabel.setText(gesture.rightHand + "\n" + cursor.rightScreenCursor.getX() + "\n" + cursor.rightScreenCursor.getY());
