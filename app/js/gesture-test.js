@@ -62,56 +62,62 @@ var gesture = {
 
     process: function() {
         var leftHandElement = cursor.getElement(cursor.leftX, cursor.leftY);
+        var mappedLeftCoord = cursor.map(cursor.leftX, cursor.leftY);
         switch (gesture.leftHand) {
             case "open":
             case "point":
             case "closed":
             default:
-                gesture.cursorMove.leftX = cursor.leftX;
-                gesture.cursorMove.leftY = cursor.leftY;
-                leftHandElement.dispatchEvent(gesture.cursorMove);
-                cursor.updateLeftHand();
+                gesture.cursorMove.leftX = mappedLeftCoord[0];
+                gesture.cursorMove.leftY = mappedLeftCoord[1];
+                dispatchEvent(gesture.cursorMove);
+                if (cursor.drawLeft === true) {
+                    cursor.updateLeftHand();
+                }
                 break;
             case "pull":
-                debounce(function() {
+                gesture.debounce(function() {
                     leftHandElement.dispatchEvent(gesture.leftPull);
                 }, gesture.limitRate);
                 break;
             case "push":
-                debounce(function() {
+                gesture.debounce(function() {
                     leftHandElement.dispatchEvent(gesture.leftPush);
                 }, gesture.limitRate);
                 break;
             case "zoom":
-                debounce(function() {
+                gesture.debounce(function() {
                     leftHandElement.dispatchEvent(gesture.zoom);
                 }, gesture.limitRate);
                 break;
         }
 
         var rightHandElement = cursor.getElement(cursor.rightX, cursor.rightY);
+        var mappedRightCoord = cursor.map(cursor.rightX, cursor.rightY);
         switch (gesture.rightHand) {
             case "open":
             case "point":
             case "closed":
             default:
-                gesture.cursorMove.rightX = cursor.rightX;
-                gesture.cursorMove.rightY = cursor.rightY;
-                rightHandElement.dispatchEvent(gesture.cursorMove);
-                cursor.updateRightHand();
+                gesture.cursorMove.rightX = mappedRightCoord[0];
+                gesture.cursorMove.rightY = mappedRightCoord[1];
+                dispatchEvent(gesture.cursorMove);
+                if (cursor.drawRight === true) {
+                    cursor.updateRightHand();
+                }
                 break;
             case "pull":
-                debounce(function() {
+                gesture.debounce(function() {
                     rightHandElement.dispatchEvent(gesture.rightPull);
                 }, gesture.limitRate);
                 break;;
             case "push":
-                debounce(function() {
+                gesture.debounce(function() {
                     rightHandElement.dispatchEvent(gesture.rightPush);
                 }, gesture.limitRate);
                 break;;
             case "zoom":
-                debounce(function() {
+                gesture.debounce(function() {
                     rightHandElement.dispatchEvent(gesture.zoom);
                 }, gesture.limitRate);
                 break;;

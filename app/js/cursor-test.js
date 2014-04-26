@@ -1,5 +1,7 @@
 var cursor = {
     debug: false,
+    drawLeft: true,
+    drawRight: true,
 
     // Initialize holder values for the cursor coordinates
     leftX: null,
@@ -116,8 +118,12 @@ var cursor = {
         }
 
         // Add each cursor reticule to its respective layer
-        cursor.leftCursorLayer.add(cursor.leftScreenCursor);
-        cursor.rightCursorLayer.add(cursor.rightScreenCursor);
+        if (cursor.drawLeft === true) {
+            cursor.leftCursorLayer.add(cursor.leftScreenCursor);
+        }
+        if (cursor.drawRight === true) {
+            cursor.rightCursorLayer.add(cursor.rightScreenCursor);
+        }
 
         if (cursor.debug === true) {
             cursor.leftCursorLayer.add(cursor.leftScreenCursorLabel);
