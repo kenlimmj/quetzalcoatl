@@ -51,6 +51,8 @@ var ws = {
                     nav.updateUserView();
                 }
 
+                gesture.setSwipeState(data.swipeval);
+
                 // Update the left-hand data and draw it
                 cursor.setLeftHand(data.lx, data.ly);
                 gesture.setLeftHand(data.lhandState);

@@ -95,10 +95,14 @@ var stage1 = {
     updateLeftBox: function(x, y) {
         stage1.left_box.setX(x);
         stage1.left_box.setY(y);
+
+        stage1.leftDragLayer.batchDraw();
     },
 
-    updateRighBox: function(x, y) {
+    updateRightBox: function(x, y) {
         stage1.right_box.setX(x);
         stage1.right_box.setY(y);
+
+        stage1.rightDragLayer.batchDraw();
     }
 }

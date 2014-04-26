@@ -3,8 +3,9 @@ var gesture = {
 
     leftHand: null,
     rightHand: null,
+    swipeState: null,
 
-    limitRate: 1000,
+    limitRate: 500,
 
     init: function() {
         gesture.cursorMove = new CustomEvent("cursorMove", {
@@ -41,6 +42,26 @@ var gesture = {
             bubbles: true,
             cancelable: true
         });
+
+        gesture.swipeLeft = new CustomEvent("swipeLeft", {
+            bubbles: true,
+            cancelable: true
+        });
+
+        gesture.swipeRight = new CustomEvent("swipeRight", {
+            bubbles: true,
+            cancelable: true
+        });
+
+        gesture.swipeUp = new CustomEvent("swipeUp", {
+            bubbles: true,
+            cancelable: true
+        });
+
+        gesture.swipeDown = new CustomEvent("swipeDown", {
+            bubbles: true,
+            cancelable: true
+        });
     },
 
     setLeftHand: function(handState) {
@@ -51,95 +72,92 @@ var gesture = {
         gesture.rightHand = handState;
     },
 
-    debounce: function(func, wait, immediate) {
-        var timeout;
-        return function() {
-            var context = this,
-                args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(function() {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            }, wait);
-            if (immediate && !timeout) func.apply(context, args);
-        };
+    setSwipeState: function(swipeVal) {
+        gesture.swipeState = swipeVal;
     },
 
     process: function() {
-        var leftHandElement = cursor.getElement(cursor.leftX, cursor.leftY);
-        var mappedLeftCoord = cursor.map(cursor.leftX, cursor.leftY);
-        switch (gesture.leftHand) {
-            case "open":
-            case "point":
+        switch (gesture.swipeState) {
+            case "left":
+                dispatchEvent(gesture.swipeLeft);
+                break;
+                break;
+            case "right":
+                dispatchEvent(gesture.swipeRight);
+                break;
+            case "up":
+                dispatchEvent(gesture.swipeUp);
+                break;
+            case "down":
+                dispatchEvent(gesture.swipeDown);
+                break;
+            case "none":
             default:
-                gesture.cursorMove.leftX = mappedLeftCoord[0];
-                gesture.cursorMove.leftY = mappedLeftCoord[1];
-                dispatchEvent(gesture.cursorMove);
-                if (cursor.drawLeft === true) {
-                    cursor.updateLeftHand();
+                var leftHandElement = cursor.getElement(cursor.leftX, cursor.leftY);
+                var mappedLeftCoord = cursor.map(cursor.leftX, cursor.leftY);
+                switch (gesture.leftHand) {
+                    case "open":
+                    case "point":
+                    default:
+                        gesture.cursorMove.leftX = mappedLeftCoord[0];
+                        gesture.cursorMove.leftY = mappedLeftCoord[1];
+                        dispatchEvent(gesture.cursorMove);
+                        if (cursor.drawLeft === true) {
+                            cursor.updateLeftHand();
+                        }
+                        break;
+                    case "closed":
+                        gesture.closedMove.leftX = mappedLeftCoord[0];
+                        gesture.closedMove.leftY = mappedLeftCoord[1];
+                        dispatchEvent(gesture.closedMove);
+                        if (cursor.drawLeft === true) {
+                            cursor.updateLeftHand();
+                        }
+                        break;
+                    case "pull":
+                        leftHandElement.dispatchEvent(gesture.leftPull);
+                        break;
+                    case "push":
+                        leftHandElement.dispatchEvent(gesture.leftPush);
+                        break;
+                    case "zoom":
+                        leftHandElement.dispatchEvent(gesture.zoom);
+                        break;
                 }
-                break;
-            case "closed":
-                gesture.closedMove.leftX = mappedLeftCoord[0];
-                gesture.closedMove.leftY = mappedLeftCoord[1];
-                dispatchEvent(gesture.closedMove);
-                if (cursor.drawLeft === true) {
-                    cursor.updateLeftHand();
+
+                var rightHandElement = cursor.getElement(cursor.rightX, cursor.rightY);
+                var mappedRightCoord = cursor.map(cursor.rightX, cursor.rightY);
+                switch (gesture.rightHand) {
+                    case "open":
+                    case "point":
+                    default:
+                        gesture.cursorMove.rightX = mappedRightCoord[0];
+                        gesture.cursorMove.rightY = mappedRightCoord[1];
+                        dispatchEvent(gesture.cursorMove);
+                        if (cursor.drawRight === true) {
+                            cursor.updateRightHand();
+                        }
+                        break;
+                    case "closed":
+                        gesture.closedMove.rightX = mappedRightCoord[0];
+                        gesture.closedMove.rightY = mappedRightCoord[1];
+                        dispatchEvent(gesture.closedMove);
+                        if (cursor.drawRight === true) {
+                            cursor.updateRightHand();
+                        }
+                        break;
+                    case "pull":
+                        rightHandElement.dispatchEvent(gesture.rightPull);
+                        break;;
+                    case "push":
+                        rightHandElement.dispatchEvent(gesture.rightPush);
+                        break;;
+                    case "zoom":
+                        rightHandElement.dispatchEvent(gesture.zoom);
+                        break;;
                 }
-                break;
-            case "pull":
-                gesture.debounce(function() {
-                    leftHandElement.dispatchEvent(gesture.leftPull);
-                }, gesture.limitRate);
-                break;
-            case "push":
-                gesture.debounce(function() {
-                    leftHandElement.dispatchEvent(gesture.leftPush);
-                }, gesture.limitRate);
-                break;
-            case "zoom":
-                gesture.debounce(function() {
-                    leftHandElement.dispatchEvent(gesture.zoom);
-                }, gesture.limitRate);
                 break;
         }
 
-        var rightHandElement = cursor.getElement(cursor.rightX, cursor.rightY);
-        var mappedRightCoord = cursor.map(cursor.rightX, cursor.rightY);
-        switch (gesture.rightHand) {
-            case "open":
-            case "point":
-            default:
-                gesture.cursorMove.rightX = mappedRightCoord[0];
-                gesture.cursorMove.rightY = mappedRightCoord[1];
-                dispatchEvent(gesture.cursorMove);
-                if (cursor.drawRight === true) {
-                    cursor.updateRightHand();
-                }
-                break;
-            case "closed":
-                gesture.closedMove.rightX = mappedRightCoord[0];
-                gesture.closedMove.rightY = mappedRightCoord[1];
-                dispatchEvent(gesture.closedMove);
-                if (cursor.drawRight === true) {
-                    cursor.updateRightHand();
-                }
-                break;
-            case "pull":
-                gesture.debounce(function() {
-                    rightHandElement.dispatchEvent(gesture.rightPull);
-                }, gesture.limitRate);
-                break;;
-            case "push":
-                gesture.debounce(function() {
-                    rightHandElement.dispatchEvent(gesture.rightPush);
-                }, gesture.limitRate);
-                break;;
-            case "zoom":
-                gesture.debounce(function() {
-                    rightHandElement.dispatchEvent(gesture.zoom);
-                }, gesture.limitRate);
-                break;;
-        }
     }
 }

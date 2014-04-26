@@ -33,23 +33,37 @@
 <script src="js/albers2.js"></script>
 <script src="js/kontext.js"></script>
 <script>
+cursor.drawLeft = false;
+cursor.drawRight = false;
+
 var k = kontext(document.querySelector('.kontext'));
 
 // Initialize the views
 stage1.init();
-stage2Init();
+stage2.init();
 
 addEventListener('keyup', function(event) {
   if (event.keyCode === 37) k.prev();
   if (event.keyCode === 39) k.next();
 }, false);
 
-addEventListener("closedCursorMove", onCursorMove);
+addEventListener("swipeLeft", function(event) {
+  k.next();
+});
 
-function onCursorMove(event) {
+addEventListener("swipeRight", function(event) {
+  k.prev();
+});
+
+addEventListener("closedCursorMove", function(event) {
+  if (k.getIndex() === 0) {
   stage1.updateLeftBox(event.leftX, event.leftY);
   stage1.updateRightBox(event.rightX, event.rightY);
-}
+  } else {
+  stage2.updateLeftBox(event.leftX, event.leftY);
+  stage2.updateRightBox(event.rightX, event.rightY);
+  }
+});
 </script>
 
 </html>
