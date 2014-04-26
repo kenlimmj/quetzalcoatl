@@ -26,7 +26,7 @@ var Obscura = (function() {
         update();
     }
 
-    function onCursorMove() {
+    function onCursorMove(event) {
         perspective.tx = Math.round(((window.innerWidth - event.leftX) / window.innerWidth) * 100);
         perspective.ty = Math.round(((window.innerHeight - event.leftY) / window.innerHeight) * 100);
     }

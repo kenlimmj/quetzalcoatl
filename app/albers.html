@@ -12,6 +12,7 @@
 </head>
 
 <body>
+  <div id="nav"></div>
   <article class="kontext">
     <div class="layer one show">
       <div id="container1" class="container"></div>
@@ -23,6 +24,11 @@
 </body>
 
 <script src="http://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.1/kinetic.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
+<script src="js/websocket.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/gesture.js"></script>
+<script src="js/viewport.js"></script>
 <script src="js/albers1.js"></script>
 <script src="js/albers2.js"></script>
 <script src="js/kontext.js"></script>
@@ -30,13 +36,20 @@
 var k = kontext(document.querySelector('.kontext'));
 
 // Initialize the views
-stage1Init();
+stage1.init();
 stage2Init();
 
-document.addEventListener('keyup', function(event) {
+addEventListener('keyup', function(event) {
   if (event.keyCode === 37) k.prev();
   if (event.keyCode === 39) k.next();
 }, false);
+
+addEventListener("closedCursorMove", onCursorMove);
+
+function onCursorMove(event) {
+  stage1.updateLeftBox(event.leftX, event.leftY);
+  stage1.updateRightBox(event.rightX, event.rightY);
+}
 </script>
 
 </html>

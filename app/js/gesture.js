@@ -12,6 +12,11 @@ var gesture = {
             cancelable: true
         });
 
+        gesture.closedMove = new CustomEvent("closedCursorMove", {
+            bubbles: true,
+            cancelable: true
+        })
+
         gesture.leftPull = new CustomEvent("leftPull", {
             bubbles: true,
             cancelable: true
@@ -66,11 +71,18 @@ var gesture = {
         switch (gesture.leftHand) {
             case "open":
             case "point":
-            case "closed":
             default:
                 gesture.cursorMove.leftX = mappedLeftCoord[0];
                 gesture.cursorMove.leftY = mappedLeftCoord[1];
                 dispatchEvent(gesture.cursorMove);
+                if (cursor.drawLeft === true) {
+                    cursor.updateLeftHand();
+                }
+                break;
+            case "closed":
+                gesture.closedMove.leftX = mappedLeftCoord[0];
+                gesture.closedMove.leftY = mappedLeftCoord[1];
+                dispatchEvent(gesture.closedMove);
                 if (cursor.drawLeft === true) {
                     cursor.updateLeftHand();
                 }
@@ -97,11 +109,18 @@ var gesture = {
         switch (gesture.rightHand) {
             case "open":
             case "point":
-            case "closed":
             default:
                 gesture.cursorMove.rightX = mappedRightCoord[0];
                 gesture.cursorMove.rightY = mappedRightCoord[1];
                 dispatchEvent(gesture.cursorMove);
+                if (cursor.drawRight === true) {
+                    cursor.updateRightHand();
+                }
+                break;
+            case "closed":
+                gesture.closedMove.rightX = mappedRightCoord[0];
+                gesture.closedMove.rightY = mappedRightCoord[1];
+                dispatchEvent(gesture.closedMove);
                 if (cursor.drawRight === true) {
                     cursor.updateRightHand();
                 }

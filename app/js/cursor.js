@@ -1,376 +1,266 @@
-/**
- * Provides the cursor class. The cursor is displayed on-screen as a pair of circles
- *
- * @class cursor
- */
+var cursor = {
+    debug: false,
+    drawLeft: true,
+    drawRight: true,
 
-/**
- * A handle to the canvas element that draws the cursor
- *
- * @property c
- * @type Object
- * @default ```document.getElementById("cursor")```
- * @final
- */
-var c = document.getElementById("cursor");
-var ctx = c.getContext("2d");
+    // Initialize holder values for the cursor coordinates
+    leftX: null,
+    leftY: null,
+    rightX: null,
+    rightY: null,
 
-/**
- * The radius of the cursor circle when the hand is in an "open" state
- *
- * @property open_radius
- * @type Number
- * @default 25
- * @final
- */
-var open_radius = 25;
+    // Hard-coded values for the cursor radii
+    unknown_radius: 65.45,
+    open_radius: 25,
+    grab_radius: 15.45,
+    point_radius: 5.9,
 
-/**
- * The radius of the cursor circle when the hand is in a "closed" state.
- *
- * @property grab_radius
- * @type Number
- * @default 15.45
- * @final
- */
-var grab_radius = open_radius / 1.618;
+    init: function() {
+        // Create one layer for each hand
+        cursor.leftCursorLayer = new Kinetic.Layer(),
+        cursor.rightCursorLayer = new Kinetic.Layer();
 
-/**
- * The radius of the cursor circle when the hand is in a "pointing/lasso" state.
- *
- * @property point_radius
- * @type Number
- * @default 9.55
- * @final
- */
-var point_radius = grab_radius / 1.618;
+        // Map the cursor values from the user viewport to the screen viewport
+        // These values are never exposed
+        var mappedLeftCursor = cursor.map(cursor.leftX, cursor.leftY),
+            mappedRightCursor = cursor.map(cursor.rightX, cursor.rightY);
 
+        // Draw a circle for the left cursor in the screen viewport
+        cursor.leftScreenCursor = new Kinetic.Circle({
+            x: mappedLeftCursor[0],
+            y: mappedLeftCursor[1],
+            radius: cursor.open_radius,
+            fill: "#d33682"
+        });
 
-/**
- * The color of the left hand cursor circle. This color is taken from the
- * 5-color palette from the Solarized color scheme.
- *
- * @property leftColor
- * @type String
- * @default #d33682
- * @final
- */
-var leftColor = "#d33682";
+        // Draw a circle for the right cursor in the screen viewport
+        cursor.rightScreenCursor = new Kinetic.Circle({
+            x: mappedRightCursor[0],
+            y: mappedRightCursor[1],
+            radius: cursor.open_radius,
+            fill: "#6c71c4"
+        });
 
-/**
- * The color of the right hand cursor circle. This color is taken from the
- * 5-color palette from the Solarized color scheme.
- *
- * @property rightColor
- * @type String
- * @default #6c71c4
- * @final
- */
-var rightColor = "#6c71c4";
+        if (cursor.debug === true) {
+            // Add a tooltip label to the left cursor in the screen viewport
+            cursor.leftScreenCursorLabel = new Kinetic.Text({
+                x: cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius(),
+                y: cursor.leftScreenCursor.getY() + cursor.leftScreenCursor.radius(),
+                align: "left",
+                text: cursor.leftScreenCursor.getX() + "\n" + cursor.leftScreenCursor.getY(),
+                fontSize: 14,
+                fill: "#d33682"
+            });
 
-/**
- * The dimensions of the user's screen, which we call the screen viewport.
- *
- * @property scoord
- * @type Object
- * @final
- */
-var scoord = {
-    xmin: 0,
-    xmax: window.innerWidth,
-    ymin: 0,
-    ymax: window.innerHeight
-};
+            // Add a tooltip label to the right cursor in the screen viewport
+            cursor.rightScreenCursorLabel = new Kinetic.Text({
+                x: cursor.rightScreenCursor.getX() + cursor.rightScreenCursor.radius(),
+                y: cursor.rightScreenCursor.getY() + cursor.rightScreenCursor.radius(),
+                align: "left",
+                text: cursor.rightScreenCursor.getX() + "\n" + cursor.rightScreenCursor.getY(),
+                fontSize: 14,
+                fill: "#6c71c4"
+            });
 
-// Set the width and height of the canvas to be the size of the window
-ctx.canvas.width = scoord.xmax - scoord.xmin;
-ctx.canvas.height = scoord.ymax - scoord.ymin;
+            // Draw a circle for the left cursor in the user viewport
+            cursor.leftUserCursor = new Kinetic.Circle({
+                x: cursor.leftX + nav.kinectView.getX(),
+                y: cursor.leftY + nav.kinectView.getY(),
+                radius: cursor.open_radius / 1.618,
+                fill: "#d33682"
+            });
 
-/**
- * Rounds a number such that it is a multiple of the provided number. This function
- * comes in handy for stabilizing cursor jitter (by rounding the mapped coordinates).
- *
- * @method stabilizer
- * @static
- * @param {Number} x A number to be rounded.
- * @param {Number} factor A number which represents a multiple to which x will be rounded.
- * @return {Number} A rounded number.
- *
- * @example
- *      stabilizer(92,6) = 96
- */
-function stabilizer(x, factor) {
-    return x - (x % factor) + (x % factor > 0 && factor);
-}
+            // Draw a circle for the right cursor in the user viewport
+            cursor.rightUserCursor = new Kinetic.Circle({
+                x: cursor.rightX + nav.kinectView.getX(),
+                y: cursor.rightY + nav.kinectView.getY(),
+                radius: cursor.open_radius / 1.618,
+                fill: "#6c71c4"
+            });
 
-/**
- * Maps a pair of coordinates from the Kinect's viewport to the screen viewport.
- * This function first creates the user's viewport via the following method:
- * 1. A box is defined using the user viewport width and height. This data comes
- *    from the Kinect, which calculates the width as the distance from the midpoint
- *    of the left elbow-wrist joint to the the midpoint of the right elbow-wrist joint.
- *    The height is the distance from the top of the head to the spine base.
- * 2. As a result of (1), the user viewport is created around the user, centered
- *    at the user's spine base. When the user's spine base moves, the user viewport moves.
- *
- * Next, the function looks at the coordinates of the hand in the Kinect viewport and
- * does one of two things:
- * 1. If the coordinates are within the user viewport, it does a straightforward linear
- * mapping from the user's viewport to the screen viewport.
- * 2. If the coordinates are outside the user viewport, it maps the coordinate to the nearest screen edge.
- *
- * @method mapCoordinates
- * @static
- * @param {Array} arr An array of coordinates ```[x,y]``` in the Kinect viewport
- * @param {Array} screenArr An array ```[width,height]``` of the width and height of the user viewport
- * @param {Array} spineArr An array of coordinates ```[x,y]``` of the user's spine base in the Kinect viewport
- * @param {Number} threshold A value to which the final coordinates are rounded.
- * This value can be obtained from ```cursorThreshold```
- * @return {Array} An array of coordinates ```[x,y]``` in the user viewport
- * @uses stabilizer
- *
- * @example
- *      mapCoordinates([300,300],[250,250],[400,300],1/100) = [154, 808]
- */
-function mapCoordinates(arr, screenarr, spinearr, threshold) {
-    // Coordinates of the user viewport. The bottom center of the user viewport is
-    // centered at the user's spine base
-    var kcoord = {
-        // The leftmost point is one arm length to the left of the spine base
-        xmin: spinearr[0] - screenarr[0] / 2,
-        // The rightmost point is one arm length to the right of the spine base
-        xmax: spinearr[0] + screenarr[0] / 2,
-        // The topmost point is the spine base minus the user height
-        ymin: spinearr[1] - screenarr[1],
-        // The bottommost point is the spine base
-        ymax: spinearr[1]
-    };
+            // Add a tooltip label to the left cursor in the user viewport
+            cursor.leftUserCursorLabel = new Kinetic.Text({
+                x: cursor.leftUserCursor.getX() + cursor.leftUserCursor.radius(),
+                y: cursor.leftUserCursor.getY() + cursor.leftUserCursor.radius(),
+                align: "left",
+                text: cursor.leftX + "\n" + cursor.leftY,
+                fontSize: 11,
+                fill: "#d33682"
+            });
 
-    var x = null,
-        y = null;
+            // Add a tooltip label to the right cursor in the user viewport
+            cursor.rightUserCursorLabel = new Kinetic.Text({
+                x: cursor.rightUserCursor.getX() + cursor.rightUserCursor.radius(),
+                y: cursor.rightUserCursor.getY() + cursor.rightUserCursor.radius(),
+                align: "left",
+                text: cursor.rightX + "\n" + cursor.rightY,
+                fontSize: 11,
+                fill: "#6c71c4"
+            });
 
-    // Calculate the coordinate space for the incoming x-coordinate
-    if (arr[0] < kcoord.xmin) {
-        // If the hand is too far to the left, clip to the left edge of the screen
-        x = 0;
-    } else if (arr[0] > kcoord.xmax) {
-        // If the hand is too far to the right, clip to the right edge of the screen
-        x = window.innerWidth;
-    } else {
-        // Otherwise, translate it so it fits within the viable space
-        x = (arr[0] - kcoord.xmin) / (kcoord.xmax - kcoord.xmin) * (scoord.xmax - scoord.xmin);
-    }
+            // Draw a dotted line connecting the left cursors in the user and screen viewports
+            cursor.leftCursorConnector = new Kinetic.Line({
+                points: [cursor.leftUserCursor.getX(), cursor.leftUserCursor.getY(), cursor.leftScreenCursor.getX(), cursor.leftScreenCursor.getY()],
+                stroke: "#d33682",
+                strokeWidth: 1.618,
+                lineJoin: "round",
+                dash: [10, 5]
+            });
 
-    // Calculate the coordinate space for the incoming y-coordinate
-    if (arr[1] < kcoord.ymin) {
-        // If the hand is too high up, clip it to the top edge of the screen
-        y = 0;
-    } else if (arr[1] > kcoord.ymax) {
-        // If the hand is too low down, clip it to the bottom edge of the screen
-        y = window.innerHeight;
-    } else {
-        // Otherwise, translate it so it fits within the viable space
-        y = (arr[1] - kcoord.ymin) / (kcoord.ymax - kcoord.ymin) * (scoord.ymax - scoord.ymin);
-    }
-
-    // Threshold the result to minimize jitter
-    var xcoord = stabilizer(x, Math.round(threshold * window.innerWidth)),
-        ycoord = stabilizer(y, Math.round(threshold * window.innerHeight));
-
-    return [xcoord, ycoord];
-}
-
-/**
- * Updates the on-screen console with information about the left and right hand
- * state and coordinate positions
- *
- * @method updateConsole
- * @static
- * @param {Array} lcoord An array of coordinates ```[x,y]``` corresponding to the position
- * of the left hand in the screen viewport.
- * @param {Array} rcoord A array of coordinates ```[x,y]``` corresponding to the position
- * of the right hand in the screen viewport.
- * @param {String} lhandState The state of the left hand (open,closed,point,push,pull).
- * @param {String} rhandState The state of the right hand (open,closed,point,push,pull).
- */
-function updateConsole(lcoord, lhandState, rcoord, rhandState) {
-    // Initialize handlers for the screen coordinates in the console
-    var lscreenx = document.getElementById("lscreenx"),
-        lscreeny = document.getElementById("lscreeny"),
-        rscreenx = document.getElementById("rscreenx"),
-        rscreeny = document.getElementById("rscreeny");
-
-    // Initialize handlers for the hand states in the console
-    var lstate = document.getElementById("lhstate"),
-        rstate = document.getElementById("rhstate");
-
-    // Write the screen coordinates
-    lscreenx.innerText = lcoord[0] + "/" + window.innerWidth;
-    lscreeny.innerText = lcoord[1] + "/" + window.innerHeight;
-
-    rscreenx.innerText = rcoord[0] + "/" + window.innerWidth;
-    rscreeny.innerText = rcoord[1] + "/" + window.innerHeight;
-
-    // Write the hand states
-    lstate.innerText = lhandState;
-    rstate.innerText = rhandState;
-}
-
-/**
- * Sums the values corresponding to object keys in an array of objects
- *
- * @method sumIter
- * @static
- * @param {Array} arr An array of objects. Each object in the array must have key-value pairs.
- * @param {String} key A key referenced in an object literal. The value corresponding to the key
- * must be a number.
- *
- * @return {Number} The sum of all numbers corresponding to the specified key in every object in the array.
- */
-function sumIter(arr, key) {
-    var result = 0;
-
-    // Go through every element in the array and add its value to the result
-    arr.forEach(function(entry) {
-        result += entry[key];
-    });
-
-    return result;
-}
-
-/**
- * Counts the number of occurrences of a hand state in an array of objects and
- * returns the state with the highest frequency of occurrence.
- *
- * @method selectState
- * @static
- * @param {Array} arr An array of objects. Each object in the array must have key-value pairs.
- * @param {String} key A key referenced in an object literal. The value corresponding to the key
- * must be a valid hand state.
- *
- * @return {Number} The hand state with the highest occurrence frequency in the array
- */
-function selectState(arr, key) {
-    // Initialize counters for each hand state
-    var openCount = 0,
-        closedCount = 0,
-        pointCount = 0,
-        unknownCount = 0;
-
-    // Go through the list and count the number of occurrences of each hand state
-    arr.forEach(function(entry) {
-        switch (entry[key]) {
-            case "open":
-                openCount++;
-                break;
-            case "closed":
-                closedCount++;
-                break;
-            case "point":
-                pointCount++;
-                break;
-            case "unknown":
-                unknownCount++;
-                break;
-            default:
-                break;
+            // Draw a dotted line connecting the right cursors in the user and screen viewports
+            cursor.rightCursorConnector = new Kinetic.Line({
+                points: [cursor.rightUserCursor.getX(), cursor.rightUserCursor.getY(), cursor.rightScreenCursor.getX(), cursor.rightScreenCursor.getY()],
+                stroke: "#6c71c4",
+                strokeWidth: 1.618,
+                lineJoin: "round",
+                dash: [10, 5]
+            });
         }
-    });
 
-    // Return the state with the highest occurrence
-    if (openCount > closedCount && openCount > pointCount && openCount > unknownCount) {
-        return "open";
-    } else if (closedCount > pointCount && closedCount > unknownCount) {
-        return "closed";
-    } else if (pointCount > unknownCount) {
-        return "point";
-    } else {
-        return "unknown";
+        // Add each cursor reticule to its respective layer
+        if (cursor.drawLeft === true) {
+            cursor.leftCursorLayer.add(cursor.leftScreenCursor);
+        }
+        if (cursor.drawRight === true) {
+            cursor.rightCursorLayer.add(cursor.rightScreenCursor);
+        }
+
+        if (cursor.debug === true) {
+            cursor.leftCursorLayer.add(cursor.leftScreenCursorLabel);
+            cursor.leftCursorLayer.add(cursor.leftUserCursor).add(cursor.leftUserCursorLabel);
+            cursor.leftCursorLayer.add(cursor.leftCursorConnector);
+
+            cursor.rightCursorLayer.add(cursor.rightScreenCursorLabel);
+            cursor.rightCursorLayer.add(cursor.rightUserCursor).add(cursor.rightUserCursorLabel);
+            cursor.rightCursorLayer.add(cursor.rightCursorConnector);
+        }
+
+        // Add both layers to the navigation overlay
+        nav.overlay.add(cursor.leftCursorLayer).add(cursor.rightCursorLayer);
+    },
+
+    setLeftHand: function(x, y) {
+        cursor.leftX = x;
+        cursor.leftY = y;
+    },
+
+    setRightHand: function(x, y) {
+        cursor.rightX = x;
+        cursor.rightY = y;
+    },
+
+    get_radius: function(handState) {
+        switch (handState) {
+            case "open":
+                return cursor.open_radius;
+            case "closed":
+                return cursor.grab_radius;
+            case "point":
+                return cursor.point_radius;
+            default:
+                return cursor.unknown_radius;
+        }
+    },
+
+    get_threshold: function(handState) {
+        switch (handState) {
+            case "open":
+                return 1 / 100
+            case "closed":
+                return 1 / 100
+            case "pull":
+                return 1 / 100
+            case "point":
+                return 1 / 200
+            default:
+                return 1 / 100
+        }
+    },
+
+    stabilize: function(x, factor) {
+        return x - (x % factor) + (x % factor > 0 && factor);
+    },
+
+    getElement: function(x, y) {
+        var mappedCursor = cursor.map(x, y);
+        return document.elementFromPoint(mappedCursor[0], mappedCursor[1]);
+    },
+
+    map: function(x, y) {
+        // Calculate the coordinate space for the incoming x-coordinate
+        if (x < nav.uxMin) {
+            // If the hand is too far to the left, clip to the left edge of the screen
+            screenX = 0;
+        } else if (x > nav.uxMax) {
+            // If the hand is too far to the right, clip to the right edge of the screen
+            screenX = nav.sWidth;
+        } else {
+            // Otherwise, translate it so it fits within the viable space
+            screenX = (x - nav.uxMin) / nav.uWidth * nav.sWidth;
+        }
+
+        // Calculate the coordinate space for the incoming y-coordinate
+        if (y < nav.uyMin) {
+            // If the hand is too high up, clip it to the top edge of the screen
+            screenY = 0;
+        } else if (y > nav.uyMax) {
+            // If the hand is too low down, clip it to the bottom edge of the screen
+            screenY = nav.sHeight;
+        } else {
+            // Otherwise, translate it so it fits within the viable space
+            screenY = (y - nav.uyMin) / nav.uHeight * nav.sHeight;
+        }
+
+        return [Math.round(screenX), Math.round(screenY)];
+    },
+
+    updateLeftHand: function() {
+        var mappedLeftCursor = cursor.map(cursor.leftX, cursor.leftY);
+
+        cursor.leftScreenCursor.setX(mappedLeftCursor[0]);
+        cursor.leftScreenCursor.setY(mappedLeftCursor[1]);
+        cursor.leftScreenCursor.setRadius(cursor.get_radius(gesture.leftHand));
+
+        if (cursor.debug === true) {
+            cursor.leftScreenCursorLabel.setX(cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius());
+            cursor.leftScreenCursorLabel.setY(cursor.leftScreenCursor.getY() + cursor.leftScreenCursor.radius());
+            cursor.leftScreenCursorLabel.setText(gesture.leftHand + "\n" + cursor.leftScreenCursor.getX() + "\n" + cursor.leftScreenCursor.getY());
+
+            cursor.leftUserCursor.setX(cursor.leftX + nav.kinectView.getX());
+            cursor.leftUserCursor.setY(cursor.leftY + nav.kinectView.getY());
+
+            cursor.leftUserCursorLabel.setX(cursor.leftUserCursor.getX() + cursor.leftUserCursor.radius());
+            cursor.leftUserCursorLabel.setY(cursor.leftUserCursor.getY() + cursor.leftUserCursor.radius());
+            cursor.leftUserCursorLabel.setText(cursor.leftX + "\n" + cursor.leftY);
+
+            cursor.leftCursorConnector.setPoints([cursor.leftUserCursor.getX(), cursor.leftUserCursor.getY(), cursor.leftScreenCursor.getX(), cursor.leftScreenCursor.getY()]);
+        }
+
+        cursor.leftCursorLayer.batchDraw();
+    },
+
+    updateRightHand: function() {
+        var mappedRightCursor = cursor.map(cursor.rightX, cursor.rightY);
+
+        cursor.rightScreenCursor.setX(mappedRightCursor[0]);
+        cursor.rightScreenCursor.setY(mappedRightCursor[1]);
+        cursor.rightScreenCursor.setRadius(cursor.get_radius(gesture.rightHand));
+
+        if (cursor.debug === true) {
+            cursor.rightScreenCursorLabel.setX(cursor.rightScreenCursor.getX() + cursor.rightScreenCursor.radius());
+            cursor.rightScreenCursorLabel.setY(cursor.rightScreenCursor.getY() + cursor.rightScreenCursor.radius());
+            cursor.rightScreenCursorLabel.setText(gesture.rightHand + "\n" + cursor.rightScreenCursor.getX() + "\n" + cursor.rightScreenCursor.getY());
+
+            cursor.rightUserCursor.setX(cursor.rightX + nav.kinectView.getX());
+            cursor.rightUserCursor.setY(cursor.rightY + nav.kinectView.getY());
+
+            cursor.rightUserCursorLabel.setX(cursor.rightUserCursor.getX() + cursor.rightUserCursor.radius());
+            cursor.rightUserCursorLabel.setY(cursor.rightUserCursor.getY() + cursor.rightUserCursor.radius());
+            cursor.rightUserCursorLabel.setText(cursor.rightX + "\n" + cursor.rightY);
+
+            cursor.rightCursorConnector.setPoints([cursor.rightUserCursor.getX(), cursor.rightUserCursor.getY(), cursor.rightScreenCursor.getX(), cursor.rightScreenCursor.getY()]);
+        }
+
+        cursor.rightCursorLayer.batchDraw();
     }
 }
-
-/**
- * Looks up the cursor sensitivity value for a given hand state
- *
- * @method cursorThreshold
- * @static
- * @param {String} state The state of a hand (open,closed,point,push,pull)
- *
- * @return {Number} A threshold value
- */
-function cursorThreshold(state) {
-    if (state === "point") {
-        return 1 / 200;
-    } else {
-        return 1 / 100;
-    }
-}
-
-/**
- * Looks up and returns the appropriate radius for the cursor circle depending
- * on the hand state provided. If the hand state provided is not recognized, the
- * default radius that is returned will be the "open" hand state radius.
- *
- * @method assignRadius
- * @static
- * @param {String} state The state of a hand (open,closed,point,push,pull)
- *
- * @return {Number} The radius (in pixels) of the cursor circle
- */
-function assignRadius(state) {
-    switch (state) {
-        case "open":
-            return open_radius;
-        case "closed":
-            return grab_radius;
-        case "point":
-            return point_radius;
-        default:
-            return open_radius;
-    }
-}
-
-/**
- * Draws (or redraws) the cursor circles on the canvas layer.
- *
- * @method reDraw
- * @static
- * @param {Array} lcoord An array of coordinates ```[x,y]``` corresponding to the position
- * of the left hand in the screen viewport.
- * @param {Array} rcoord A array of coordinates ```[x,y]``` corresponding to the position
- * of the right hand in the screen viewport.
- * @param {String} lhandState The state of the left hand (open,closed,point,push,pull).
- * @param {String} rhandState The state of the right hand (open,closed,point,push,pull).
- * @uses assignRadius
- */
-// An instance redraws the cursor on the overlay layer
-// Input: Array of float x and float y mapped coordinates
-// Output: Unit
-function reDraw(lcoord, lhandState, rcoord, rhandState) {
-    // Initialize the radius of the cursor circle
-    var lradius = assignRadius(lhandState),
-        rradius = assignRadius(rhandState);
-
-    // Clear the entire canvas
-    // TODO: Only clear the part of the canvas that contains the old cursor circles
-    // In addition, only do it on a per-hand basis, rather than for both circles
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-    // Draw the cursors at their new location
-    // Left Hand
-    ctx.beginPath();
-    ctx.arc(lcoord[0], lcoord[1], lradius, 0, 2 * Math.PI);
-    ctx.fillStyle = leftColor;
-    ctx.fill();
-    ctx.closePath();
-
-    // Right Hand
-    ctx.beginPath();
-    ctx.arc(rcoord[0], rcoord[1], rradius, 0, 2 * Math.PI);
-    ctx.fillStyle = rightColor;
-    ctx.fill();
-    ctx.closePath();
-}
-
-// Write placeholder variables to the console
-updateConsole([0, 0], "N/A", [0, 0], "N/A", window.innerWidth, window.innerHeight, window.innerWidth / 2, window.innerHeight);
