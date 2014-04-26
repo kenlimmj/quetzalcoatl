@@ -27,12 +27,11 @@ var Obscura = (function() {
     }
 
     function onCursorMove() {
-        perspective.tx = Math.round((event.leftX / window.innerWidth) * 100);
-        perspective.ty = Math.round((event.leftY / window.innerHeight) * 100);
+        perspective.tx = Math.round(((window.innerWidth - event.leftX) / window.innerWidth) * 100);
+        perspective.ty = Math.round(((window.innerHeight - event.leftY) / window.innerHeight) * 100);
     }
 
     function onMouseMove(event) {
-        console.log(event);
         perspective.tx = Math.round((event.clientX / window.innerWidth) * 100);
         perspective.ty = Math.round((event.clientY / window.innerHeight) * 100);
     }
