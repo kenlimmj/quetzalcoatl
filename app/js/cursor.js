@@ -1,5 +1,7 @@
 var cursor = {
     debug: false,
+
+    // Switches for determining whether the cursor reticules are drawn
     drawLeft: true,
     drawRight: true,
 
@@ -8,6 +10,16 @@ var cursor = {
     leftY: null,
     rightX: null,
     rightY: null,
+
+    // Direction locks for the left cursor
+    leftLockX: false,
+    leftLockY: false,
+    leftLockD: false,
+
+    // Direction locks for the right cursor
+    rightLockX: false,
+    rightLockY: false,
+    rightLockD: false,
 
     // Hard-coded values for the cursor radii
     unknown_radius: 65.45,
@@ -217,22 +229,35 @@ var cursor = {
     updateLeftHand: function() {
         var mappedLeftCursor = cursor.map(cursor.leftX, cursor.leftY);
 
-        cursor.leftScreenCursor.setX(mappedLeftCursor[0]);
-        cursor.leftScreenCursor.setY(mappedLeftCursor[1]);
+        if (cursor.leftLockX === false) {
+            cursor.leftScreenCursor.setX(mappedLeftCursor[0]);
+        }
+
+        if (cursor.leftLockY === false) {
+            cursor.leftScreenCursor.setY(mappedLeftCursor[1]);
+        }
+
         cursor.leftScreenCursor.setRadius(cursor.get_radius(gesture.leftHand));
 
         if (cursor.debug === true) {
-            cursor.leftScreenCursorLabel.setX(cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius());
-            cursor.leftScreenCursorLabel.setY(cursor.leftScreenCursor.getY() + cursor.leftScreenCursor.radius());
+            if (cursor.leftLockX === false) {
+                cursor.leftScreenCursorLabel.setX(cursor.leftScreenCursor.getX() + cursor.leftScreenCursor.radius());
+            }
+            if (cursor.leftLockY === false) {
+                cursor.leftScreenCursorLabel.setY(cursor.leftScreenCursor.getY() + cursor.leftScreenCursor.radius());
+            }
             cursor.leftScreenCursorLabel.setText(gesture.leftHand + "\n" + cursor.leftScreenCursor.getX() + "\n" + cursor.leftScreenCursor.getY());
 
+            // Draw the location of the left cursor in the user viewport
             cursor.leftUserCursor.setX(cursor.leftX + nav.kinectView.getX());
             cursor.leftUserCursor.setY(cursor.leftY + nav.kinectView.getY());
 
+            // Draw the left cursor label in the user viewport
             cursor.leftUserCursorLabel.setX(cursor.leftUserCursor.getX() + cursor.leftUserCursor.radius());
             cursor.leftUserCursorLabel.setY(cursor.leftUserCursor.getY() + cursor.leftUserCursor.radius());
             cursor.leftUserCursorLabel.setText(cursor.leftX + "\n" + cursor.leftY);
 
+            // Draw a dotted line connecting the left cursor in the user viewport to the screen viewport
             cursor.leftCursorConnector.setPoints([cursor.leftUserCursor.getX(), cursor.leftUserCursor.getY(), cursor.leftScreenCursor.getX(), cursor.leftScreenCursor.getY()]);
         }
 
@@ -242,22 +267,33 @@ var cursor = {
     updateRightHand: function() {
         var mappedRightCursor = cursor.map(cursor.rightX, cursor.rightY);
 
-        cursor.rightScreenCursor.setX(mappedRightCursor[0]);
-        cursor.rightScreenCursor.setY(mappedRightCursor[1]);
+        if (cursor.rightLockX === false) {
+            cursor.rightScreenCursor.setX(mappedRightCursor[0]);
+        }
+        if (cursor.rightLockY === false) {
+            cursor.rightScreenCursor.setY(mappedRightCursor[1]);
+        }
         cursor.rightScreenCursor.setRadius(cursor.get_radius(gesture.rightHand));
 
         if (cursor.debug === true) {
-            cursor.rightScreenCursorLabel.setX(cursor.rightScreenCursor.getX() + cursor.rightScreenCursor.radius());
-            cursor.rightScreenCursorLabel.setY(cursor.rightScreenCursor.getY() + cursor.rightScreenCursor.radius());
+            if (cursor.rightLockX === false) {
+                cursor.rightScreenCursorLabel.setX(cursor.rightScreenCursor.getX() + cursor.rightScreenCursor.radius());
+            }
+            if (cursor.rightLockY === false) {
+                cursor.rightScreenCursorLabel.setY(cursor.rightScreenCursor.getY() + cursor.rightScreenCursor.radius());
+            }
             cursor.rightScreenCursorLabel.setText(gesture.rightHand + "\n" + cursor.rightScreenCursor.getX() + "\n" + cursor.rightScreenCursor.getY());
 
+            // Draw the location of the right cursor in the user viewport
             cursor.rightUserCursor.setX(cursor.rightX + nav.kinectView.getX());
             cursor.rightUserCursor.setY(cursor.rightY + nav.kinectView.getY());
 
+            // Draw the right cursor label in the user viewport
             cursor.rightUserCursorLabel.setX(cursor.rightUserCursor.getX() + cursor.rightUserCursor.radius());
             cursor.rightUserCursorLabel.setY(cursor.rightUserCursor.getY() + cursor.rightUserCursor.radius());
             cursor.rightUserCursorLabel.setText(cursor.rightX + "\n" + cursor.rightY);
 
+            // Draw a dotted line connecting the right cursor in the user viewport to the screen viewport
             cursor.rightCursorConnector.setPoints([cursor.rightUserCursor.getX(), cursor.rightUserCursor.getY(), cursor.rightScreenCursor.getX(), cursor.rightScreenCursor.getY()]);
         }
 
