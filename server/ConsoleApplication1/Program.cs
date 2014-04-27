@@ -217,6 +217,10 @@ namespace Quetzalcoatl
                                     Point lHand = jointPoints[JointType.HandLeft];
                                     Point rHand = jointPoints[JointType.HandRight];
 
+                                    //Define handles to each hand in depth space
+                                    CameraSpacePoint lhanddepth = body.Joints[JointType.HandLeft].Position;
+                                    CameraSpacePoint rhanddepth = body.Joints[JointType.HandRight].Position;
+
                                     // Define handles to each shoulder
                                     Point lShoulder = jointPoints[JointType.ShoulderLeft];
                                     Point rShoulder = jointPoints[JointType.ShoulderRight];
@@ -268,8 +272,8 @@ namespace Quetzalcoatl
                                             {
                                                 rframecount = 0;
                                             }
-                                            rpush = CheckPush(body.Joints[JointType.HandRight].Position.Z, "right", rframecount);
-                                            rpull = CheckPull(body.Joints[JointType.HandRight].Position.Z, "right", rframecount);
+                                            rpush = CheckPush(rhanddepth.Z, "right", rframecount);
+                                            rpull = CheckPull(rhanddepth.Z, "right", rframecount);
                                         }
                                         else
                                         {
@@ -283,8 +287,8 @@ namespace Quetzalcoatl
                                             {
                                                 lframecount = 0;
                                             }
-                                            lpush = CheckPush(body.Joints[JointType.HandLeft].Position.Z, "left", lframecount);
-                                            lpull = CheckPull(body.Joints[JointType.HandLeft].Position.Z, "left", lframecount);
+                                            lpush = CheckPush(lhanddepth.Z, "left", lframecount);
+                                            lpull = CheckPull(lhanddepth.Z, "left", lframecount);
                                         }
                                         else
                                         {
@@ -299,6 +303,13 @@ namespace Quetzalcoatl
 
                                         // Calculate the distance from the base of the spine to the top of the head
                                         double height = Math.Abs(bSpine.Y - neck.Y) + 2 * (neck.Y - head.Y);
+
+                                        //Calculate the inferred location of the hands
+                                        double wristdist = Math.Pow((Math.Pow(Math.Abs(rElbow.X - rWrist.X), 2) + Math.Pow(Math.Abs(rElbow.Y - rWrist.Y), 2)), 0.5);
+                                        double rangle = Math.Atan(rWrist.Y-rElbow.Y/rWrist.X-rElbow.X);
+                                        double langle = Math.Atan(lWrist.Y-lElbow.Y/lWrist.X-lElbow.X);
+                                        Point rpos2 = new Point(wristdist*Math.Cos(rangle), wristdist*Math.Sin(rangle));
+                                        Point lpos2 = new Point(wristdist*Math.Cos(langle), wristdist*Math.Sin(langle));
 
                                         // Text-ify the left hand state
                                         if (lpull == true)
@@ -323,7 +334,6 @@ namespace Quetzalcoatl
                                                     lHandState = "point";
                                                     break;
                                                 default:
-                                                    lHandState = "unknown";
                                                     break;
                                             }
                                         }
@@ -351,13 +361,42 @@ namespace Quetzalcoatl
                                                     rHandState = "point";
                                                     break;
                                                 default:
-                                                    rHandState = "unknown";
                                                     break;
                                             }
                                         }
 
                                         // Create a JSON packet of all the data to be sent to the client
-                                        string result = MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale, swipe);
+                                       string result = "";
+                                        switch (body.HandRightConfidence)
+                                       {
+                                           case TrackingConfidence.High:
+                                               switch (body.HandLeftConfidence)
+                                               {
+                                                   case TrackingConfidence.High:
+                                                       result=MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale, swipe);
+                                                       break;
+                                                   case TrackingConfidence.Low:
+                                                       result=MakeJson(rHandState, rHand, lHandState, lpos2, bSpine, width, height, zoomscale, swipe);
+                                                       break;
+                                               }
+                                               break;
+                                            case TrackingConfidence.Low:
+                                                switch(body.HandLeftConfidence)
+                                                {
+                                                    case TrackingConfidence.High:
+                                                        result=MakeJson(rHandState, rpos2, lHandState, lHand, bSpine, width, height, zoomscale, swipe);
+                                                        break;
+                                                    case TrackingConfidence.Low:
+                                                        result = MakeJson(rHandState, rpos2, lHandState, lpos2, bSpine, width, height, zoomscale, swipe);
+                                                        break;
+                                                }
+                                                break;
+                                       }
+                                        if (body.HandRightConfidence == TrackingConfidence.High) 
+                                        {
+                                            result = MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale, swipe);
+                                        } else if (body.HandRightConfidence == TrackingConfidence.Low)
+                                        result = MakeJson(rHandState, rpos2, lHandState, lpos2, bSpine, width, height, zoomscale, swipe);
 
                                         // Send the data to the client
                                         allSockets.ToList().ForEach(s => s.Send(result));
@@ -540,6 +579,8 @@ namespace Quetzalcoatl
                     return "none";
                 }
             }
+
+
 
             /// An instance is a constructor for the JSON packet
             private class Packet
