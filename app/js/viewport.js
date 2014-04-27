@@ -1,6 +1,9 @@
 var nav = {
     debug: false,
 
+    // A switch to keep track of whether a user is engaged
+    engaged: false,
+
     // Dimensions of the screen viewport
     sWidth: window.innerWidth,
     sHeight: window.innerHeight,
@@ -53,7 +56,7 @@ var nav = {
         nav.uxMin = nav.uSpineX - nav.uWidth / 2;
         nav.uxMax = nav.uSpineX + nav.uWidth / 2;
         nav.uyMin = nav.uSpineY - nav.uHeight;
-        nav.uyMax = nav.uHeight;
+        nav.uyMax = nav.uSpineY;
     },
 
     drawKinectView: function() {
