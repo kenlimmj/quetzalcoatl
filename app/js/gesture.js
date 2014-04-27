@@ -5,8 +5,6 @@ var gesture = {
     rightHand: null,
     swipeState: null,
 
-    limitRate: 500,
-
     init: function() {
         gesture.cursorMove = new CustomEvent("cursorMove", {
             bubbles: true,
@@ -80,7 +78,6 @@ var gesture = {
         switch (gesture.swipeState) {
             case "left":
                 dispatchEvent(gesture.swipeLeft);
-                break;
                 break;
             case "right":
                 dispatchEvent(gesture.swipeRight);
