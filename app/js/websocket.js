@@ -89,6 +89,10 @@ var ws = {
 
         // Generate the interval as a random number between 0 and the maxInterval determined from above
         return Math.random() * maxInterval;
+    },
+
+    drawInitGuide: function() {
+
     }
 }
 
