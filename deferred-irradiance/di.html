@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Deferred Irradiance Map</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="js/code.js"></script>
+<link href="css/style.css" rel="stylesheet" />
+
+<body>
+  <canvas id="display"></canvas>
+  <div id="ui"></div>
+</body>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.1/kinetic.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
+<script src="../js/websocket.js"></script>
+<script src="../js/cursor.js"></script>
+<script src="../js/gesture.js"></script>
+<script src="../js/viewport.js"></script>
+
+<script>
+cursor.drawLeft = false;
+cursor.drawRight = false;
+
+addEventListener("pull", function() {
+  $(document).simulateKeyPress('s');
+});
+addEventListener("push", function() {
+  $(document).simulateKeyPress('w');
+});
+addEventListener("closedMove", function(event) {
+  var e = $.Event('mousemove');
+  e.pageX = event.rightX;
+  e.pageY = event.rightY;
+  $(document).mousedown().trigger(e);
+});
+</script>
+
+</html>
