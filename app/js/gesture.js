@@ -16,22 +16,42 @@ var gesture = {
             cancelable: true
         })
 
-        gesture.leftPull = new CustomEvent("leftPull", {
+        gesture.genericLeftPull = new CustomEvent("genericLeftPull", {
             bubbles: true,
             cancelable: true
         });
 
-        gesture.rightPull = new CustomEvent("rightPull", {
+        gesture.genericRightPull = new CustomEvent("genericRightPull", {
             bubbles: true,
             cancelable: true
         });
 
-        gesture.leftPush = new CustomEvent("leftPush", {
+        gesture.genericLeftPush = new CustomEvent("genericLeftPush", {
             bubbles: true,
             cancelable: true
         });
 
-        gesture.rightPush = new CustomEvent("rightPush", {
+        gesture.genericRightPush = new CustomEvent("genericRightPush", {
+            bubbles: true,
+            cancelable: true
+        });
+
+        gesture.elemLeftPull = new CustomEvent("elemLeftPull", {
+            bubbles: true,
+            cancelable: true
+        });
+
+        gesture.elemRightPull = new CustomEvent("elemRightPull", {
+            bubbles: true,
+            cancelable: true
+        });
+
+        gesture.elemLeftPush = new CustomEvent("elemLeftPush", {
+            bubbles: true,
+            cancelable: true
+        });
+
+        gesture.elemRightPush = new CustomEvent("elemRightPush", {
             bubbles: true,
             cancelable: true
         });
@@ -112,10 +132,18 @@ var gesture = {
                         }
                         break;
                     case "pull":
-                        leftHandElement.dispatchEvent(gesture.leftPull);
+                        dispatchEvent(gesture.genericLeftPull)
+                        if (leftHandElement) {
+                            gesture.elemLeftPull.elem = leftHandElement;
+                            leftHandElement.dispatchEvent(gesture.elemLeftPull);
+                        }
                         break;
                     case "push":
-                        leftHandElement.dispatchEvent(gesture.leftPush);
+                        dispatchEvent(gesture.genericLeftPush)
+                        if (leftHandElement) {
+                            gesture.elemLeftPush.elem = leftHandElement;
+                            leftHandElement.dispatchEvent(gesture.elemLeftPush);
+                        }
                         break;
                     case "zoom":
                         leftHandElement.dispatchEvent(gesture.zoom);
@@ -144,10 +172,18 @@ var gesture = {
                         }
                         break;
                     case "pull":
-                        rightHandElement.dispatchEvent(gesture.rightPull);
+                        dispatchEvent(gesture.genericRightPull)
+                        if (rightHandElement) {
+                            gesture.elemRightPull.elem = rightHandElement;
+                            rightHandElement.dispatchEvent(gesture.elemRightPull);
+                        }
                         break;;
                     case "push":
-                        rightHandElement.dispatchEvent(gesture.rightPush);
+                        dispatchEvent(gesture.genericRightPush)
+                        if (rightHandElement) {
+                            gesture.elemRightPush.elem = rightHandElement;
+                            rightHandElement.dispatchEvent(gesture.elemRightPush);
+                        }
                         break;;
                     case "zoom":
                         rightHandElement.dispatchEvent(gesture.zoom);
