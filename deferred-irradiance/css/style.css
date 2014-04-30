@@ -1,0 +1,23 @@
+body {
+  background-color: black;
+}
+html, body, canvas, #ui {
+  font-family: sans-serif;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+html, body, div, canvas, div {
+  margin: 0;
+  padding: 0;
+}
+#ui, canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-shadow: black 1px 1px 3px;
+}
+canvas {
+  display: none;
+}
