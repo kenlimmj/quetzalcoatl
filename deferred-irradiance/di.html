@@ -25,49 +25,51 @@
 cursor.drawLeft = false;
 cursor.drawRight = false;
 
-function triggerKeyboardEvent(el, keyCode)
-{
-    var eventObj = document.createEventObject ?
-        document.createEventObject() : document.createEvent("Events");
+function triggerKeyboardEvent(el, keyCode) {
+  var eventObj = document.createEventObject ?
+    document.createEventObject() : document.createEvent("Events");
 
-    if(eventObj.initEvent){
-      eventObj.initEvent("keydown", true, true);
-    }
+  if (eventObj.initEvent) {
+    eventObj.initEvent("keydown", true, true);
+  }
 
-    eventObj.keyCode = keyCode;
-    eventObj.which = keyCode;
+  eventObj.keyCode = keyCode;
+  eventObj.which = keyCode;
 
-    el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeydown", eventObj);
+  el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeydown", eventObj);
 }
 
-function releaseKeyboardEvent(el, keyCode)
-{
-    var eventObj = document.createEventObject ?
-        document.createEventObject() : document.createEvent("Events");
+function releaseKeyboardEvent(el, keyCode) {
+  var eventObj = document.createEventObject ?
+    document.createEventObject() : document.createEvent("Events");
 
-    if(eventObj.initEvent){
-      eventObj.initEvent("keyup", true, true);
-    }
+  if (eventObj.initEvent) {
+    eventObj.initEvent("keyup", true, true);
+  }
 
-    eventObj.keyCode = keyCode;
-    eventObj.which = keyCode;
+  eventObj.keyCode = keyCode;
+  eventObj.which = keyCode;
 
-    el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeyup", eventObj);
+  el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeyup", eventObj);
 }
 
-addEventListener("pull", function() {
+addEventListener("genericLeftPull", function() {
   triggerKeyboardEvent(document.body, 83);
-  setTimeout(function() { releaseKeyboardEvent(document.body, 83); },250);
+  setTimeout(function() {
+    releaseKeyboardEvent(document.body, 83);
+  }, 250);
 });
-addEventListener("push", function() {
+addEventListener("genericLeftPush", function() {
   triggerKeyBoardEvent(document, 87);
-  setTimeout(function() { releaseKeyboardEvent(document.body, 87); },250);
+  setTimeout(function() {
+    releaseKeyboardEvent(document.body, 87);
+  }, 250);
 });
 addEventListener("closedMove", function(event) {
-  var e = $.Event('mousemove');
-  e.pageX = event.rightX;
-  e.pageY = event.rightY;
-  $(document).mousedown().trigger(e);
+  // var e = $.Event('mousemove');
+  // e.pageX = event.rightX;
+  // e.pageY = event.rightY;
+  // $(document).mousedown().trigger(e);
 });
 </script>
 
