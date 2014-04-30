@@ -10,6 +10,7 @@
 <link href="css/style.css" rel="stylesheet" />
 
 <body>
+  <div id="nav"></div>
   <canvas id="display"></canvas>
   <div id="ui"></div>
 </body>
@@ -53,18 +54,19 @@ function releaseKeyboardEvent(el, keyCode) {
   el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeyup", eventObj);
 }
 
+addEventListener("cursorMove", function() {
+  releaseKeyboardEvent(document.body, 83);
+  releaseKeyboardEvent(document.body, 87);
+})
+
 addEventListener("genericLeftPull", function() {
   triggerKeyboardEvent(document.body, 83);
-  setTimeout(function() {
-    releaseKeyboardEvent(document.body, 83);
-  }, 250);
 });
+
 addEventListener("genericLeftPush", function() {
-  triggerKeyBoardEvent(document, 87);
-  setTimeout(function() {
-    releaseKeyboardEvent(document.body, 87);
-  }, 250);
+  triggerKeyboardEvent(document.body, 87);
 });
+
 addEventListener("closedMove", function(event) {
   // var e = $.Event('mousemove');
   // e.pageX = event.rightX;

@@ -132,14 +132,14 @@ var gesture = {
                         }
                         break;
                     case "pull":
-                        dispatchEvent(gesture.genericLeftPull)
+                        document.body.dispatchEvent(gesture.genericLeftPull)
                         if (leftHandElement) {
                             gesture.elemLeftPull.elem = leftHandElement;
                             leftHandElement.dispatchEvent(gesture.elemLeftPull);
                         }
                         break;
                     case "push":
-                        dispatchEvent(gesture.genericLeftPush)
+                        document.body.dispatchEvent(gesture.genericLeftPush)
                         if (leftHandElement) {
                             gesture.elemLeftPush.elem = leftHandElement;
                             leftHandElement.dispatchEvent(gesture.elemLeftPush);
