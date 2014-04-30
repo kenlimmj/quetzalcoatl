@@ -540,20 +540,13 @@ namespace Quetzalcoatl
             {
                 if (lstate == HandState.Closed && rstate == HandState.Closed)
                 {
-                    if (lhand.Y >= head.Y &&
-                        lhand.Y <= bspine.Y &&
-                        lhand.X <= bspine.X &&
-                        rhand.X >= bspine.X &&
-                        rhand.Y >= head.Y &&
-                        rhand.Y <= bspine.Y)
+
+                    if (zoominit == 0)
                     {
-                        if (zoominit == 0)
-                        {
-                            initX = rhd.X - lhd.X;
-                            initY = rhd.Y - lhd.Y;
-                            initZ = rhd.Z - lhd.Z;
-                            zoominit = Math.Pow((Math.Pow(Math.Abs(initX), 2) + Math.Pow(Math.Abs(initY), 2) + Math.Pow(Math.Abs(initZ), 2)), 0.5);
-                        }
+                        initX = rhd.X - lhd.X;
+                        initY = rhd.Y - lhd.Y;
+                        initZ = rhd.Z - lhd.Z;
+                        zoominit = Math.Pow((Math.Pow(Math.Abs(initX), 2) + Math.Pow(Math.Abs(initY), 2) + Math.Pow(Math.Abs(initZ), 2)), 0.5);
                     }
                     if (zoominit != 0)
                     {
@@ -565,8 +558,6 @@ namespace Quetzalcoatl
                         theta = Math.Acos((currX * initX + currY * initY) / (zoomcurr * zoominit));
                         phi = Math.Acos((currY * initY + currZ * initZ) / (zoominit * zoomcurr));
                         rho = Math.Acos((currX * initX + currZ * initZ) / (zoomcurr * zoominit));
-
-                        
                     }
                 }
                 else
