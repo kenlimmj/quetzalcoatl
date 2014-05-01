@@ -104,14 +104,17 @@ namespace Quetzalcoatl
             private int lframecount = 0;
             private int startcount = 0;
             private int endcount = 0;
+            private int zerrorcount = 0;
+            private int perrorcount = 0;
+            private int serrorcount = 0;
 
             private float zright = 0;
             private float zleft = 0;
             private float ssright = 0;
             private float ssleft = 0;
 
-            private float pushzright = 0;
-            private float pushzleft = 0;
+            private float lpulldist = 0;
+            private float rpulldist = 0;
 
             private bool rpush = false;
             private bool lpush = false;
@@ -237,6 +240,10 @@ namespace Quetzalcoatl
                                     Point lWrist = jointPoints[JointType.WristLeft];
                                     Point rWrist = jointPoints[JointType.WristRight];
 
+                                    // Define handles to each wrist in depth space
+                                    CameraSpacePoint lwristd = body.Joints[JointType.WristLeft].Position;
+                                    CameraSpacePoint rwristd = body.Joints[JointType.WristRight].Position;
+
                                     // Define handles to each elbow
                                     Point lElbow = jointPoints[JointType.ElbowLeft];
                                     Point rElbow = jointPoints[JointType.ElbowRight];
@@ -262,7 +269,10 @@ namespace Quetzalcoatl
 
                                         if (rpos[5].X != 0 && rpos[5].Y != 0)
                                         {
-                                            swipe = CheckSwipe(rpos[0], rpos[5], lpos[0], lpos[5]);
+                                            if (serrorcount > 15)
+                                            {
+                                                swipe = CheckSwipe(rpos[0], rpos[5], lpos[0], lpos[5]);
+                                            }
                                         }
                                         if (rpos[5].X == 0 && lpos[5].X == 0)
                                         {
@@ -270,18 +280,18 @@ namespace Quetzalcoatl
                                         }
                                         if (!(swipe.Equals("none")))
                                         {
+                                            serrorcount = 0;
                                             Array.Clear(rpos, 0, rpos.Length);
                                             Array.Clear(lpos, 0, lpos.Length);
                                         }
 
                                         if (body.HandRightState == HandState.Closed)
                                         {
-                                            if (this.rframecount >= 45)
+                                            if (this.rframecount >= 15)
                                             {
                                                 rframecount = 0;
                                             }
-                                            rpush = CheckPush(rhanddepth.Z, "right", rframecount);
-                                            rpull = CheckPull(rhanddepth.Z, "right", rframecount);
+                                            CheckPushPull(rhanddepth.Z, "right", rframecount, rpush, rpull, body.HandRightState);
                                         }
                                         else
                                         {
@@ -291,20 +301,17 @@ namespace Quetzalcoatl
 
                                         if (body.HandLeftState == HandState.Closed)
                                         {
-                                            if (this.lframecount >= 45)
+                                            if (this.lframecount >= 15)
                                             {
                                                 lframecount = 0;
                                             }
-                                            lpush = CheckPush(lhanddepth.Z, "left", lframecount);
-                                            lpull = CheckPull(lhanddepth.Z, "left", lframecount);
+                                            CheckPushPull(lhanddepth.Z, "left", lframecount, lpush, lpull, body.HandLeftState);
                                         }
                                         else
                                         {
                                             lpush = false;
                                             lpull = false;
                                         }
-
-                                        CheckZoom(body.HandLeftState, body.HandRightState, rHand, lHand, rShoulder, lShoulder, bSpine, head, lhanddepth, rhanddepth);
 
                                         // Calculate the distance from the midpoint of the left elbow-wrist joint to the midpoint of the right elbow-wrist joint
                                         double width = (Math.Pow((Math.Pow(Math.Abs(rShoulder.X - rElbow.X), 2) + Math.Pow(Math.Abs(rShoulder.Y - rElbow.Y), 2)), 0.5) + (Math.Pow((Math.Pow(Math.Abs(rElbow.X - rWrist.X), 2) + Math.Pow(Math.Abs(rElbow.Y - rWrist.Y), 2)), 0.5) / 2)) * 2 + Math.Abs(rShoulder.X - lShoulder.X);
@@ -313,11 +320,11 @@ namespace Quetzalcoatl
                                         double height = Math.Abs(bSpine.Y - neck.Y) + 2 * (neck.Y - head.Y);
 
                                         //Calculate the inferred location of the hands
-                                        double wristdist = Math.Pow((Math.Pow(Math.Abs(rElbow.X - rWrist.X), 2) + Math.Pow(Math.Abs(rElbow.Y - rWrist.Y), 2)), 0.5);
+                                        double wristdist = Math.Pow((Math.Pow(rWrist.X - rElbow.X, 2) + Math.Pow(rWrist.Y - rElbow.Y, 2)), 0.5);
                                         double rangle = Math.Atan(rWrist.Y-rElbow.Y/rWrist.X-rElbow.X);
                                         double langle = Math.Atan(lWrist.Y-lElbow.Y/lWrist.X-lElbow.X);
-                                        Point rpos2 = new Point(wristdist*Math.Cos(rangle), wristdist*Math.Sin(rangle));
-                                        Point lpos2 = new Point(wristdist*Math.Cos(langle), wristdist*Math.Sin(langle));
+                                        Point rpos2 = new Point(rWrist.X+wristdist*Math.Cos(rangle), rWrist.Y+wristdist*Math.Sin(rangle));
+                                        Point lpos2 = new Point(lWrist.X+wristdist*Math.Cos(langle), lWrist.Y+wristdist*Math.Sin(langle));
 
                                         // Text-ify the left hand state
                                         if (lpull == true)
@@ -372,19 +379,22 @@ namespace Quetzalcoatl
                                                     break;
                                             }
                                         }
+                                        
 
                                         // Create a JSON packet of all the data to be sent to the client
                                        string result = "";
-                                        switch (body.HandRightConfidence)
+                                       switch (body.HandRightConfidence)
                                        {
                                            case TrackingConfidence.High:
                                                switch (body.HandLeftConfidence)
                                                {
                                                    case TrackingConfidence.High:
-                                                       result=MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale, theta, phi, rho, swipe);
+                                                       CheckZoom(body.HandLeftState, body.HandRightState, lhanddepth, rhanddepth, zerrorcount);
+                                                       result=MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale, theta, phi, rho, swipe, lpulldist, rpulldist);
                                                        break;
                                                    case TrackingConfidence.Low:
-                                                       result=MakeJson(rHandState, rHand, lHandState, lpos2, bSpine, width, height, zoomscale, theta, phi, rho, swipe);
+                                                       CheckZoom(body.HandLeftState, body.HandRightState, lwristd, rhanddepth, zerrorcount);
+                                                       result=MakeJson(rHandState, rHand, lHandState, lpos2, bSpine, width, height, zoomscale, theta, phi, rho, swipe, lpulldist, rpulldist);
                                                        break;
                                                }
                                                break;
@@ -392,19 +402,16 @@ namespace Quetzalcoatl
                                                 switch(body.HandLeftConfidence)
                                                 {
                                                     case TrackingConfidence.High:
-                                                        result=MakeJson(rHandState, rpos2, lHandState, lHand, bSpine, width, height, zoomscale, theta, phi, rho, swipe);
+                                                        CheckZoom(body.HandLeftState, body.HandRightState, lhanddepth, rwristd, zerrorcount);
+                                                        result=MakeJson(rHandState, rpos2, lHandState, lHand, bSpine, width, height, zoomscale, theta, phi, rho, swipe, lpulldist, rpulldist);
                                                         break;
                                                     case TrackingConfidence.Low:
-                                                        result = MakeJson(rHandState, rpos2, lHandState, lpos2, bSpine, width, height, zoomscale, theta, phi, rho, swipe);
+                                                        CheckZoom(body.HandLeftState, body.HandRightState, lwristd, rwristd, zerrorcount);
+                                                        result = MakeJson(rHandState, rpos2, lHandState, lpos2, bSpine, width, height, zoomscale, theta, phi, rho, swipe, lpulldist, rpulldist);
                                                         break;
                                                 }
                                                 break;
                                        }
-                                        if (body.HandRightConfidence == TrackingConfidence.High) 
-                                        {
-                                            result = MakeJson(rHandState, rHand, lHandState, lHand, bSpine, width, height, zoomscale, theta, phi, rho, swipe);
-                                        } else if (body.HandRightConfidence == TrackingConfidence.Low)
-                                        result = MakeJson(rHandState, rpos2, lHandState, lpos2, bSpine, width, height, zoomscale, theta, phi, rho, swipe);
 
                                         // Send the data to the client
                                         allSockets.ToList().ForEach(s => s.Send(result));
@@ -426,6 +433,8 @@ namespace Quetzalcoatl
                                         rframecount++;
                                         lframecount++;
                                         endcount++;
+                                        perrorcount++;
+                                        serrorcount++;
                                     }
                                     else
                                     {
@@ -480,67 +489,74 @@ namespace Quetzalcoatl
                 }
             }
 
-            private bool CheckPull(float currentz, string parity, int framenum)
+            private void CheckPushPull(float currentz, string parity, int framenum, bool currpush, bool currpull, HandState currstate)
             {
                 if (parity == "right")
                 {
-                    if (framenum == 0)
+                    if (currpull == true && currstate == HandState.Closed)
+                    {
+                        rpull = true;
+                        rpulldist = currentz - zright;
+                    }
+                    if (currpush == true && currstate == HandState.Closed)
+                    {
+                        rpush = true;
+                        rpulldist = currentz - zright;
+                    }
+                    if (framenum == 0 && currpush==false && currpush==false)
                     {
                         zright = currentz;
+                        rpulldist = 0;
                     }
                     else if (currentz >= zright + .102)
                     {
-                        return true;
+                        rpull = true;
+                    }
+                    else if (currentz <= zright -.102)
+                    {
+                        rpush = true;
+                    }
+                    else if (currpull==false && currpush == false)
+                    {
+                        rpulldist = 0;
                     }
                 }
                 if (parity == "left")
                 {
+                    if (currpull == true && currstate == HandState.Closed)
+                    {
+                        lpull = true;
+                        lpulldist = currentz - zleft;
+                    }
+                    if (currpush == true && currstate == HandState.Closed)
+                    {
+                        lpush = true;
+                        lpulldist = currentz - zleft;
+                    }
                     if (framenum == 0)
                     {
                         zleft = currentz;
                     }
                     else if (currentz >= zleft + .102)
                     {
-                        return true;
+                        lpull = true;
+                    }
+                    else if (currentz <= zleft - .102)
+                    {
+                        lpush = true;
+                    }
+                    else if (currpull == false && currpush == false)
+                    {
+                        lpulldist = 0;
                     }
                 }
-                return false;
-            }
-
-            private bool CheckPush(float pushcurrentz, string parity, int framenum)
-            {
-                if (parity == "right")
-                {
-                    if (framenum == 0)
-                    {
-                        pushzright = pushcurrentz;
-                    }
-                    else if (pushcurrentz <= pushzright - .102)
-                    {
-                        return true;
-                    }
-                }
-
-                if (parity == "left")
-                {
-                    if (framenum == 0)
-                    {
-                        pushzleft = pushcurrentz;
-                    }
-                    else if (pushcurrentz <= zleft - .102)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
             }
             
-            private void CheckZoom(HandState lstate, HandState rstate, Point rhand, Point lhand, Point rshoulder, Point lshoulder, Point bspine, Point head, CameraSpacePoint lhd, CameraSpacePoint rhd)
+            private void CheckZoom(HandState lstate, HandState rstate, CameraSpacePoint lhd, CameraSpacePoint rhd, int errorcount)
             {
-                if (lstate == HandState.Closed && rstate == HandState.Closed)
+                if ((lstate == HandState.Closed && rstate == HandState.Closed)||(lstate==HandState.Closed && (rstate == HandState.Unknown || rstate == HandState.NotTracked))||
+                    ((lstate==HandState.Unknown||lstate==HandState.NotTracked)&&rstate==HandState.Closed))
                 {
-
                     if (zoominit == 0)
                     {
                         initX = rhd.X - lhd.X;
@@ -555,9 +571,9 @@ namespace Quetzalcoatl
                         double currX = rhd.X - lhd.X;
                         double currY = rhd.Y - lhd.Y;
                         double currZ = rhd.Z - lhd.Z;
-                        theta = Math.Acos((currX * initX + currY * initY) / (zoomcurr * zoominit));
-                        phi = Math.Acos((currY * initY + currZ * initZ) / (zoominit * zoomcurr));
-                        rho = Math.Acos((currX * initX + currZ * initZ) / (zoomcurr * zoominit));
+                        theta = 180 / Math.PI * Math.Acos((currX * initX + currY * initY) / (Math.Pow(Math.Pow(currX, 2) + Math.Pow(currY, 2), 0.5) * Math.Pow(Math.Pow(initX, 2) + Math.Pow(initY, 2), 0.5)));
+                        phi = 180 / Math.PI * Math.Acos((currY * initY + currZ * initZ) / (Math.Pow(Math.Pow(currY, 2) + Math.Pow(currZ, 2), 0.5) * Math.Pow(Math.Pow(initY, 2) + Math.Pow(initZ, 2), 0.5)));
+                        rho = 180 / Math.PI * Math.Acos((currX * initX + currZ * initZ) / (Math.Pow(Math.Pow(currX, 2) + Math.Pow(currZ, 2), 0.5) * Math.Pow(Math.Pow(initX, 2) + Math.Pow(initZ, 2), 0.5)));
                     }
                 }
                 else
@@ -611,6 +627,10 @@ namespace Quetzalcoatl
                 public string rhandState { get; set; }
                 public string lhandState { get; set; }
 
+                ///Left and Right Pull Distances
+                public float lpull { get; set; }
+                public float rpull { get; set; }
+
                 ///Spine Base Coordinates
                 public double sx { get; set; }
                 public double sy { get; set; }
@@ -634,7 +654,8 @@ namespace Quetzalcoatl
             /// An instance constructs a JSON from a list of parameters
             /// Input: Left and right hand coordinates, and left and right hand states
             /// Output: Formatted JSON packet
-            public string MakeJson(String rightstate, Point rightpos, String leftstate, Point leftpos, Point spinebase, double width, double height, double zoom, double theta, double phi, double rho, string zoomdir)
+            public string MakeJson(String rightstate, Point rightpos, String leftstate, Point leftpos, Point spinebase, double width, double height, double zoom, double theta, double phi, double rho, string zoomdir,
+                float leftpull, float rightpull)
             {
                 Packet bodyData = new Packet
                 {
@@ -646,6 +667,9 @@ namespace Quetzalcoatl
 
                     rhandState = rightstate,
                     lhandState = leftstate,
+
+                    lpull = leftpull,
+                    rpull = rightpull,
 
                     sx = Math.Round(spinebase.X),
                     sy = Math.Round(spinebase.Y),
