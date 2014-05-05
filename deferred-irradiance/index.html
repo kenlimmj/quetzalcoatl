@@ -15,8 +15,10 @@
   <div id="ui"></div>
 </body>
 
+<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
 <script src="http://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.1/kinetic.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js"></script>
 <script src="../js/websocket.js"></script>
 <script src="../js/cursor.js"></script>
 <script src="../js/gesture.js"></script>
@@ -68,10 +70,10 @@ addEventListener("genericLeftPush", function() {
 });
 
 addEventListener("closedMove", function(event) {
-  // var e = $.Event('mousemove');
-  // e.pageX = event.rightX;
-  // e.pageY = event.rightY;
-  // $(document).mousedown().trigger(e);
+  var e = $.Event('mousemove');
+  e.pageX = event.rightX;
+  e.pageY = event.rightY;
+  $(document.body).mousedown().trigger(e);
 });
 </script>
 

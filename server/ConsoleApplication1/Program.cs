@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -133,7 +133,6 @@ namespace Quetzalcoatl
             private double phi = 0;
             private double rho = 0;
 
-
             private bool startStatement = false;
 
             private bool engaged = false;
@@ -143,7 +142,6 @@ namespace Quetzalcoatl
             private Point[] lpos = new Point[6];
             private Point[] rpos = new Point[6];
             private string swipe = "none";
-
 
             public void InitializeKinect()
             {
@@ -379,7 +377,7 @@ namespace Quetzalcoatl
                                                     break;
                                             }
                                         }
-                                        
+
 
                                         // Create a JSON packet of all the data to be sent to the client
                                        string result = "";
@@ -551,7 +549,7 @@ namespace Quetzalcoatl
                     }
                 }
             }
-            
+
             private void CheckZoom(HandState lstate, HandState rstate, CameraSpacePoint lhd, CameraSpacePoint rhd, int errorcount)
             {
                 if ((lstate == HandState.Closed && rstate == HandState.Closed)||(lstate==HandState.Closed && (rstate == HandState.Unknown || rstate == HandState.NotTracked))||
