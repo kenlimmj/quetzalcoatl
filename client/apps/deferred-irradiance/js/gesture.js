@@ -5,120 +5,56 @@ var gesture = {
     rightHand: null,
     swipeState: null,
 
+    gestureList: [{
+        name: "cursorMove"
+    }, {
+        name: "closedCursorMove"
+    }, {
+        name: "genericLeftPull"
+    }, {
+        name: "genericRightPull"
+    }, {
+        name: "genericLeftPush"
+    }, {
+        name: "genericRightPush"
+    }, {
+        name: "genericSwipeLeft"
+    }, {
+        name: "genericSwipeRight"
+    }, {
+        name: "genericSwipeUp"
+    }, {
+        name: "genericSwipeDown"
+    }, {
+        name: "elemLeftPull"
+    }, {
+        name: "elemRightPull"
+    }, {
+        name: "elemLeftPush"
+    }, {
+        name: "elemRightPush"
+    }, {
+        name: "elemSwipeLeft"
+    }, {
+        name: "elemSwipeRight"
+    }, {
+        name: "elemSwipeUp"
+    }, {
+        name: "elemSwipeDown"
+    }, {
+        name: "genericZoom"
+    }, {
+        name: "elemZoom"
+    }],
+
     // Initializes all gesture events
     init: function() {
-        // Open hand movement
-        gesture.cursorMove = new CustomEvent("cursorMove");
-        gesture.cursorMove.pageX = nav.sWidth;
-        gesture.cursorMove.pageY = nav.sHeight;
-        gesture.cursorMove.leftX = null;
-        gesture.cursorMove.leftY = null;
+        this.gestureList.forEach(function(item) {
+            var gestureItem = eval("gesture." + item.name + " = new CustomEvent(item.name)");
 
-        // Closed hand movement
-        gesture.closedCursorMove = new CustomEvent("closedCursorMove");
-        gesture.closedCursorMove.pageX = nav.sWidth;
-        gesture.closedCursorMove.pageY = nav.sHeight;
-        gesture.closedCursorMove.leftX = null;
-        gesture.closedCursorMove.leftY = null;
-
-        // Left pull gesture
-        gesture.genericLeftPull = new CustomEvent("genericLeftPull");
-        gesture.genericLeftPull.pageX = nav.sWidth;
-        gesture.genericLeftPull.pageY = nav.sHeight;
-
-        // Right pull gesture
-        gesture.genericRightPull = new CustomEvent("genericRightPull");
-        gesture.genericRightPull.pageX = nav.sWidth;
-        gesture.genericRightPull.pageY = nav.sHeight;
-
-        // Left push gesture
-        gesture.genericLeftPush = new CustomEvent("genericLeftPush");
-        gesture.genericLeftPush.pageX = nav.sWidth;
-        gesture.genericLeftPush.pageY = nav.sHeight;
-
-        // Right push gesture
-        gesture.genericRightPush = new CustomEvent("genericRightPush");
-        gesture.genericRightPush.pageX = nav.sWidth;
-        gesture.genericRightPush.pageY = nav.sHeight;
-
-        // Left pull gesture on a specific element
-        gesture.elemLeftPull = new CustomEvent("elemLeftPull");
-        gesture.elemLeftPull.pageX = nav.sWidth;
-        gesture.elemLeftPull.pageY = nav.sHeight;
-        gesture.elemLeftPull.elem = null;
-
-        // Right pull gesture on a specific element
-        gesture.elemRightPull = new CustomEvent("elemRightPull");
-        gesture.elemRightPull.pageX = nav.sWidth;
-        gesture.elemRightPull.pageY = nav.sHeight;
-        gesture.elemRightPull.elem = null;
-
-        // Left push gesture on a specific element
-        gesture.elemLeftPush = new CustomEvent("elemLeftPush");
-        gesture.elemLeftPush.pageX = nav.sWidth;
-        gesture.elemLeftPush.pageY = nav.sHeight;
-        gesture.elemLeftPush.elem = null;
-
-        // Right push gesture on a specific element
-        gesture.elemRightPush = new CustomEvent("elemRightPush");
-        gesture.elemRightPush.pageX = nav.sWidth;
-        gesture.elemRightPush.pageY = nav.sHeight;
-        gesture.elemRightPush.elem = null;
-
-        // Zoom gesture
-        gesture.genericZoom = new CustomEvent("genericZoom");
-        gesture.genericZoom.pageX = nav.sWidth;
-        gesture.genericZoom.pageY = nav.sHeight;
-
-        // Zoom gesture on a specific element
-        gesture.elemZoom = new CustomEvent("elemZoom");
-        gesture.elemZoom.pageX = nav.sWidth;
-        gesture.elemZoom.pageY = nav.sHeight;
-        gesture.elemZoom.elem = null;
-
-        // Left swipe gesture
-        gesture.genericSwipeLeft = new CustomEvent("genericSwipeLeft");
-        gesture.genericSwipeLeft.pageX = nav.sWidth;
-        gesture.genericSwipeLeft.pageY = nav.sHeight;
-
-        // Right swipe gesture
-        gesture.genericSwipeRight = new CustomEvent("genericSwipeRight");
-        gesture.genericSwipeRight.pageX = nav.sWidth;
-        gesture.genericSwipeRight.pageY = nav.sHeight;
-
-        // Upwards swipe gesture
-        gesture.genericSwipeUp = new CustomEvent("genericSwipeUp");
-        gesture.genericSwipeUp.pageX = nav.sWidth;
-        gesture.genericSwipeUp.pageY = nav.sHeight;
-
-        // Downwards swipe gesture
-        gesture.genericSwipeDown = new CustomEvent("genericSwipeDown");
-        gesture.genericSwipeDown.pageX = nav.sWidth;
-        gesture.genericSwipeDown.pageY = nav.sHeight;
-
-        // Left swipe gesture on a specific element
-        gesture.elemSwipeLeft = new CustomEvent("elemSwipeLeft");
-        gesture.elemSwipeLeft.pageX = nav.sWidth;
-        gesture.elemSwipeLeft.pageY = nav.sHeight;
-        gesture.elemSwipeLeft.elem = null;
-
-        // Right swipe gesture on a specific element
-        gesture.elemSwipeRight = new CustomEvent("elemSwipeRight");
-        gesture.elemSwipeRight.pageX = nav.sWidth;
-        gesture.elemSwipeRight.pageY = nav.sHeight;
-        gesture.elemSwipeRight.elem = null;
-
-        // Upwards swipe gesture on a specific element
-        gesture.elemSwipeUp = new CustomEvent("elemSwipeUp");
-        gesture.elemSwipeUp.pageX = nav.sWidth;
-        gesture.elemSwipeUp.pageY = nav.sHeight;
-        gesture.elemSwipeUp.elem = null;
-
-        // Downwards swipe gesture on a specific element
-        gesture.elemSwipeDown = new CustomEvent("elemSwipeDown");
-        gesture.elemSwipeDown.pageX = nav.sWidth;
-        gesture.elemSwipeDown.pageY = nav.sHeight;
-        gesture.elemSwipeDown.elem = null;
+            gestureItem.pageX = nav.sWidth;
+            gestureItem.pageY = nav.sHeight;
+        });
     },
 
     // Setter for the left hand state
@@ -138,10 +74,11 @@ var gesture = {
 
     // State machine for gesture detection and recognition
     process: function() {
-        // Map the left and right hand coordinates from the user viewport to the Kinect viewport
+        // Get the DOM elements under the cursor location
         var leftHandElement = cursor.getElement(cursor.leftX, cursor.leftY);
         var rightHandElement = cursor.getElement(cursor.rightX, cursor.rightY);
 
+        // Prioritize swipes
         switch (gesture.swipeState) {
             case "left":
                 // Dispatch the generic swipe event
@@ -201,20 +138,11 @@ var gesture = {
                 break;
             case "none":
             default:
+                // Map the left and right hand coordinates from the user viewport to the Kinect viewport
                 var mappedLeftCoord = cursor.map(cursor.leftX, cursor.leftY),
                     mappedRightCoord = cursor.map(cursor.rightX, cursor.rightY);
 
                 switch (gesture.leftHand) {
-                    case "open":
-                    case "point":
-                    default:
-                        gesture.cursorMove.leftX = mappedLeftCoord[0];
-                        gesture.cursorMove.leftY = mappedLeftCoord[1];
-                        dispatchEvent(gesture.cursorMove);
-                        if (cursor.drawLeft === true) {
-                            cursor.updateLeftHand();
-                        }
-                        break;
                     case "closed":
                         gesture.closedCursorMove.leftX = mappedLeftCoord[0];
                         gesture.closedCursorMove.leftY = mappedLeftCoord[1];
@@ -240,19 +168,19 @@ var gesture = {
                     case "zoom":
                         leftHandElement.dispatchEvent(gesture.genericZoom);
                         break;
-                }
-
-                switch (gesture.rightHand) {
                     case "open":
                     case "point":
                     default:
-                        gesture.cursorMove.rightX = mappedRightCoord[0];
-                        gesture.cursorMove.rightY = mappedRightCoord[1];
+                        gesture.cursorMove.leftX = mappedLeftCoord[0];
+                        gesture.cursorMove.leftY = mappedLeftCoord[1];
                         dispatchEvent(gesture.cursorMove);
-                        if (cursor.drawRight === true) {
-                            cursor.updateRightHand();
+                        if (cursor.drawLeft === true) {
+                            cursor.updateLeftHand();
                         }
                         break;
+                }
+
+                switch (gesture.rightHand) {
                     case "closed":
                         gesture.closedCursorMove.rightX = mappedRightCoord[0];
                         gesture.closedCursorMove.rightY = mappedRightCoord[1];
@@ -277,6 +205,16 @@ var gesture = {
                         break;
                     case "zoom":
                         rightHandElement.dispatchEvent(gesture.genericZoom);
+                        break;
+                    case "open":
+                    case "point":
+                    default:
+                        gesture.cursorMove.rightX = mappedRightCoord[0];
+                        gesture.cursorMove.rightY = mappedRightCoord[1];
+                        dispatchEvent(gesture.cursorMove);
+                        if (cursor.drawRight === true) {
+                            cursor.updateRightHand();
+                        }
                         break;
                 }
                 break

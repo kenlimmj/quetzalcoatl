@@ -3,11 +3,10 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Deferred Irradiance Map</title>
-<meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="js/code.js"></script>
-<link href="css/style.css" rel="stylesheet" />
+<link href="css/style.css" rel="stylesheet">
 
 <body>
   <div id="nav"></div>
@@ -15,10 +14,8 @@
   <div id="ui"></div>
 </body>
 
-<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
 <script src="http://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.1/kinetic.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js"></script>
 <script src="../js/websocket.js"></script>
 <script src="../js/cursor.js"></script>
 <script src="../js/gesture.js"></script>
@@ -59,7 +56,7 @@ function releaseKeyboardEvent(el, keyCode) {
 addEventListener("cursorMove", function() {
   releaseKeyboardEvent(document.body, 83);
   releaseKeyboardEvent(document.body, 87);
-})
+});
 
 addEventListener("genericLeftPull", function() {
   triggerKeyboardEvent(document.body, 83);
@@ -67,13 +64,6 @@ addEventListener("genericLeftPull", function() {
 
 addEventListener("genericLeftPush", function() {
   triggerKeyboardEvent(document.body, 87);
-});
-
-addEventListener("closedMove", function(event) {
-  var e = $.Event('mousemove');
-  e.pageX = event.rightX;
-  e.pageY = event.rightY;
-  $(document.body).mousedown().trigger(e);
 });
 </script>
 

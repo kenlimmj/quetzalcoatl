@@ -9378,22 +9378,6 @@ loader.define('/camera.js', function(exports, require, get) {
                 }
                 return void 0;
             });
-            document.body.addEventListener("cursorMove", function(event) {
-                console.log("cursorMove happened!");
-                _this.lx = event.rightX;
-                _this.ly = event.rightY;
-            });
-
-            document.body.addEventListener("closedCursorMove", function(event) {
-                console.log("closedCursorMove happened!");
-                x = event.rightX;
-                y = event.rightY;
-                _this.x += x - _this.lx;
-                _this.y += y - _this.ly;
-                _this.lx = x;
-                _this.ly = y;
-                return false;
-            });
         }
 
         MouseDrag.prototype.reset = function() {
