@@ -6,7 +6,7 @@ var scriptsGlob = 'src/js/*.js',
     scssGlob = 'src/scss/*.scss',
     htmlGlob = 'src/*.html',
     imgGlob = 'src/img/*',
-    testGlob = 'tests/qunit/test-runner.html';
+    testGlob = 'tests/qunit/*.html';
 
 var siteUrl = 'http://localhost/';
 
