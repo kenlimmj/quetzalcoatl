@@ -1,0 +1,24 @@
+{
+  "name": "quetzalcoatl",
+  "version": "1.0.0",
+  "authors": [
+    "Lim Mingjie Kenneth <me@kenlimmj.com> (http://kenlimmj.com)",
+    "Leart Albert Ulaj <lau8@cornell.edu>"
+  ],
+  "description": "Quetzalcoatl Kinect Control System",
+  "main": "dist/app.min.js",
+  "license": "MIT",
+  "homepage": "http://github.com/kenlimmj/quetzalcoatl",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/kenlimmj/quetzalcoatl"
+  },
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

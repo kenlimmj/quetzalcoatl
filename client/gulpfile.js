@@ -6,7 +6,7 @@ var scriptsGlob = 'src/js/*.js',
     scssGlob = 'src/scss/*.scss',
     htmlGlob = 'src/*.html',
     imgGlob = 'src/img/*',
-    testGlob = 'tests/qunit/*.html';
+    testGlob = 'test/*.js';
 
 var siteUrl = 'http://localhost/';
 
@@ -67,10 +67,14 @@ gulp.task('process-css', function() {
 gulp.task('post-process-styles', function() {
     gulp.src(cssGlob)
         .pipe(plugins.plumber())
-        .pipe(colorguard())
+        .pipe(plugins.uncss({
+          html: htmlGlob
+        }))
+        .pipe(plugins.colorguard())
         .pipe(plugins.prefix({
             cascade: true
         }))
+        .pipe(plugins.cmq())
         .pipe(plugins.recess())
         .pipe(gulp.dest('dist/css/'))
         .pipe(plugins.csso())
@@ -86,7 +90,7 @@ gulp.task('scripts', function() {
         .pipe(plugins.plumber())
         .pipe(plugins.jshint())
         .pipe(plugins.concat('app.js'))
-        .pipe(plugins.stripDebug())
+        // .pipe(plugins.stripDebug())
         .pipe(gulp.dest('dist/js/'))
         .pipe(plugins.uglify())
         .pipe(plugins.rename('app.min.js'))
@@ -97,7 +101,7 @@ gulp.task('scripts', function() {
 gulp.task('polyfill', function() {
     gulp.src(scriptsGlob)
         .pipe(plugins.plumber())
-        .pipe(autopolyfiller('polyfill.js'))
+        .pipe(plugins.autopolyfiller('polyfill.js'))
         .pipe(gulp.dest('dist/js/'))
         .pipe(plugins.uglify())
         .pipe(plugins.rename('polyfill.min.js'))
@@ -120,9 +124,13 @@ gulp.task('manifest', function() {
 });
 
 gulp.task('test', function() {
-    gulp.src(testGlob)
+    gulp.src(testGlob, {
+        read: false
+    })
         .pipe(plugins.plumber())
-        .pipe(plugins.qunit())
+        .pipe(plugins.mocha({
+            reporter: "spec"
+        }))
         .on('error', plugins.util.log)
 });
 
@@ -131,6 +139,13 @@ gulp.task('loc', function() {
         .pipe(plugins.plumber())
         .pipe(plugins.sloc())
         .on('error', plugins.util.log)
+});
+
+gulp.task('zip', function() {
+    gulp.src('./*')
+        .pipe(plugins.plumber())
+        .pipe(plugins.zip('quetzalcoatl.zip'))
+        .pipe(gulp.dest('/'))
 });
 
 gulp.task('sitemap', function() {
