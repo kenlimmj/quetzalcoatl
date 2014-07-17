@@ -20,7 +20,7 @@ var Nav = (function() {
     // Declare objects, dimensions and parameters
     var kinectSensor = {
         width: 512,
-        height: 424
+        height: 484
     },
         app = {
             width: window.innerWidth,
@@ -43,13 +43,12 @@ var Nav = (function() {
 
     return {
         init: function() {
-            var divName = navOverlayName;
 
             // Check if the nav element has already been inserted into the
-            if (!document.getElementById(divName)) {
+            if (!document.getElementById(navOverlayName)) {
                 // Create and insert a overlay HTML node
                 var navElement = document.createElement("div");
-                navElement.setAttribute("id", divName);
+                navElement.setAttribute("id", navOverlayName);
 
                 // Set styles on the overlay
                 navElement.style.position = "absolute";
@@ -65,16 +64,19 @@ var Nav = (function() {
                 // Insert the overlay at the top of the body
                 document.body.insertBefore(navElement, document.body.firstChild);
             } else {
-                var navElement = document.getElementById(divName);
+                var navElement = document.getElementById(navOverlayName);
             }
 
             // Draw a canvas in the nav overlay
             this.overlay = new Kinetic.Stage({
-                container: divName,
+                container: navOverlayName,
                 width: navElement.offsetWidth,
                 height: navElement.offsetHeight
             });
 
+            // If we're in debugging mode, add layers for drawing all the viewport windows
+            // When we specify the layers, we're also setting the pixel density of the canvas
+            // so everything looks good on Retina screens
             if (debug) {
                 this.userViewportLayer = new Kinetic.Layer();
                 this.userViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
@@ -88,6 +90,34 @@ var Nav = (function() {
 
             return this.overlay;
         },
+        destroy: function() {
+            kinectSensor = {
+                width: 512,
+                height: 484
+            },
+            app = {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            user = {
+                spineBase: {
+                    x: null,
+                    y: null
+                },
+                viewport: {
+                    xMin: null,
+                    xMax: null,
+                    yMin: null,
+                    yMax: null,
+                    width: null,
+                    height: null
+                }
+            };
+
+            if (document.getElementById(navOverlayName)) {
+                document.getElementById(navOverlayName).remove();
+            }
+        },
         setAppViewport: function(width, height) {
             var width = width || window.innerWidth,
                 height = height || window.innerHeight;
@@ -97,13 +127,19 @@ var Nav = (function() {
 
             return app;
         },
+        getAppViewport: function() {
+            return app;
+        },
         setKinectViewport: function(width, height) {
             var width = width || 512,
-                height = height || 424;
+                height = height || 484;
 
             kinectSensor.width = width;
             kinectSensor.height = height;
 
+            return kinectSensor;
+        },
+        getKinectViewport: function() {
             return kinectSensor;
         },
         setUserViewport: function(width, height) {
@@ -122,13 +158,19 @@ var Nav = (function() {
 
             return user.viewport;
         },
+        getUserViewport: function() {
+            return user.viewport;
+        },
         setUserSpineBase: function(x, y) {
             var x = x || kinectSensor.width / 2,
-                y = y || 0;
+                y = y || kinectSensor.height;
 
             user.spineBase.x = x;
             user.spineBase.y = y;
 
+            return user.spineBase;
+        },
+        getUserSpineBase: function() {
             return user.spineBase;
         },
         drawKinectViewport: function() {

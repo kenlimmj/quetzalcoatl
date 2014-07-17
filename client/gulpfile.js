@@ -6,7 +6,8 @@ var scriptsGlob = 'src/js/*.js',
     scssGlob = 'src/scss/*.scss',
     htmlGlob = 'src/*.html',
     imgGlob = 'src/img/*',
-    testGlob = 'test/*.js';
+    testGlob = 'test/test-runner.html',
+    assetsGlob = ['lib/kineticjs/kinetic.min.js', 'lib/mousetrap/mousetrap.min.js'];
 
 var siteUrl = 'http://localhost/';
 
@@ -90,7 +91,7 @@ gulp.task('scripts', function() {
         .pipe(plugins.plumber())
         .pipe(plugins.jshint())
         .pipe(plugins.concat('app.js'))
-        // .pipe(plugins.stripDebug())
+        .pipe(plugins.stripDebug())
         .pipe(gulp.dest('dist/js/'))
         .pipe(plugins.uglify())
         .pipe(plugins.rename('app.min.js'))
@@ -99,7 +100,7 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('polyfill', function() {
-    gulp.src(scriptsGlob)
+    gulp.src(assetsGlob)
         .pipe(plugins.plumber())
         .pipe(plugins.autopolyfiller('polyfill.js'))
         .pipe(gulp.dest('dist/js/'))
@@ -124,13 +125,9 @@ gulp.task('manifest', function() {
 });
 
 gulp.task('test', function() {
-    gulp.src(testGlob, {
-        read: false
-    })
+    gulp.src(testGlob)
         .pipe(plugins.plumber())
-        .pipe(plugins.mocha({
-            reporter: "spec"
-        }))
+        .pipe(plugins.qunit())
         .on('error', plugins.util.log)
 });
 

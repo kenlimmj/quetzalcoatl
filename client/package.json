@@ -5,6 +5,7 @@
   "main": "gulpfile.js",
   "dependencies": {},
   "devDependencies": {
+    "chai": "^1.9.1",
     "gulp": "^3.8.6",
     "gulp-autopolyfiller": "^1.1.0",
     "gulp-autoprefixer": "^0.0.8",
