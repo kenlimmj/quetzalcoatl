@@ -1,0 +1,31 @@
+{
+  "name": "wtf-forms",
+  "description": "Friendlier HTML form controls with a little CSS magic.",
+  "version": "2.2.0",
+  "keywords": [
+    "html",
+    "css",
+    "forms",
+    "web"
+  ],
+  "homepage": "http://wtfforms.com",
+  "main": [
+    "wtf-forms.css"
+  ],
+  "ignore": [
+    ".*",
+    "docs.css",
+    "index.html",
+    "font/"
+  ],
+  "_release": "2.2.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.2.0",
+    "commit": "6200dc7109782242d88283899cfd9545b9077114"
+  },
+  "_source": "git://github.com/mdo/wtf-forms.git",
+  "_target": "~2.2.0",
+  "_originalSource": "wtf-forms",
+  "_direct": true
+}

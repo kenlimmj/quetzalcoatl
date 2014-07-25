@@ -41,28 +41,16 @@ var Nav = (function() {
             }
         };
 
+    var supportsImports = function() {
+      return 'import' in document.createElement('link');
+    }
+
     return {
         init: function() {
 
             // Check if the nav element has already been inserted into the
             if (!document.getElementById(navOverlayName)) {
-                // Create and insert a overlay HTML node
-                var navElement = document.createElement("div");
-                navElement.setAttribute("id", navOverlayName);
 
-                // Set styles on the overlay
-                navElement.style.position = "absolute";
-                navElement.style.top = 0;
-                navElement.style.left = 0;
-
-                navElement.style.width = "100%";
-                navElement.style.height = "100%";
-
-                navElement.style.pointerEvents = "none";
-                navElement.style.zIndex = 999;
-
-                // Insert the overlay at the top of the body
-                document.body.insertBefore(navElement, document.body.firstChild);
             } else {
                 var navElement = document.getElementById(navOverlayName);
             }
@@ -314,6 +302,11 @@ var Nav = (function() {
                 .add(this.appViewportLayer);
 
             return this.appViewportLayer;
+        },
+        setDebugState: function(state) {
+          debug = state;
+
+          return debug;
         }
     }
 })(Nav || {});
