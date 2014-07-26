@@ -1,6 +1,9 @@
 var Interface = (function() {
+    var templateDirectory = '';
+
     var templatePrototypeGenerator = function(elementId) {
-        var template = document.querySelector('link[rel="import"]').import,
+        var link = document.querySelector('link[rel="import"]').import;
+            template = link.getElementById(elementId),
             content = template.content,
             contentNode = document.importNode(content, true);
 
@@ -19,8 +22,44 @@ var Interface = (function() {
         });
     };
 
-    var Interface = function() {
+    var supportsImports = function() {
+      return 'import' in document.createElement('link');
+    }
 
+    var insertImportLink = function(templateName) {
+      var linkNode = document.createElement('link');
+      linkNode.setAttribute('rel', 'import');
+      linkNode.setAttribute('async', 'true');
+      linkNode.setAttribute('href', templateDirectory + templateName + '.html');
+      document.head.appendChild(linkNode);
+
+      return linkNode;
+    }
+
+    var Interface = function(width, height) {
+        // Set the width and height of the app to that of the window
+        // unless arguments were passed to the constructor
+        this.width = width || window.innerWidth;
+        this.height = height || window.innerHeight;
+
+        var templateLink = insertImportLink('kinectNavOverlay');
+
+        // Defer all actions until the template import finishes
+        templateLink.onload = function() {
+          // Register the web components in the DOM
+          var overlayTemplate = registerTemplate('kinect-nav-overlay', 'kinectNavOverlay');
+
+          // Insert the control overlay if it doesn't already exist
+          if (document.getElementsByTagName('kinect-nav-overlay').length === 0) {
+            var kinectNavOverlay = new overlayTemplate();
+
+            document.body.insertBefore(kinectNavOverlay, document.body.firstChild);
+          } else {
+            var kinectNavOverlay = document.getElementsByTagName('kinect-nav-overlay');
+          }
+
+          return kinectNavOverlay;
+        }
     };
 
     Interface.prototype = {
@@ -38,6 +77,12 @@ var Interface = (function() {
                     }
                 });
             }
+        },
+        getX: function() {
+          return this.width;
+        },
+        getY: function() {
+          return this.height;
         }
     };
 

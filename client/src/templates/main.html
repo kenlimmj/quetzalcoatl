@@ -1,24 +1,9 @@
 <html>
 <head>
 <link rel="stylesheet" href="//brick.a.ssl.fastly.net/Source+Sans+Pro:300,200,200i/Anonymous+Pro:400">
-<link rel="import" href="kinectNavOverlay.html">
+<!-- <link rel="import" href="kinectNavOverlay.html"> -->
 </head>
 <body>
-<kinect-nav-overlay></kinect-nav-overlay>
 </body>
-<script>
-var protoGenerator = function(elementId) {
-  var proto = Object.create(HTMLElement.prototype, {
-    createdCallback: {
-      value: function() {
-        this.createShadowRoot().appendChild(document.importNode(document.querySelector('link[rel="import"]').import.getElementById(elementId).content, true));
-      }
-    }
-  });
-
-  return proto;
-}
-
-document.registerElement('kinect-nav-overlay', { prototype: protoGenerator('kinectNavOverlay') });
-</script>
+<script src="../js/ui.js"></script>
 </html>
