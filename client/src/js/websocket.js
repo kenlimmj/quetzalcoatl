@@ -3,6 +3,7 @@ var Server = (function() {
         connectionAttempts = 1;
 
     var generateInterval = function(k, maxDuration) {
+        // Cap the retry interval at 30 seconds
         var maxDuration = maxDuration || 30;
 
         return Math.random() * Math.min((Math.pow(2, k) - 1) * 5000, maxDuration * 5000);
@@ -27,6 +28,7 @@ var Server = (function() {
 
         if (connection) {
             connection.onopen = function() {
+                // Reset the attempt count on successful connection
                 connectionAttempts = 1;
 
                 Nav.init();
@@ -46,6 +48,7 @@ var Server = (function() {
             }
 
             connection.onclose = function() {
+                // If the connection fails, retry with exponential backoff
                 var time = generateInterval(connectionAttempts);
 
                 setTimeout(function() {

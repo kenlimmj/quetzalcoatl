@@ -1,0 +1,14 @@
+{
+  "name": "kineticjs-tips-and-tools",
+  "homepage": "https://github.com/lavrton/kineticjs-tips-and-tools",
+  "_release": "77f74aa7f5",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "77f74aa7f58e7ca0d3d063d972946eca27200da8"
+  },
+  "_source": "https://github.com/lavrton/kineticjs-tips-and-tools.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/lavrton/kineticjs-tips-and-tools.git",
+  "_direct": true
+}

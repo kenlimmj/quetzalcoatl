@@ -41,10 +41,6 @@ var Nav = (function() {
             }
         };
 
-    var supportsImports = function() {
-      return 'import' in document.createElement('link');
-    }
-
     return {
         init: function() {
 

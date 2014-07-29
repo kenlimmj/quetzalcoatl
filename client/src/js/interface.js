@@ -1,16 +1,22 @@
-var Interface = (function() {
-    var templateDirectory = '';
+var AppInterface = (function() {
+    var templateDirectory = '',
+        appViewportName = "Application Viewport",
+        circleFill = "#444",
+        circleRadius = 39.26886,
+        textFill = "#444",
+        textSize = 18,
+        labelAlignment = "right";
 
     var templatePrototypeGenerator = function(elementId) {
-        var link = document.querySelector('link[rel="import"]').import;
+        var link = document.querySelector('link[rel="import"][data-id=' + elementId + ']').import;
         template = link.getElementById(elementId),
-        content = template.content,
+        content = template.content;
         contentNode = document.importNode(content, true);
 
         return Object.create(HTMLElement.prototype, {
             createdCallback: {
                 value: function() {
-                    this.createShadowRoot().appendChild(contentNode);
+                    this.appendChild(contentNode);
                 }
             }
         });
@@ -26,10 +32,13 @@ var Interface = (function() {
         return 'import' in document.createElement('link');
     }
 
-    var insertImportLink = function(templateName) {
-        var linkNode = document.createElement('link');
+    var insertImportLink = function(templateName, asyncState) {
+        var asyncState = asyncState || true,
+            linkNode = document.createElement('link');
+
+        linkNode.dataset.id = templateName;
         linkNode.setAttribute('rel', 'import');
-        linkNode.setAttribute('async', 'true');
+        linkNode.setAttribute('async', asyncState.toString());
         linkNode.setAttribute('href', templateDirectory + templateName + '.html');
         document.head.appendChild(linkNode);
 
@@ -67,42 +76,63 @@ var Interface = (function() {
         return message;
     };
 
-    var Interface = function(width, height) {
+    var AppInterface = function(width, height) {
         var _ = this;
 
         // Set the width and height of the app to that of the window
         // unless arguments were passed to the constructor
-        this.viewport = {
+        _.viewport = {
             width: width || window.innerWidth,
             height: height || window.innerHeight
         }
 
         // Only proceed if the browser supports HTML imports
         if (supportsImports) {
-            var templateLink = insertImportLink('kinectNavOverlay');
+            // Schedule async imports
+            var lockScreenLink = insertImportLink('kinectLockScreen'),
+                overlayLink = insertImportLink('kinectNavOverlay');
 
             // Defer all actions until the template import finishes
-            templateLink.onload = function() {
-                // Insert the control overlay if it doesn't already exist
-                if (document.getElementsByTagName('kinect-nav-overlay').length === 0) {
+            lockScreenLink.onload = function() {
+                // Insert the lock screen only if it doesn't already exist
+                if (document.getElementsByTagName('kinect-lockscreen').length === 0) {
                     // Register the web components in the DOM
+                    var overlayTemplate = registerTemplate('kinect-lockscreen', 'kinectLockScreen'),
+                        kinectLockScreen = new overlayTemplate();
+
+                    document.body.insertBefore(kinectLockScreen, document.body.firstChild);
+                } else {
+                    var kinectLockScreen = document.getElementsByTagName('kinect-lockscreen')[0];
+                }
+
+                // Set an id on the element so it's easy to retrieve later
+                kinectLockScreen.id = 'kinectLockScreen';
+            }
+
+            // Defer all actions until the template import finishes
+            overlayLink.onload = function() {
+                // Insert the control overlay only if it doesn't already exist
+                if (document.getElementsByTagName('kinect-nav-overlay').length === 0) {
                     var overlayTemplate = registerTemplate('kinect-nav-overlay', 'kinectNavOverlay'),
                         kinectNavOverlay = new overlayTemplate();
 
-                    document.body.insertBefore(kinectNavOverlay, document.body.firstChild);
+                    document.body.insertBefore(kinectNavOverlay, document.getElementsByTagName('kinect-lockscreen')[0].nextSibling);
                 } else {
                     var kinectNavOverlay = document.getElementsByTagName('kinect-nav-overlay')[0];
                 }
 
+                // Set an id on the element so it's easy to retrieve later
+                kinectNavOverlay.id = 'kinectNavOverlay';
+
                 // Draw a canvas stage in the interface overlay
                 _.overlay = new Kinetic.Stage({
-                    container: kinectNavOverlay,
-                    width: width,
-                    height: height
+                    container: 'overlay',
+                    width: _.viewport.width,
+                    height: _.viewport.height
                 });
 
                 // Update the stage whenever the viewport dimensions are changed
-                Object.observe(this.viewport, function(changes) {
+                Object.observe(_.viewport, function(changes) {
                     changes.forEach(function(change) {
                         _.overlay.setWidth(change.object.width);
                         _.overlay.setHeight(change.object.height);
@@ -111,12 +141,13 @@ var Interface = (function() {
             }
         }
 
+
         // Request permission from the user to show notifications
         // Side effects: Gets and stores the user's response to the request
         requestNotificationPermission();
     };
 
-    Interface.prototype = {
+    AppInterface.prototype = {
         notifyRecognizedUser: function(name) {
             return notify("User Detected", "Welcome back, " + name + ". You have full control.", "userRecognition");
         },
@@ -129,43 +160,65 @@ var Interface = (function() {
         notifyConnectionLost: function() {
             return notify("Connection Lost", "Please check the status of the Kinect connected to this computer.", "connectionStatus")
         },
-        setX: function(width) {
+        setWidth: function(width) {
             this.viewport.width = width;
 
             return this.overlay;
         },
-        setY: function(height) {
+        setHeight: function(height) {
             this.viewport.height = height;
 
             return this.overlay;
         },
-        getX: function() {
+        getWidth: function() {
             return this.viewport.width;
         },
-        getY: function() {
+        getHeight: function() {
             return this.viewport.height;
         },
         drawViewport: function() {
+            var appViewportLayer = new Kinetic.FastLayer();
+            appViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
+
+            // Draw a circle representing the spine base location in the app's viewport
             var appSpineBase = new Kinetic.Circle({
-                x: this.width / 2,
-                y: this.height,
-                radius: circleRadius * 1.618,
+                x: this.getWidth() / 2,
+                y: this.getHeight(),
+                radius: circleRadius,
                 fill: circleFill
             });
 
+            // Draw a text label on the bottom-right of the bounding box
             var appSpineBaseLabel = new Kinetic.Text({
-
+                x: 0,
+                y: this.getHeight() - 70,
+                width: this.getWidth() - 20,
+                align: labelAlignment,
+                text: appViewportName + "\n" + "x: " + this.getWidth() + "\n" + "y: " + this.getHeight(),
+                fontSize: textSize,
+                fill: textFill
             });
+
+            appViewportLayer.add(appSpineBase, appSpineBaseLabel);
+
+            return appViewportLayer;
+        },
+        showViewport: function() {
+            var appViewport = this.drawViewport();
+
+            this.overlay.add(appViewport);
+
+            return this.overlay;
         },
         hideLockScreen: function() {
-
+            $('#kinectLockScreen').velocity({ opacity: 0 }, { display: "none" });
         },
         showLockScreen: function() {
-
+            $('#kinectLockScreen').velocity({ opacity: 1 }, { display: "block" });
         }
     };
 
-    return Interface;
-})(Interface || {});
+    return AppInterface;
+})(AppInterface || {});
 
-var foo = new Interface();
+var foo = new AppInterface();
