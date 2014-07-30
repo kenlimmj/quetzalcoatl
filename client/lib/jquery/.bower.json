@@ -33,5 +33,5 @@
   },
   "_source": "git://github.com/jquery/jquery.git",
   "_target": "*",
-  "_originalSource": "jquery"
+  "_originalSource": "jquery/jquery"
 }

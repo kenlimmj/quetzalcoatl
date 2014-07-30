@@ -76,6 +76,52 @@ var AppInterface = (function() {
         return message;
     };
 
+    var drawViewport = function(width, height, viewportDim) {
+        var appViewportLayer = new Kinetic.Layer();
+        appViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
+
+        // Draw a circle representing the spine base location in the app's viewport
+        var appSpineBase = new Kinetic.Circle({
+            x: width / 2,
+            y: height,
+            radius: circleRadius,
+            fill: circleFill
+        });
+
+        // Draw a text label on the bottom-right of the bounding box
+        var appSpineBaseLabel = new Kinetic.Text({
+            x: 0,
+            y: height - 70,
+            width: width - 20,
+            align: labelAlignment,
+            text: appViewportName + "\n" + "x: " + width + "\n" + "y: " + height,
+            fontSize: textSize,
+            fill: textFill
+        });
+
+        appViewportLayer.add(appSpineBase, appSpineBaseLabel);
+
+        Object.observe(viewportDim, function(changes) {
+            changes.forEach(function(change) {
+                appSpineBase.setAbsolutePosition({
+                    x: change.object.width / 2,
+                    y: change.object.height
+                });
+
+                appSpineBaseLabel.setAbsolutePosition({
+                    x: appSpineBaseLabel.getX(),
+                    y: change.object.height - 70
+                });
+                appSpineBaseLabel.setWidth(change.object.width - 20);
+                appSpineBaseLabel.text(appViewportName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
+
+                appViewportLayer.draw();
+            });
+        });
+
+        return appViewportLayer;
+    }
+
     var AppInterface = function(width, height) {
         var _ = this;
 
@@ -131,13 +177,59 @@ var AppInterface = (function() {
                     height: _.viewport.height
                 });
 
-                // Update the stage whenever the viewport dimensions are changed
+                var appViewportLayer = new Kinetic.Layer();
+                // FIXME: Manually set the device ratio so the canvas looks sharp
+                // on retina devices. This can be removed once the auto-detection
+                // bug in Kinetic JS is fixed
+                appViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
+
+                // Draw a circle representing the spine base location in the app's viewport
+                var appSpineBase = new Kinetic.Circle({
+                    x: _.viewport.width / 2,
+                    y: _.viewport.height,
+                    radius: circleRadius,
+                    fill: circleFill
+                });
+
+                // Draw a text label on the bottom-right of the bounding box
+                var appSpineBaseLabel = new Kinetic.Text({
+                    x: 0,
+                    y: _.viewport.height - 70,
+                    width: _.viewport.width - 20,
+                    align: labelAlignment,
+                    text: appViewportName + "\n" + "x: " + _.viewport.width + "\n" + "y: " + _.viewport.height,
+                    fontSize: textSize,
+                    fill: textFill
+                });
+
+                // Load shapes into layers and layers into stages
+                appViewportLayer.add(appSpineBase, appSpineBaseLabel);
+                _.overlay.add(appViewportLayer);
+
+                // Redraw every damn thing under the sun when the viewport dimensions are updated
                 Object.observe(_.viewport, function(changes) {
                     changes.forEach(function(change) {
-                        _.overlay.setWidth(change.object.width);
-                        _.overlay.setHeight(change.object.height);
+                        appSpineBase.setAbsolutePosition({
+                            x: change.object.width / 2,
+                            y: change.object.height
+                        });
+
+                        appSpineBaseLabel.setAbsolutePosition({
+                            x: appSpineBaseLabel.getX(),
+                            y: change.object.height - 70
+                        });
+                        appSpineBaseLabel.setWidth(change.object.width - 20);
+                        appSpineBaseLabel.text(appViewportName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
+
+                        _.overlay.size(change.object);
+
+                        _.overlay.batchDraw();
                     });
                 });
+
+                // FIXME: Temporary commands for testing
+                _.hideLockScreen();
+                _.showViewport();
             }
         }
 
@@ -161,11 +253,15 @@ var AppInterface = (function() {
             return notify("Connection Lost", "Please check the status of the Kinect connected to this computer.", "connectionStatus")
         },
         setWidth: function(width) {
+            var width = width || window.innerWidth;
+
             this.viewport.width = width;
 
             return this.overlay;
         },
         setHeight: function(height) {
+            var height = height || window.innerHeight;
+
             this.viewport.height = height;
 
             return this.overlay;
@@ -176,49 +272,38 @@ var AppInterface = (function() {
         getHeight: function() {
             return this.viewport.height;
         },
-        drawViewport: function() {
-            var appViewportLayer = new Kinetic.FastLayer();
-            appViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
-
-            // Draw a circle representing the spine base location in the app's viewport
-            var appSpineBase = new Kinetic.Circle({
-                x: this.getWidth() / 2,
-                y: this.getHeight(),
-                radius: circleRadius,
-                fill: circleFill
+        hideViewport: function() {
+            $('#kinectNavOverlay').velocity({
+                opacity: 0
+            }, {
+                display: "none"
             });
-
-            // Draw a text label on the bottom-right of the bounding box
-            var appSpineBaseLabel = new Kinetic.Text({
-                x: 0,
-                y: this.getHeight() - 70,
-                width: this.getWidth() - 20,
-                align: labelAlignment,
-                text: appViewportName + "\n" + "x: " + this.getWidth() + "\n" + "y: " + this.getHeight(),
-                fontSize: textSize,
-                fill: textFill
-            });
-
-            appViewportLayer.add(appSpineBase, appSpineBaseLabel);
-
-            return appViewportLayer;
         },
         showViewport: function() {
-            var appViewport = this.drawViewport();
-
-            this.overlay.add(appViewport);
-
-            return this.overlay;
+            $('#kinectNavOverlay').velocity({
+                opacity: 1
+            }, {
+                display: "block"
+            });
         },
         hideLockScreen: function() {
-            $('#kinectLockScreen').velocity({ opacity: 0 }, { display: "none" });
+            $('#kinectLockScreen').velocity({
+                opacity: 0
+            }, {
+                display: "none"
+            });
         },
         showLockScreen: function() {
-            $('#kinectLockScreen').velocity({ opacity: 1 }, { display: "block" });
+            $('#kinectLockScreen').velocity({
+                opacity: 1
+            }, {
+                display: "block"
+            });
         }
     };
 
     return AppInterface;
 })(AppInterface || {});
 
+// FIXME: Temporary initialization code for testing
 var foo = new AppInterface();
