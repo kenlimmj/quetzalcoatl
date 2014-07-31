@@ -1,49 +1,13 @@
 var AppInterface = (function() {
-    var templateDirectory = '',
-        appViewportName = "Application Viewport",
+    "use strict";
+
+    var appViewportName = "Application Viewport",
         circleFill = "#444",
-        circleRadius = 39.26886,
+        circleRadius = 2 * window.innerWidth / 100,
+        labelAlignment = "left",
         textFill = "#444",
-        textSize = 18,
-        labelAlignment = "right";
-
-    var templatePrototypeGenerator = function(elementId) {
-        var link = document.querySelector('link[rel="import"][data-id=' + elementId + ']').import;
-        template = link.getElementById(elementId),
-        content = template.content;
-        contentNode = document.importNode(content, true);
-
-        return Object.create(HTMLElement.prototype, {
-            createdCallback: {
-                value: function() {
-                    this.appendChild(contentNode);
-                }
-            }
-        });
-    };
-
-    var registerTemplate = function(tagName, templateId) {
-        return document.registerElement(tagName, {
-            prototype: templatePrototypeGenerator(templateId)
-        });
-    };
-
-    var supportsImports = function() {
-        return 'import' in document.createElement('link');
-    }
-
-    var insertImportLink = function(templateName, asyncState) {
-        var asyncState = asyncState || true,
-            linkNode = document.createElement('link');
-
-        linkNode.dataset.id = templateName;
-        linkNode.setAttribute('rel', 'import');
-        linkNode.setAttribute('async', asyncState.toString());
-        linkNode.setAttribute('href', templateDirectory + templateName + '.html');
-        document.head.appendChild(linkNode);
-
-        return linkNode;
-    };
+        textSize = window.innerWidth / 100,
+        textFamily = "Source Sans Pro";
 
     var requestNotificationPermission = function() {
         window.addEventListener('load', function() {
@@ -76,52 +40,6 @@ var AppInterface = (function() {
         return message;
     };
 
-    var drawViewport = function(width, height, viewportDim) {
-        var appViewportLayer = new Kinetic.Layer();
-        appViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
-
-        // Draw a circle representing the spine base location in the app's viewport
-        var appSpineBase = new Kinetic.Circle({
-            x: width / 2,
-            y: height,
-            radius: circleRadius,
-            fill: circleFill
-        });
-
-        // Draw a text label on the bottom-right of the bounding box
-        var appSpineBaseLabel = new Kinetic.Text({
-            x: 0,
-            y: height - 70,
-            width: width - 20,
-            align: labelAlignment,
-            text: appViewportName + "\n" + "x: " + width + "\n" + "y: " + height,
-            fontSize: textSize,
-            fill: textFill
-        });
-
-        appViewportLayer.add(appSpineBase, appSpineBaseLabel);
-
-        Object.observe(viewportDim, function(changes) {
-            changes.forEach(function(change) {
-                appSpineBase.setAbsolutePosition({
-                    x: change.object.width / 2,
-                    y: change.object.height
-                });
-
-                appSpineBaseLabel.setAbsolutePosition({
-                    x: appSpineBaseLabel.getX(),
-                    y: change.object.height - 70
-                });
-                appSpineBaseLabel.setWidth(change.object.width - 20);
-                appSpineBaseLabel.text(appViewportName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
-
-                appViewportLayer.draw();
-            });
-        });
-
-        return appViewportLayer;
-    }
-
     var AppInterface = function(width, height) {
         var _ = this;
 
@@ -133,17 +51,17 @@ var AppInterface = (function() {
         }
 
         // Only proceed if the browser supports HTML imports
-        if (supportsImports) {
+        if (Util.supportsImports()) {
             // Schedule async imports
-            var lockScreenLink = insertImportLink('kinectLockScreen'),
-                overlayLink = insertImportLink('kinectNavOverlay');
+            var lockScreenLink = Util.insertImportLink('kinectLockScreen'),
+                overlayLink = Util.insertImportLink('kinectAppOverlay');
 
             // Defer all actions until the template import finishes
             lockScreenLink.onload = function() {
                 // Insert the lock screen only if it doesn't already exist
                 if (document.getElementsByTagName('kinect-lockscreen').length === 0) {
                     // Register the web components in the DOM
-                    var overlayTemplate = registerTemplate('kinect-lockscreen', 'kinectLockScreen'),
+                    var overlayTemplate = Util.registerTemplate('kinect-lockscreen', 'kinectLockScreen'),
                         kinectLockScreen = new overlayTemplate();
 
                     document.body.insertBefore(kinectLockScreen, document.body.firstChild);
@@ -158,21 +76,21 @@ var AppInterface = (function() {
             // Defer all actions until the template import finishes
             overlayLink.onload = function() {
                 // Insert the control overlay only if it doesn't already exist
-                if (document.getElementsByTagName('kinect-nav-overlay').length === 0) {
-                    var overlayTemplate = registerTemplate('kinect-nav-overlay', 'kinectNavOverlay'),
-                        kinectNavOverlay = new overlayTemplate();
+                if (document.getElementsByTagName('kinect-app-overlay').length === 0) {
+                    var overlayTemplate = Util.registerTemplate('kinect-app-overlay', 'kinectAppOverlay'),
+                        kinectAppOverlay = new overlayTemplate();
 
-                    document.body.insertBefore(kinectNavOverlay, document.getElementsByTagName('kinect-lockscreen')[0].nextSibling);
+                    document.body.insertBefore(kinectAppOverlay, document.getElementsByTagName('kinect-lockscreen')[0].nextSibling);
                 } else {
-                    var kinectNavOverlay = document.getElementsByTagName('kinect-nav-overlay')[0];
+                    var kinectAppOverlay = document.getElementsByTagName('kinect-app-overlay')[0];
                 }
 
                 // Set an id on the element so it's easy to retrieve later
-                kinectNavOverlay.id = 'kinectNavOverlay';
+                kinectAppOverlay.id = 'kinectAppOverlay';
 
                 // Draw a canvas stage in the interface overlay
                 _.overlay = new Kinetic.Stage({
-                    container: 'overlay',
+                    container: 'app-overlay',
                     width: _.viewport.width,
                     height: _.viewport.height
                 });
@@ -192,18 +110,18 @@ var AppInterface = (function() {
                 });
 
                 // Draw a text label on the bottom-right of the bounding box
-                var appSpineBaseLabel = new Kinetic.Text({
-                    x: 0,
-                    y: _.viewport.height - 70,
-                    width: _.viewport.width - 20,
+                var appViewportLabel = new Kinetic.Text({
+                    x: 0.5*window.innerWidth / 100,
+                    y: 0.5*window.innerWidth / 100,
                     align: labelAlignment,
                     text: appViewportName + "\n" + "x: " + _.viewport.width + "\n" + "y: " + _.viewport.height,
                     fontSize: textSize,
-                    fill: textFill
+                    fill: textFill,
+                    fontFamily: textFamily
                 });
 
                 // Load shapes into layers and layers into stages
-                appViewportLayer.add(appSpineBase, appSpineBaseLabel);
+                appViewportLayer.add(appSpineBase, appViewportLabel);
                 _.overlay.add(appViewportLayer);
 
                 // Redraw every damn thing under the sun when the viewport dimensions are updated
@@ -214,12 +132,7 @@ var AppInterface = (function() {
                             y: change.object.height
                         });
 
-                        appSpineBaseLabel.setAbsolutePosition({
-                            x: appSpineBaseLabel.getX(),
-                            y: change.object.height - 70
-                        });
-                        appSpineBaseLabel.setWidth(change.object.width - 20);
-                        appSpineBaseLabel.text(appViewportName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
+                        appViewportLabel.text(appViewportName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
 
                         _.overlay.size(change.object);
 
@@ -273,14 +186,14 @@ var AppInterface = (function() {
             return this.viewport.height;
         },
         hideViewport: function() {
-            $('#kinectNavOverlay').velocity({
+            $('#kinectAppOverlay').velocity({
                 opacity: 0
             }, {
                 display: "none"
             });
         },
         showViewport: function() {
-            $('#kinectNavOverlay').velocity({
+            $('#kinectAppOverlay').velocity({
                 opacity: 1
             }, {
                 display: "block"
