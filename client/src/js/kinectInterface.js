@@ -69,9 +69,39 @@ var KinectInterface = (function() {
                 _.overlay.add(sensorViewportLayer);
 
                 Object.observe(appInterface.overlay.attrs, function(changes) {
-                  changes.forEach(function(change) {
-                    console.log("Boo!");
-                  });
+                    changes.forEach(function(change) {
+                        sensorBoundingBox.setAbsolutePosition({
+                            x: change.object.width / 2 - _.viewport.width / 2,
+                            y: change.object.height / 2 - _.viewport.height / 2
+                        });
+
+                        sensorBoundingBoxLabel.setAbsolutePosition({
+                            x: change.object.width / 2 - _.viewport.width / 2,
+                            y: change.object.height / 2 + _.viewport.height / 2 + 0.5 * window.innerWidth / 100
+                        });
+
+                        sensorViewportLayer.batchDraw();
+                    });
+                });
+
+                Object.observe(_.viewport, function(changes) {
+                    changes.forEach(function(change) {
+                        sensorBoundingBox.setAbsolutePosition({
+                          x: appInterface.getWidth() / 2 - change.object.width / 2,
+                          y: appInterface.getHeight() / 2 - change.object.height / 2
+                        });
+
+                        sensorBoundingBox.setSize({ width: change.object.width, height: change.object.height });
+
+                        sensorBoundingBoxLabel.setAbsolutePosition({
+                          x: appInterface.getWidth() / 2 - change.object.width / 2,
+                          y: appInterface.getHeight() / 2 + change.object.height / 2 + 0.5 * window.innerWidth / 100
+                        });
+
+                        sensorBoundingBoxLabel.text(sensorBoundingBoxName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
+
+                        sensorViewportLayer.batchDraw();
+                    });
                 });
             }
         }
