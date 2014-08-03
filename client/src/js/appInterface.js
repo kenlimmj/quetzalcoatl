@@ -9,37 +9,6 @@ var AppInterface = (function() {
         textSize = window.innerWidth / 100,
         textFamily = "Source Sans Pro";
 
-    var requestNotificationPermission = function() {
-        window.addEventListener('load', function() {
-            Notification.requestPermission(function(status) {
-                if (Notification.permission !== status) {
-                    Notification.permission = status;
-                }
-            });
-        });
-    }
-
-    var notify = function(title, body, tag, duration) {
-        var duration = duration || 5000,
-            body = body || "",
-            tag = tag || "kinectNotification";
-
-        if (window.Notification && Notification.permission === "granted") {
-            var message = new Notification(title, {
-                body: body,
-                tag: tag
-            });
-        }
-
-        message.onshow = function() {
-            setTimeout(function() {
-                message.close();
-            }, duration);
-        }
-
-        return message;
-    };
-
     var AppInterface = function(width, height) {
         var _ = this;
 
@@ -109,6 +78,8 @@ var AppInterface = (function() {
                     fill: circleFill
                 });
 
+                _.appSpineBase = appSpineBase;
+
                 // Draw a text label on the bottom-right of the bounding box
                 var appViewportLabel = new Kinetic.Text({
                     x: 0.5*window.innerWidth / 100,
@@ -149,22 +120,10 @@ var AppInterface = (function() {
 
         // Request permission from the user to show notifications
         // Side effects: Gets and stores the user's response to the request
-        requestNotificationPermission();
+        Util.requestNotificationPermission();
     };
 
     AppInterface.prototype = {
-        notifyRecognizedUser: function(name) {
-            return notify("User Detected", "Welcome back, " + name + ". You have full control.", "userRecognition");
-        },
-        notifyUnknownUser: function() {
-            return notify("Unknown User Detected", "Quetzalcoatl will not unlock unless switched to generic user mode.", "userRecognition");
-        },
-        notifyConnectionEstablished: function() {
-            return notify("Connection Established", "Quetzalcoatl is now receiving data from the Kinect connected to this computer.", "connectionStatus");
-        },
-        notifyConnectionLost: function() {
-            return notify("Connection Lost", "Please check the status of the Kinect connected to this computer.", "connectionStatus")
-        },
         setWidth: function(width) {
             var width = width || window.innerWidth;
 

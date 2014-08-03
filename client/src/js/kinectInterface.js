@@ -9,7 +9,7 @@ var KinectInterface = (function() {
         strokeWidth = 1.618,
         textFamily = "Source Sans Pro",
         textFill = "#444",
-        textSize = window.innerWidth / 100;
+        textSize = 0.825 * window.innerWidth / 100;
 
     var KinectInterface = function(appInterface, width, height) {
         var _ = this;
@@ -55,6 +55,8 @@ var KinectInterface = (function() {
                     strokeWidth: strokeWidth
                 });
 
+                _.sensorBoundingBox = sensorBoundingBox;
+
                 var sensorBoundingBoxLabel = new Kinetic.Text({
                     x: appInterface.getWidth() / 2 - _.viewport.width / 2,
                     y: appInterface.getHeight() / 2 + _.viewport.height / 2 + 0.5 * window.innerWidth / 100,
@@ -68,7 +70,7 @@ var KinectInterface = (function() {
                 sensorViewportLayer.add(sensorBoundingBox, sensorBoundingBoxLabel);
                 _.overlay.add(sensorViewportLayer);
 
-                Object.observe(appInterface.overlay.attrs, function(changes) {
+                Object.observe(appInterface.viewport, function(changes) {
                     changes.forEach(function(change) {
                         sensorBoundingBox.setAbsolutePosition({
                             x: change.object.width / 2 - _.viewport.width / 2,
@@ -95,7 +97,7 @@ var KinectInterface = (function() {
 
                         sensorBoundingBoxLabel.setAbsolutePosition({
                           x: appInterface.getWidth() / 2 - change.object.width / 2,
-                          y: appInterface.getHeight() / 2 + change.object.height / 2 + 0.5 * window.innerWidth / 100
+                          y: appInterface.getHeight() / 2 + change.object.height / 2 + 0.375 * window.innerWidth / 100
                         });
 
                         sensorBoundingBoxLabel.text(sensorBoundingBoxName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
