@@ -8,9 +8,7 @@ var UserInterface = (function() {
         strokeWidth = 1.618,
         textFamily = "Source Sans Pro",
         textFill = "#444",
-        textSize = 0.75 * window.innerWidth / 100,
-        userViewportWidth = 350,
-        userViewportHeight = 250;
+        textSize = 0.75 * window.innerWidth / 100;
 
     var UserInterface = function(appInterface, kinectInterface, name, width, height, spineBaseX, spineBaseY) {
         var _ = this,
@@ -22,8 +20,8 @@ var UserInterface = (function() {
         }
 
         _.spineBase = {
-            x: spineBaseX || _.viewport.width / 2,
-            y: spineBaseY || _.viewport.height
+            x: spineBaseX || kinectInterface.viewport.width / 2,
+            y: spineBaseY || kinectInterface.viewport.height - 50
         }
 
         if (Util.supportsImports()) {
@@ -34,7 +32,7 @@ var UserInterface = (function() {
                     var overlayTemplate = Util.registerTemplate('kinect-user-overlay', 'kinectUserOverlay'),
                         kinectUserOverlay = new overlayTemplate();
 
-                    document.body.insertBefore(kinectUserOverlay, document.getElementById('kinectSensorOverlay'));
+                    document.body.insertBefore(kinectUserOverlay, document.getElementById('kinectLockScreen'));
                 } else {
                     var kinectUserOverlay = document.getElementsByTagName('kinect-user-overlay')[0];
                 }
@@ -47,7 +45,14 @@ var UserInterface = (function() {
                     height: window.innerHeight
                 });
 
-                var userViewportLayer = new Kinetic.Layer();
+                var userViewportLayer = new Kinetic.Layer({
+                        hitGraphEnabled: false,
+                        listening: false
+                    });
+
+                // FIXME: Manually set the device ratio so the canvas looks sharp
+                // on retina devices. This can be removed once the auto-detection
+                // bug in Kinetic JS is fixed
                 userViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
 
                 var userBoundingBox = new Kinetic.Rect({

@@ -49,7 +49,7 @@ var AppInterface = (function() {
                     var overlayTemplate = Util.registerTemplate('kinect-app-overlay', 'kinectAppOverlay'),
                         kinectAppOverlay = new overlayTemplate();
 
-                    document.body.insertBefore(kinectAppOverlay, document.getElementsByTagName('kinect-lockscreen')[0].nextSibling);
+                    document.body.insertBefore(kinectAppOverlay, document.getElementsByTagName('kinect-lockscreen')[0]);
                 } else {
                     var kinectAppOverlay = document.getElementsByTagName('kinect-app-overlay')[0];
                 }
@@ -64,7 +64,11 @@ var AppInterface = (function() {
                     height: _.viewport.height
                 });
 
-                var appViewportLayer = new Kinetic.Layer();
+                var appViewportLayer = new Kinetic.Layer({
+                        hitGraphEnabled: false,
+                        listening: false
+                    });
+
                 // FIXME: Manually set the device ratio so the canvas looks sharp
                 // on retina devices. This can be removed once the auto-detection
                 // bug in Kinetic JS is fixed

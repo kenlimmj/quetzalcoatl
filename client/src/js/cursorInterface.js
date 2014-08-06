@@ -1,7 +1,5 @@
 var CursorInterface = (function() {
-    var openRadius = 25,
-        grabRadius = 15.45,
-        pointRadius = 5.9,
+    var openRadius = 1.75 * window.innerWidth / 100,
         labelAlignment = "left",
         strokeFill = "#444",
         strokeWidth = 1.618,
@@ -36,8 +34,8 @@ var CursorInterface = (function() {
         }
 
         return {
-            x: Math.round(screenX),
-            y: Math.round(screenY)
+            x: screenX,
+            y: screenY
         };
     }
 
@@ -55,20 +53,24 @@ var CursorInterface = (function() {
 
         _.leftHand = {
             rawCoord: {
-                x: userInterface.viewport.width / 3,
-                y: userInterface.viewport.height / 2
+                x: kinectInterface.viewport.width / 3,
+                y: kinectInterface.viewport.height / 2,
+                confidence: 1.0
             },
             draw: true,
+            debug: false,
             lockX: false,
             lockY: false
         };
 
         _.rightHand = {
             rawCoord: {
-                x: 2 * userInterface.viewport.width / 3,
-                y: userInterface.viewport.height / 2
+                x: 2 * kinectInterface.viewport.width / 3,
+                y: kinectInterface.viewport.height / 2,
+                confidence: 1.0
             },
             draw: true,
+            debug: false,
             lockX: false,
             locKY: false
         };
@@ -81,7 +83,7 @@ var CursorInterface = (function() {
                     var overlayTemplate = Util.registerTemplate('kinect-cursor-overlay', 'kinectCursorOverlay'),
                         kinectCursorOverlay = new overlayTemplate();
 
-                    document.body.insertBefore(kinectCursorOverlay, document.getElementById('kinectUserOverlay'));
+                    document.body.insertBefore(kinectCursorOverlay, document.getElementById('kinectLockScreen'));
                 } else {
                     var kinectCursorOverlay = document.getElementsByTagName('kinect-cursor-overlay')[0];
                 }
@@ -94,14 +96,53 @@ var CursorInterface = (function() {
                     height: _.viewport.height
                 });
 
-                var leftCursorLayer = new Kinetic.Layer(),
-                    rightCursorLayer = new Kinetic.Layer();
+                var leftCursorLayer = new Kinetic.Layer({
+                        hitGraphEnabled: false,
+                        listening: false
+                    }),
+                    rightCursorLayer = new Kinetic.Layer({
+                        hitGraphEnabled: false,
+                        listening: false
+                    }),
+                    leftScreenGroup = new Kinetic.Group({
+                        visibile: _.leftHand.draw,
+                        listening: false
+                    }),
+                    rightScreenGroup = new Kinetic.Group({
+                        visibile: _.rightHand.draw,
+                        listening: false
+                    }),
+                    leftUserGroup = new Kinetic.Group({
+                        visibile: _.leftHand.draw && _.leftHand.debug,
+                        listening: false
+                    }),
+                    rightUserGroup = new Kinetic.Group({
+                        visibile: _.rightHand.draw && _.rightHand.debug,
+                        listening: false
+                    });
 
                 leftCursorLayer.canvas.pixelRatio = window.devicePixelRatio;
                 rightCursorLayer.canvas.pixelRatio = window.devicePixelRatio;
 
                 _.leftHand.mappedCoord = map(appInterface, userInterface, _.leftHand.rawCoord);
                 _.rightHand.mappedCoord = map(appInterface, userInterface, _.rightHand.rawCoord);
+
+                var leftUserReticule = new Kinetic.Circle({
+                    x: _.leftHand.rawCoord.x + kinect.sensorBoundingBox.getX(),
+                    y: _.leftHand.rawCoord.y + kinect.sensorBoundingBox.getY(),
+                    radius: openRadius / 1.618,
+                    fill: leftReticuleFill
+                });
+
+                var leftUserReticuleLabel = new Kinetic.Text({
+                    x: _.leftHand.rawCoord.x + kinect.sensorBoundingBox.getX() + openRadius / 1.618,
+                    y: _.leftHand.rawCoord.y + kinect.sensorBoundingBox.getY() + openRadius / 1.618,
+                    text: "x: " + Math.round(_.leftHand.rawCoord.x) + "\n" + "y: " + Math.round(_.leftHand.rawCoord.y) + "\n" + "c: " + _.leftHand.rawCoord.confidence,
+                    align: labelAlignment,
+                    fontSize: textSize,
+                    fontFamily: textFamily,
+                    fill: leftReticuleFill
+                });
 
                 var leftScreenReticule = new Kinetic.Circle({
                     x: _.leftHand.mappedCoord.x,
@@ -113,11 +154,33 @@ var CursorInterface = (function() {
                 var leftScreenReticuleLabel = new Kinetic.Text({
                     x: _.leftHand.mappedCoord.x + openRadius,
                     y: _.leftHand.mappedCoord.y + openRadius,
-                    text: "x: " + _.leftHand.mappedCoord.x + "\n" + "y: " + _.leftHand.mappedCoord.y,
+                    text: "x: " + Math.round(_.leftHand.mappedCoord.x) + "\n" + "y: " + Math.round(_.leftHand.mappedCoord.y),
                     align: labelAlignment,
                     fontSize: textSize,
                     fontFamily: textFamily,
                     fill: leftReticuleFill
+                });
+
+                leftUserReticule.transformsEnabled('position');
+                leftUserReticuleLabel.transformsEnabled('position');
+                leftScreenReticule.transformsEnabled('position');
+                leftScreenReticuleLabel.transformsEnabled('position');
+
+                var rightUserReticule = new Kinetic.Circle({
+                    x: _.rightHand.rawCoord.x + kinect.sensorBoundingBox.getX(),
+                    y: _.rightHand.rawCoord.y + kinect.sensorBoundingBox.getY(),
+                    radius: openRadius / 1.618,
+                    fill: rightReticuleFill
+                });
+
+                var rightUserReticuleLabel = new Kinetic.Text({
+                    x: _.rightHand.rawCoord.x + kinect.sensorBoundingBox.getX() + openRadius / 1.618,
+                    y: _.rightHand.rawCoord.y + kinect.sensorBoundingBox.getY() + openRadius / 1.618,
+                    text: "x: " + Math.round(_.rightHand.rawCoord.x) + "\n" + "y: " + Math.round(_.rightHand.rawCoord.y) + "\n" + "c: " + _.rightHand.rawCoord.confidence,
+                    align: labelAlignment,
+                    fontSize: textSize,
+                    fontFamily: textFamily,
+                    fill: rightReticuleFill
                 });
 
                 var rightScreenReticule = new Kinetic.Circle({
@@ -130,26 +193,17 @@ var CursorInterface = (function() {
                 var rightScreenReticuleLabel = new Kinetic.Text({
                     x: _.rightHand.mappedCoord.x + openRadius,
                     y: _.rightHand.mappedCoord.y + openRadius,
-                    text: "x: " + _.rightHand.mappedCoord.x + "\n" + "y: " + _.rightHand.mappedCoord.y,
+                    text: "x: " + Math.round(_.rightHand.mappedCoord.x) + "\n" + "y: " + Math.round(_.rightHand.mappedCoord.y),
                     align: labelAlignment,
                     fontSize: textSize,
                     fontFamily: textFamily,
                     fill: rightReticuleFill
                 });
 
-                var leftUserReticule = new Kinetic.Circle({
-                    x: _.leftHand.rawCoord.x + kinect.sensorBoundingBox.getX(),
-                    y: _.leftHand.rawCoord.y + kinect.sensorBoundingBox.getY(),
-                    radius: openRadius / 1.618,
-                    fill: leftReticuleFill
-                });
-
-                var rightUserReticule = new Kinetic.Circle({
-                    x: _.rightHand.rawCoord.x + kinect.sensorBoundingBox.getX(),
-                    y: _.rightHand.rawCoord.y + kinect.sensorBoundingBox.getY(),
-                    radius: openRadius / 1.618,
-                    fill: rightReticuleFill
-                });
+                rightUserReticule.transformsEnabled('position');
+                rightUserReticuleLabel.transformsEnabled('position');
+                rightScreenReticule.transformsEnabled('position');
+                rightScreenReticuleLabel.transformsEnabled('position');
 
                 var leftReticuleConnector = new Kinetic.Line({
                     points: [_.leftHand.rawCoord.x + kinect.sensorBoundingBox.getX(), _.leftHand.rawCoord.y + kinect.sensorBoundingBox.getY(), _.leftHand.mappedCoord.x, _.leftHand.mappedCoord.y],
@@ -167,8 +221,14 @@ var CursorInterface = (function() {
                     dash: [10, 5]
                 });
 
-                leftCursorLayer.add(leftScreenReticule, leftScreenReticuleLabel, leftUserReticule, leftReticuleConnector);
-                rightCursorLayer.add(rightScreenReticule, rightScreenReticuleLabel, rightUserReticule, rightReticuleConnector);
+                leftUserGroup.add(leftUserReticule, leftUserReticuleLabel);
+                rightUserGroup.add(rightUserReticule, rightUserReticuleLabel);
+
+                leftScreenGroup.add(leftScreenReticule, leftScreenReticuleLabel);
+                rightScreenGroup.add(rightScreenReticule, rightScreenReticuleLabel);
+
+                leftCursorLayer.add(leftScreenGroup, leftUserGroup, leftReticuleConnector);
+                rightCursorLayer.add(rightScreenGroup, rightUserGroup, rightReticuleConnector);
 
                 _.overlay.add(leftCursorLayer, rightCursorLayer);
 
@@ -193,7 +253,7 @@ var CursorInterface = (function() {
                             y: _.leftHand.mappedCoord.y + openRadius
                         });
 
-                        leftScreenReticuleLabel.text("x: " + _.leftHand.mappedCoord.x + "\n" + "y: " + _.leftHand.mappedCoord.y);
+                        leftScreenReticuleLabel.text("x: " + _.leftHand.mappedCoord.x + "\n" + "y: " + _.leftHand.mappedCoord.y + "\n" + "c: " + _.leftHand.rawCoord.confidence);
 
                         leftCursorLayer.batchDraw();
                     });
@@ -220,7 +280,7 @@ var CursorInterface = (function() {
                             y: _.rightHand.mappedCoord.y + openRadius
                         });
 
-                        rightScreenReticuleLabel.text("x: " + _.rightHand.mappedCoord.x + "\n" + "y: " + _.rightHand.mappedCoord.y);
+                        rightScreenReticuleLabel.text("x: " + _.rightHand.mappedCoord.x + "\n" + "y: " + _.rightHand.mappedCoord.y + "\n" + "c: " + _.rightHand.rawCoord.confidence);
 
                         rightCursorLayer.batchDraw();
                     });
@@ -230,13 +290,17 @@ var CursorInterface = (function() {
     }
 
     CursorInterface.prototype = {
-        setLeftHand: function(x, y) {
+        setLeftHand: function(x, y, c) {
+            var c = c || 1;
+
             this.leftHand.rawCoord.x = x;
             this.leftHand.rawCoord.y = y;
 
             return this.leftHand.rawCoord;
         },
         setRightHand: function(x, y) {
+            var c = c || 1;
+
             this.rightHand.rawCoord.x = x;
             this.rightHand.rawCoord.y = y;
 

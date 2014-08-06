@@ -1,7 +1,7 @@
 window.onload = function() {
   var foo = new AppInterface(),
       kinect = new KinectInterface(foo),
-      user = new UserInterface(foo, kinect),
+      user = new UserInterface(foo, kinect, "Kenneth"),
       cursor = new CursorInterface(foo, kinect, user);
 
   window.foo = foo;

@@ -30,7 +30,7 @@ var KinectInterface = (function() {
                     var overlayTemplate = Util.registerTemplate('kinect-sensor-overlay', 'kinectSensorOverlay'),
                         kinectSensorOverlay = new overlayTemplate();
 
-                    document.body.insertBefore(kinectSensorOverlay, document.getElementById('kinectAppOverlay'));
+                    document.body.insertBefore(kinectSensorOverlay, document.getElementById('kinectLockScreen'));
                 } else {
                     var kinectSensorOverlay = document.getElementsByTagName('kinect-sensor-overlay')[0];
                 }
@@ -43,7 +43,14 @@ var KinectInterface = (function() {
                     height: window.innerHeight
                 });
 
-                var sensorViewportLayer = new Kinetic.Layer();
+                var sensorViewportLayer = new Kinetic.Layer({
+                        hitGraphEnabled: false,
+                        listening: false
+                    });
+
+                // FIXME: Manually set the device ratio so the canvas looks sharp
+                // on retina devices. This can be removed once the auto-detection
+                // bug in Kinetic JS is fixed
                 sensorViewportLayer.canvas.pixelRatio = window.devicePixelRatio;
 
                 var sensorBoundingBox = new Kinetic.Rect({

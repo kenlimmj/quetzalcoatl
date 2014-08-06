@@ -1,5 +1,6 @@
-var Server = (function() {
-    var socketAddress = "//localhost:1620/Quetzalcoatl",
+var ServerInterface = (function() {
+    var appName = "quetzalcoatl",
+        socketAddress = "//localhost:1620/" + appName,
         connectionAttempts = 1;
 
     var generateInterval = function(k, maxDuration) {
@@ -9,7 +10,7 @@ var Server = (function() {
         return Math.random() * Math.min((Math.pow(2, k) - 1) * 5000, maxDuration * 5000);
     }
 
-    var Server = function(url) {
+    var ServerInterface = function(url) {
         switch (location.protocol) {
             case "https:":
                 var serverAddress = url || "wss:" + socketAddress
@@ -62,5 +63,5 @@ var Server = (function() {
         }
     }
 
-    return Server;
-})(Server || {});
+    return ServerInterface;
+})(ServerInterface || {});
