@@ -105,7 +105,7 @@ var AppInterface = (function() {
 
                         appViewportLabel.text(appViewportName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
 
-                        _.overlay.size(change.object);
+                        _.overlay.setSize(change.object);
 
                         _.overlay.batchDraw();
                     });
@@ -176,6 +176,3 @@ var AppInterface = (function() {
 
     return AppInterface;
 })(AppInterface || {});
-
-// FIXME: Temporary initialization code for testing
-var foo = new AppInterface();

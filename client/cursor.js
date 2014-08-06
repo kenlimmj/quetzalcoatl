@@ -212,7 +212,7 @@ var cursor = {
         }
 
         // Calculate the coordinate space for the incoming y-coordinate
-        if (y < nav.uyMin) {
+        if (y < nav.uyMin)
             // If the hand is too high up, clip it to the top edge of the screen
             screenY = 0;
         } else if (y > nav.uyMax) {

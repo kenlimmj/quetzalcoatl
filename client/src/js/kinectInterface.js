@@ -148,6 +148,3 @@ var KinectInterface = (function() {
 
     return KinectInterface;
 })(KinectInterface || {});
-
-// FIXME: Temporary initialization code for testing
-var kinect = new KinectInterface(foo);

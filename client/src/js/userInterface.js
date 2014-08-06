@@ -61,7 +61,7 @@ var UserInterface = (function() {
 
                 var userBoundingBoxLabel = new Kinetic.Text({
                     x: _.spineBase.x - _.viewport.width / 2 + kinectInterface.sensorBoundingBox.getX(),
-                    y: _.spineBase.y + kinectInterface.sensorBoundingBox.getY() + 0.25 * window.innerWidth / 100,
+                    y: _.spineBase.y + kinectInterface.sensorBoundingBox.getY() + 0.5 * window.innerWidth / 100,
                     align: labelAlignment,
                     text: name + "'s Viewport" + "\n" + "x: " + _.viewport.width + "\n" + "y: " + _.viewport.height,
                     fontSize: textSize,
@@ -96,7 +96,7 @@ var UserInterface = (function() {
 
                         userBoundingBoxLabel.setAbsolutePosition({
                             x: _.spineBase.x - _.viewport.width / 2 + change.object.x,
-                            y: _.spineBase.y + change.object.y + 0.25 * window.innerWidth / 100
+                            y: _.spineBase.y + change.object.y + 0.5 * window.innerWidth / 100
                         });
 
                         userViewportLayer.batchDraw();
@@ -112,7 +112,7 @@ var UserInterface = (function() {
 
                         userBoundingBoxLabel.setAbsolutePosition({
                             x: change.object.x - _.viewport.width / 2 + kinectInterface.sensorBoundingBox.getX(),
-                            y: change.object.y + kinectInterface.sensorBoundingBox.getY() + 0.25 * window.innerWidth / 100
+                            y: change.object.y + kinectInterface.sensorBoundingBox.getY() + 0.5 * window.innerWidth / 100
                         });
 
                         userSpineBase.setAbsolutePosition({
@@ -140,7 +140,7 @@ var UserInterface = (function() {
 
                         userBoundingBoxLabel.setAbsolutePosition({
                             x: _.spineBase.x - change.object.width / 2 + kinectInterface.sensorBoundingBox.getX(),
-                            y: _.spineBase.y + kinectInterface.sensorBoundingBox.getY() + 0.25 * window.innerWidth / 100
+                            y: _.spineBase.y + kinectInterface.sensorBoundingBox.getY() + 0.5 * window.innerWidth / 100
                         });
 
                         userBoundingBoxLabel.text(name + "'s Viewport" + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
@@ -209,5 +209,3 @@ var UserInterface = (function() {
 
     return UserInterface;
 })(UserInterface || {});
-
-var user = new UserInterface(foo, kinect);
