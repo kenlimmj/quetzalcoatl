@@ -1,4 +1,6 @@
 var CursorInterface = (function() {
+    "use strict";
+
     var openRadius = 1.75 * window.innerWidth / 100,
         labelAlignment = "left",
         strokeFill = "#444",

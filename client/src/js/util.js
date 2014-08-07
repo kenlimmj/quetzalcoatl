@@ -80,6 +80,29 @@ var Util = (function() {
         },
         notifyConnectionLost: function() {
             return notify("Connection Lost", "Please check the status of the Kinect connected to this computer.", "connectionStatus")
+        },
+        getHiddenProp: function() {
+            // FIXME: To be removed one day when the world goes prefixless
+            var prefixes = ['webkit', 'moz', 'ms', 'o'];
+
+            // If 'hidden' is natively supported, return it
+            if ('hidden' in document) return 'hidden';
+
+            // Otherwise loop over all the known prefixes until we find one
+            for (var i = 0; i < prefixes.length; i++) {
+                if ((prefixes[i] + 'Hidden') in document)
+                    return prefixes[i] + 'Hidden';
+            }
+
+            // Otherwise it's not supported
+            return null;
+        },
+        pageIsHidden: function() {
+            // Check if the page supports the PageVisibility API
+            var prop = Util.getHiddenProp();
+
+            // If it doesn't, the page is never hidden. If it does, return the status
+            return !prop ? false : document[prop];
         }
     }
 })(Util || {});

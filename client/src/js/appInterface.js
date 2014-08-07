@@ -82,8 +82,6 @@ var AppInterface = (function() {
                     fill: circleFill
                 });
 
-                _.appSpineBase = appSpineBase;
-
                 // Draw a text label on the bottom-right of the bounding box
                 var appViewportLabel = new Kinetic.Text({
                     x: 0.5*window.innerWidth / 100,
@@ -94,6 +92,11 @@ var AppInterface = (function() {
                     fill: textFill,
                     fontFamily: textFamily
                 });
+
+                // Expose the canvas layers for easy manipulation
+                _.appViewportLayer = appViewportLayer;
+                _.appSpineBase = appSpineBase;
+                _.appViewportLabel = appViewportLabel;
 
                 // Load shapes into layers and layers into stages
                 appViewportLayer.add(appSpineBase, appViewportLabel);
@@ -125,6 +128,23 @@ var AppInterface = (function() {
         // Request permission from the user to show notifications
         // Side effects: Gets and stores the user's response to the request
         Util.requestNotificationPermission();
+
+        // Check if the browser supports the PageVisiblity API
+        var visProp = Util.getHiddenProp();
+
+        if (visProp) {
+            var visEvent = visProp.replace(/[H|h]idden/,'') + 'visibilitychange';
+
+            // Set up a listener to lock the screen when the user navigates away
+            document.addEventListener(visEvent, function() {
+                if (Util.pageIsHidden()) {
+                  console.log("hidden");
+                  _.showLockScreen();
+                } else {
+                  _.hideLockScreen();
+                }
+            });
+        }
     };
 
     AppInterface.prototype = {
