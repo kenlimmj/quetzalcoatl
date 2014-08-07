@@ -57,6 +57,10 @@ var CursorInterface = (function() {
                 y: kinectInterface.viewport.height / 2,
                 confidence: 1.0
             },
+            gesture: {
+              type: "none",
+              value: 0
+            },
             draw: true,
             debug: false,
             lockX: false,
@@ -69,15 +73,22 @@ var CursorInterface = (function() {
                 y: kinectInterface.viewport.height / 2,
                 confidence: 1.0
             },
+            gesture: {
+              type: "none",
+              value: 0
+            },
             draw: true,
             debug: false,
             lockX: false,
             locKY: false
         };
 
+        // Only proceed if the browser supports HTML imports
         if (Util.supportsImports()) {
+            // Schedule async import
             var overlayLink = Util.insertImportLink('kinectCursorOverlay');
 
+            // Defer all actions until the template import finishes
             overlayLink.onload = function() {
                 if (document.getElementsByTagName('kinect-cursor-overlay').length === 0) {
                     var overlayTemplate = Util.registerTemplate('kinect-cursor-overlay', 'kinectCursorOverlay'),
@@ -88,6 +99,7 @@ var CursorInterface = (function() {
                     var kinectCursorOverlay = document.getElementsByTagName('kinect-cursor-overlay')[0];
                 }
 
+                // Set an id on the element so it's easy to retrieve later
                 kinectCursorOverlay.id = 'kinectCursorOverlay';
 
                 _.overlay = new Kinetic.Stage({
@@ -105,19 +117,19 @@ var CursorInterface = (function() {
                         listening: false
                     }),
                     leftScreenGroup = new Kinetic.Group({
-                        visibile: _.leftHand.draw,
+                        visible: _.leftHand.draw,
                         listening: false
                     }),
                     rightScreenGroup = new Kinetic.Group({
-                        visibile: _.rightHand.draw,
+                        visible: _.rightHand.draw,
                         listening: false
                     }),
                     leftUserGroup = new Kinetic.Group({
-                        visibile: _.leftHand.draw && _.leftHand.debug,
+                        visible: _.leftHand.draw && _.leftHand.debug,
                         listening: false
                     }),
                     rightUserGroup = new Kinetic.Group({
-                        visibile: _.rightHand.draw && _.rightHand.debug,
+                        visible: _.rightHand.draw && _.rightHand.debug,
                         listening: false
                     });
 
@@ -161,6 +173,8 @@ var CursorInterface = (function() {
                     fill: leftReticuleFill
                 });
 
+                // Specify that only the position (and not size) will be changed
+                // for a rendering performance bonus
                 leftUserReticule.transformsEnabled('position');
                 leftUserReticuleLabel.transformsEnabled('position');
                 leftScreenReticule.transformsEnabled('position');
@@ -200,6 +214,8 @@ var CursorInterface = (function() {
                     fill: rightReticuleFill
                 });
 
+                // Specify that only the position (and not size) will be changed
+                // for a rendering performance bonus
                 rightUserReticule.transformsEnabled('position');
                 rightUserReticuleLabel.transformsEnabled('position');
                 rightScreenReticule.transformsEnabled('position');
@@ -221,16 +237,25 @@ var CursorInterface = (function() {
                     dash: [10, 5]
                 });
 
-                leftUserGroup.add(leftUserReticule, leftUserReticuleLabel);
-                rightUserGroup.add(rightUserReticule, rightUserReticuleLabel);
+                leftUserGroup.add(leftScreenReticuleLabel, leftUserReticule, leftUserReticuleLabel, leftReticuleConnector);
+                rightUserGroup.add(rightScreenReticuleLabel, rightUserReticule, rightUserReticuleLabel, rightReticuleConnector);
 
-                leftScreenGroup.add(leftScreenReticule, leftScreenReticuleLabel);
-                rightScreenGroup.add(rightScreenReticule, rightScreenReticuleLabel);
+                leftScreenGroup.add(leftScreenReticule);
+                rightScreenGroup.add(rightScreenReticule);
 
-                leftCursorLayer.add(leftScreenGroup, leftUserGroup, leftReticuleConnector);
-                rightCursorLayer.add(rightScreenGroup, rightUserGroup, rightReticuleConnector);
+                leftCursorLayer.add(leftScreenGroup, leftUserGroup);
+                rightCursorLayer.add(rightScreenGroup, rightUserGroup);
 
                 _.overlay.add(leftCursorLayer, rightCursorLayer);
+
+                Object.observe(_.leftHand, function(changes) {
+                    changes.forEach(function(change) {
+                        leftUserGroup.visible(change.object.draw && change.object.debug);
+                        leftScreenGroup.visible(change.object.draw);
+
+                        leftCursorLayer.batchDraw();
+                    });
+                });
 
                 Object.observe(_.leftHand.rawCoord, function(changes) {
                     changes.forEach(function(change) {
@@ -256,6 +281,15 @@ var CursorInterface = (function() {
                         leftScreenReticuleLabel.text("x: " + _.leftHand.mappedCoord.x + "\n" + "y: " + _.leftHand.mappedCoord.y + "\n" + "c: " + _.leftHand.rawCoord.confidence);
 
                         leftCursorLayer.batchDraw();
+                    });
+                });
+
+                Object.observe(_.rightHand, function(changes) {
+                    changes.forEach(function(change) {
+                        rightUserGroup.visible(change.object.draw && change.object.debug);
+                        rightScreenGroup.visible(change.object.draw);
+
+                        rightCursorLayer.batchDraw();
                     });
                 });
 
@@ -285,6 +319,8 @@ var CursorInterface = (function() {
                         rightCursorLayer.batchDraw();
                     });
                 });
+
+
             }
         }
     }
@@ -293,16 +329,30 @@ var CursorInterface = (function() {
         setLeftHand: function(x, y, c) {
             var c = c || 1;
 
-            this.leftHand.rawCoord.x = x;
-            this.leftHand.rawCoord.y = y;
+            if (this.leftHand.lockY === false) {
+                this.leftHand.rawCoord.x = x;
+            }
+
+            if (this.leftHand.lockX === false) {
+                this.leftHand.rawCoord.y = y;
+            }
+
+            this.leftHand.rawCoord.c = c;
 
             return this.leftHand.rawCoord;
         },
         setRightHand: function(x, y) {
             var c = c || 1;
 
-            this.rightHand.rawCoord.x = x;
-            this.rightHand.rawCoord.y = y;
+            if (this.rightHand.lockY === false) {
+                this.rightHand.rawCoord.x = x;
+            }
+
+            if (this.rightHand.lockX === false) {
+                this.rightHand.rawCoord.y = y;
+            }
+
+            this.rightHand.rawCoord.c = c;
 
             return this.rightHand.rawCoord;
         },
@@ -363,6 +413,20 @@ var CursorInterface = (function() {
         },
         hideRightHand: function() {
             this.rightHand.draw = false;
+
+            return this.rightHand;
+        },
+        setLeftHandDebug: function(state) {
+            var state = state || true;
+
+            this.leftHand.debug = state;
+
+            return this.leftHand;
+        },
+        setRightHandDebug: function(state) {
+            var state = state || true;
+
+            this.rightHand.debug = state;
 
             return this.rightHand;
         }

@@ -32,19 +32,19 @@ var ServerInterface = (function() {
                 // Reset the attempt count on successful connection
                 connectionAttempts = 1;
 
-                Nav.init();
+                var app = new AppInterface(),
+                    kinect = new KinectInterface(app);
 
-                Cursor.init();
-                // Gesture.init();
+                window.app = app;
+                window.kinect = kinect;
             }
 
             connection.onmessage = function(packet) {
                 if (typeof(packet.data === 'string') {
                     var data = JSON.parse(packet.data);
 
-                    Nav.setUserSpineBase(data.sx, data.sy);
-
-                    Nav.setUserViewport(data.screenw, data.screenh);
+                    var activeUser = new UserInterface(app, kinect, data.activeUser.name),
+                        activeUserCursor = new CursorInterface(app, kinect, activeUser);
                 });
             }
 

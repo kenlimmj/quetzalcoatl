@@ -4,6 +4,9 @@ window.onload = function() {
       user = new UserInterface(foo, kinect, "Kenneth"),
       cursor = new CursorInterface(foo, kinect, user);
 
+  cursor.setLeftHandDebug(true);
+  cursor.setRightHandDebug(true);
+
   window.foo = foo;
   window.kinect = kinect;
   window.user = user;
