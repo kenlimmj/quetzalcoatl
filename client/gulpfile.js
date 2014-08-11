@@ -7,7 +7,7 @@ var scriptsGlob = 'src/js/*.js',
     htmlGlob = 'src/*.html',
     imgGlob = 'src/img/*',
     testGlob = 'test/test-runner.html',
-    assetsGlob = ['lib/kineticjs/kinetic.min.js', 'lib/mousetrap/mousetrap.min.js'];
+    assetsGlob = plugins.gulpBowerFiles();
 
 var siteUrl = 'http://localhost/';
 
@@ -90,10 +90,12 @@ gulp.task('scripts', function() {
     gulp.src(scriptsGlob)
         .pipe(plugins.plumber())
         .pipe(plugins.jshint())
-        .pipe(plugins.concat('app.js'))
+        .pipe(plugins.sourcemaps.init())
         .pipe(plugins.stripDebug())
+        .pipe(plugins.concat('app.js'))
         .pipe(gulp.dest('dist/js/'))
         .pipe(plugins.uglify())
+        .pipe(plugins.sourcemaps.write())
         .pipe(plugins.rename('app.min.js'))
         .pipe(gulp.dest('dist/js/'))
         .on('error', plugins.util.log)
@@ -141,7 +143,7 @@ gulp.task('loc', function() {
 gulp.task('zip', function() {
     gulp.src('./*')
         .pipe(plugins.plumber())
-        .pipe(plugins.zip('quetzalcoatl.zip'))
+        .pipe(plugins.zip('app.zip'))
         .pipe(gulp.dest('/'))
 });
 
@@ -171,4 +173,8 @@ gulp.task('docs', function() {
         .pipe(plugins.yuidoc())
         .pipe(gulp.dest('docs/'))
         .on('error', plugins.util.log)
+});
+
+gulp.task('humans', function() {
+    gulp.src()
 });
