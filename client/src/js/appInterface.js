@@ -9,65 +9,88 @@ var AppInterface = (function() {
         textSize = window.innerWidth / 100,
         textFamily = "Source Sans Pro";
 
-    var AppInterface = function(width, height) {
-        var _ = this;
+    var AppInterface = function(width, height, callback) {
+        var self = this;
 
         // Set the width and height of the app to that of the window
         // unless arguments were passed to the constructor
-        _.viewport = {
+        self.viewport = {
             width: width || window.innerWidth,
             height: height || window.innerHeight
         }
 
+        // Store the callback in the parent object
+        // FIXME: This gets around the problem in which it is not possible to
+        // directly access the callback variable from within the promise scope
+        self.callback = callback;
+
         // Only proceed if the browser supports HTML imports
         if (Util.supportsImports()) {
-            // Schedule async imports
-            var lockScreenLink = Util.insertImportLink('kinectLockScreen'),
-                overlayLink = Util.insertImportLink('kinectAppOverlay');
+            var lockScreenLink = new Promise(function(resolve, reject) {
+                var importLink = Util.insertImportLink('kinectLockScreen');
 
-            // Defer all actions until the template import finishes
-            lockScreenLink.onload = function() {
-                // Insert the lock screen only if it doesn't already exist
-                if (document.getElementsByTagName('kinect-lockscreen').length === 0) {
-                    // Register the web components in the DOM
-                    var overlayTemplate = Util.registerTemplate('kinect-lockscreen', 'kinectLockScreen'),
-                        kinectLockScreen = new overlayTemplate();
+                importLink.onload = function() {
+                    // Insert the lock screen only if it doesn't already exist
+                    if (document.getElementsByTagName('kinect-lockscreen').length === 0) {
+                        // Register the web components in the DOM
+                        var overlayTemplate = Util.registerTemplate('kinect-lockscreen', 'kinectLockScreen'),
+                            kinectLockScreen = new overlayTemplate();
 
-                    document.body.insertBefore(kinectLockScreen, document.body.firstChild);
-                } else {
-                    var kinectLockScreen = document.getElementsByTagName('kinect-lockscreen')[0];
+                        document.body.insertBefore(kinectLockScreen, document.body.firstChild);
+                    } else {
+                        var kinectLockScreen = document.getElementsByTagName('kinect-lockscreen')[0];
+                    }
+
+                    resolve(kinectLockScreen);
                 }
 
+                importLink.onerror = function() {
+                    reject(Error(importLink));
+                }
+            });
+
+            lockScreenLink.then(function(kinectLockScreen) {
                 // Set an id on the element so it's easy to retrieve later
                 kinectLockScreen.id = 'kinectLockScreen';
-            }
+            });
 
-            // Defer all actions until the template import finishes
-            overlayLink.onload = function() {
-                // Insert the control overlay only if it doesn't already exist
-                if (document.getElementsByTagName('kinect-app-overlay').length === 0) {
-                    var overlayTemplate = Util.registerTemplate('kinect-app-overlay', 'kinectAppOverlay'),
-                        kinectAppOverlay = new overlayTemplate();
+            var overlayLink = new Promise(function(resolve, reject) {
+                var importLink = Util.insertImportLink('kinectAppOverlay');
 
-                    document.body.insertBefore(kinectAppOverlay, document.getElementsByTagName('kinect-lockscreen')[0]);
-                } else {
-                    var kinectAppOverlay = document.getElementsByTagName('kinect-app-overlay')[0];
+                importLink.onload = function() {
+                    // Insert the control overlay only if it doesn't already exist
+                    if (document.getElementsByTagName('kinect-app-overlay').length === 0) {
+                        var overlayTemplate = Util.registerTemplate('kinect-app-overlay', 'kinectAppOverlay'),
+                            kinectAppOverlay = new overlayTemplate();
+
+                        document.body.insertBefore(kinectAppOverlay, document.getElementsByTagName('kinect-lockscreen')[0]);
+                    } else {
+                        var kinectAppOverlay = document.getElementsByTagName('kinect-app-overlay')[0];
+                    }
+
+                    resolve(kinectAppOverlay);
                 }
 
+                importLink.onerror = function() {
+                    reject(Error(importLink));
+                }
+            });
+
+            overlayLink.then(function(kinectAppOverlay) {
                 // Set an id on the element so it's easy to retrieve later
                 kinectAppOverlay.id = 'kinectAppOverlay';
 
                 // Draw a canvas stage in the interface overlay
-                _.overlay = new Kinetic.Stage({
+                self.overlay = new Kinetic.Stage({
                     container: 'app-overlay',
-                    width: _.viewport.width,
-                    height: _.viewport.height
+                    width: self.viewport.width,
+                    height: self.viewport.height
                 });
 
                 var appViewportLayer = new Kinetic.Layer({
-                        hitGraphEnabled: false,
-                        listening: false
-                    });
+                    hitGraphEnabled: false,
+                    listening: false
+                });
 
                 // FIXME: Manually set the device ratio so the canvas looks sharp
                 // on retina devices. This can be removed once the auto-detection
@@ -76,34 +99,34 @@ var AppInterface = (function() {
 
                 // Draw a circle representing the spine base location in the app's viewport
                 var appSpineBase = new Kinetic.Circle({
-                    x: _.viewport.width / 2,
-                    y: _.viewport.height,
+                    x: self.viewport.width / 2,
+                    y: self.viewport.height,
                     radius: circleRadius,
                     fill: circleFill
                 });
 
                 // Draw a text label on the bottom-right of the bounding box
                 var appViewportLabel = new Kinetic.Text({
-                    x: 0.5*window.innerWidth / 100,
-                    y: 0.5*window.innerWidth / 100,
+                    x: 0.5 * window.innerWidth / 100,
+                    y: 0.5 * window.innerWidth / 100,
                     align: labelAlignment,
-                    text: appViewportName + "\n" + "x: " + _.viewport.width + "\n" + "y: " + _.viewport.height,
+                    text: appViewportName + "\n" + "x: " + self.viewport.width + "\n" + "y: " + self.viewport.height,
                     fontSize: textSize,
                     fill: textFill,
                     fontFamily: textFamily
                 });
 
                 // Expose the canvas layers for easy manipulation
-                _.appViewportLayer = appViewportLayer;
-                _.appSpineBase = appSpineBase;
-                _.appViewportLabel = appViewportLabel;
+                self.appViewportLayer = appViewportLayer;
+                self.appSpineBase = appSpineBase;
+                self.appViewportLabel = appViewportLabel;
 
                 // Load shapes into layers and layers into stages
                 appViewportLayer.add(appSpineBase, appViewportLabel);
-                _.overlay.add(appViewportLayer);
+                self.overlay.add(appViewportLayer);
 
                 // Redraw every damn thing under the sun when the viewport dimensions are updated
-                Object.observe(_.viewport, function(changes) {
+                Object.observe(self.viewport, function(changes) {
                     changes.forEach(function(change) {
                         appSpineBase.setAbsolutePosition({
                             x: change.object.width / 2,
@@ -112,18 +135,20 @@ var AppInterface = (function() {
 
                         appViewportLabel.text(appViewportName + "\n" + "x: " + change.object.width + "\n" + "y: " + change.object.height);
 
-                        _.overlay.setSize(change.object);
+                        self.overlay.setSize(change.object);
 
-                        _.overlay.batchDraw();
+                        self.overlay.batchDraw();
                     });
                 });
-
-                // FIXME: Temporary commands for testing
-                _.hideLockScreen();
-                _.showViewport();
-            }
+            });
         }
 
+        // Run the callback, if any, once all the async imports have completed
+        if (self.callback) {
+          Promise.all([overlayLink, lockScreenLink]).then(function() {
+              self.callback(self);
+          });
+        }
 
         // Request permission from the user to show notifications
         // Side effects: Gets and stores the user's response to the request
@@ -133,15 +158,14 @@ var AppInterface = (function() {
         var visProp = Util.getHiddenProp();
 
         if (visProp) {
-            var visEvent = visProp.replace(/[H|h]idden/,'') + 'visibilitychange';
+            var visEvent = visProp.replace(/[H|h]idden/, '') + 'visibilitychange';
 
             // Set up a listener to lock the screen when the user navigates away
             document.addEventListener(visEvent, function() {
                 if (Util.pageIsHidden()) {
-                  console.log("hidden");
-                  _.showLockScreen();
+                    self.showLockScreen();
                 } else {
-                  _.hideLockScreen();
+                    self.hideLockScreen();
                 }
             });
         }

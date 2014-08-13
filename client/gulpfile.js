@@ -1,13 +1,13 @@
 var gulp = require('gulp'),
-    plugins = require('gulp-load-plugins')();
+    plugins = require('gulp-load-plugins')(),
+    gulpBowerFiles = require('gulp-bower-files');
 
 var scriptsGlob = 'src/js/*.js',
     cssGlob = 'src/css/*.css',
     scssGlob = 'src/scss/*.scss',
     htmlGlob = 'src/*.html',
     imgGlob = 'src/img/*',
-    testGlob = 'test/test-runner.html',
-    assetsGlob = plugins.gulpBowerFiles();
+    testGlob = 'test/test-runner.html';
 
 var siteUrl = 'http://localhost/';
 
@@ -69,7 +69,7 @@ gulp.task('post-process-styles', function() {
     gulp.src(cssGlob)
         .pipe(plugins.plumber())
         .pipe(plugins.uncss({
-          html: htmlGlob
+            html: htmlGlob
         }))
         .pipe(plugins.colorguard())
         .pipe(plugins.prefix({
@@ -130,28 +130,6 @@ gulp.task('test', function() {
     gulp.src(testGlob)
         .pipe(plugins.plumber())
         .pipe(plugins.qunit())
-        .on('error', plugins.util.log)
-});
-
-gulp.task('loc', function() {
-    gulp.src(scriptsGlob)
-        .pipe(plugins.plumber())
-        .pipe(plugins.sloc())
-        .on('error', plugins.util.log)
-});
-
-gulp.task('zip', function() {
-    gulp.src('./*')
-        .pipe(plugins.plumber())
-        .pipe(plugins.zip('app.zip'))
-        .pipe(gulp.dest('/'))
-});
-
-gulp.task('todo', function() {
-    gulp.src(scriptsGlob)
-        .pipe(plugins.plumber())
-        .pipe(plugins.todo())
-        .pipe(gulp.dest(''))
         .on('error', plugins.util.log)
 });
 

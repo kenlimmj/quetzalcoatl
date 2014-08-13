@@ -1,4 +1,6 @@
 var ServerInterface = (function() {
+    "use strict";
+
     var defaultSocketAddress = "localhost",
         defaultSocketPort = 1620,
         connectionAttempts = 1;
@@ -43,8 +45,9 @@ var ServerInterface = (function() {
                     // Reset the attempt count on successful connection
                     connectionAttempts = 1;
 
-                    // Initialize all the control interfaces
-                    var app = new AppInterface(),
+                    var app = new AppInterface(window.innerWidth, window.innerHeight, function() {
+                        app.hideLockScreen();
+                    }),
                         kinect = new KinectInterface(app);
 
                     // Inject the interfaces into the global namespace
@@ -62,6 +65,10 @@ var ServerInterface = (function() {
                 }
 
                 connection.onclose = function() {
+                    if (window.app) {
+                        app.showLockScreen();
+                    }
+
                     // If the connection fails, retry with exponential backoff
                     var time = generateInterval(connectionAttempts);
 
@@ -71,8 +78,6 @@ var ServerInterface = (function() {
                         initConnection();
                     }, time);
                 }
-
-                return connection;
             }
         }
 

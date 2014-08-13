@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Linq;
+using System.Xml;
 
 // JSON Serializer
 using Newtonsoft.Json;
@@ -9,6 +10,11 @@ using Newtonsoft.Json;
 using SuperSocket.SocketBase;
 using SuperSocket.SocketEngine;
 using SuperWebSocket;
+
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.UI;
 
 // Kinect API
 // using Microsoft.Kinect;
@@ -21,6 +27,19 @@ namespace dummy
 		static void Main (string[] args)
 		{
 			socketServer_Initialize ();
+
+			String win1 = "Test Window";
+
+			using (Image<Bgr, Byte> img = new Image<Bgr, byte> (400, 200, new Bgr (255, 0, 0))) {
+				//Create the font
+				MCvFont f = new MCvFont (CvEnum.FONT.CV_FONT_HERSHEY_COMPLEX, 1.0, 1.0);
+
+				//Draw "Hello, world." on the image using the specific font
+				img.Draw ("Hello, world", ref f, new Point (10, 80), new Bgr (0, 255, 0)); 
+
+				//Show the image using ImageViewer from Emgu.CV.UI
+				ImageViewer.Show (img, "Test Window");
+			}
 		}
 
 		static void socketServer_Initialize ()
