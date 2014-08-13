@@ -1,61 +1,135 @@
 ﻿using System;
 using System.Text;
 using System.Linq;
+
+// JSON Serializer
 using Newtonsoft.Json;
+
+// WebSocket Server
 using SuperSocket.SocketBase;
 using SuperSocket.SocketEngine;
 using SuperWebSocket;
+
+// Kinect API
+// using Microsoft.Kinect;
 
 namespace dummy
 {
 	class MainClass
 	{
-		public static void Main (string[] args)
+
+		static void Main (string[] args)
 		{
-			Console.WriteLine ("Press any key to start the WebSocketServer!");
+			socketServer_Initialize ();
+		}
 
-			Console.ReadKey ();
-			Console.WriteLine ();
+		static void socketServer_Initialize ()
+		{
+			// Initialize the server object
+			SuperWebSocket.WebSocketServer socketServer = new WebSocketServer ();
 
-			var appServer = new WebSocketServer ();
+			// Initialize basic server configurations
+			SuperSocket.SocketBase.Config.RootConfig socketRootConfig = new SuperSocket.SocketBase.Config.RootConfig ();
+			SuperSocket.SocketBase.Config.ServerConfig socketServerConfig = new SuperSocket.SocketBase.Config.ServerConfig ();
+			SuperSocket.SocketEngine.SocketServerFactory socketServerFactory = new SuperSocket.SocketEngine.SocketServerFactory ();
 
-			//Setup the appServer
-			if (!appServer.Setup (1620)) { //Setup with listening port
-				Console.WriteLine ("Failed to setup!");
+			// Set the name, IP address and port number which the server is started on
+			socketServerConfig.Name = "Quetzalcoatl Server";
+			socketServerConfig.Ip = "127.0.0.1";
+			socketServerConfig.Port = 1620;
+
+			// Print boilerplate text when the console is first displayed
+			logConsoleBoilerplate ();
+
+			// Create the server using the specifications created above
+			// If the server fails to start, write to the console
+			if (!socketServer.Setup (socketRootConfig, socketServerConfig, socketServerFactory)) {
+				Console.WriteLine ("Failed to initialize server at ws[s]://" + socketServer.Config.Ip + ":" + socketServer.Config.Port);
 				Console.ReadKey ();
 				return;
 			}
 
-			appServer.NewMessageReceived += new SessionHandler<WebSocketSession, string> (appServer_NewMessageReceived);
-
-			Console.WriteLine ();
-
-			//Try to start the appServer
-			if (!appServer.Start ()) {
-				Console.WriteLine ("Failed to start!");
+			// Start the server
+			// If the server fails to start, write to the console
+			if (!socketServer.Start ()) {
+				Console.WriteLine ("Server was successfully initialized at ws[s]://" + socketServer.Config.Ip + ":" + socketServer.Config.Port +
+				" but failed to start. Ensure that no processes are currently running at the same address.");
 				Console.ReadKey ();
 				return;
 			}
 
-			Console.WriteLine ("The server started successfully, press key 'q' to stop it!");
+			// Notify the user that the server has successfully started and is awaiting connections
+			Console.WriteLine ("Server initialized at ws[s]://" + socketServer.Config.Ip + ":" + socketServer.Config.Port + " at " + socketServer.StartedTime);
+			Console.WriteLine ("Awaiting client connections...");
+			Console.WriteLine ();
 
-			while (Console.ReadKey ().KeyChar != 'q') {
-				Console.WriteLine ();
+			// Bind listeners for server events
+			socketServer.NewMessageReceived += new SessionHandler<WebSocketSession, string> (socketServer_NewMessageReceived);
+			socketServer.NewSessionConnected += socketServer_NewSessionConnected;
+			socketServer.SessionClosed += socketServer_SessionClosed;
+
+			// Nullify all console inputs except for when the user types "exit"
+			while (Console.ReadLine () != "exit") {
 				continue;
 			}
 
-			//Stop the appServer
-			appServer.Stop ();
+			// Properly shutdown the server by waiting on the buffer and freeing all used ports
+			socketServer_Shutdown (socketServer);
 
-			Console.WriteLine ();
-			Console.WriteLine ("The server was stopped!");
-			Console.ReadKey ();
+			return;
 		}
 
-		static void appServer_NewMessageReceived (WebSocketSession session, string message)
+		static void logConsoleBoilerplate ()
 		{
-			//Send the received message back
-			session.Send ("Server: " + message);
+			Console.WriteLine (
+				"QUETZALCOATL KINECT CONTROL SERVER" + "\n" +
+				"This software requires the Quetzalcoatl Kinect Control System (QKCS) running on the client application" +
+				" in order to function properly." + "\n" +
+				"For access, email kl545@cornell.edu at the Cornell Program for Computer Graphics" + "\n" +
+				"--------------------------------------------------------------------------------" + "\n"
+			);
+		}
+
+		static void socketServer_Shutdown (WebSocketServer socketServer)
+		{
+			Console.WriteLine ("Shutting down server at ws[s]://" + socketServer.Config.Ip + ":" + socketServer.Config.Port);
+			socketServer.Stop ();
+			Console.WriteLine ("Connections purged. Goodbye!");
+
+			// Close the main console window
+			System.Environment.Exit (0);
+		}
+
+		static void socketServer_NewMessageReceived (WebSocketSession socketSession, string message)
+		{
+			// Do something here
+		}
+
+		static void socketServer_Send (WebSocketSession socketSession, string message)
+		{
+			socketSession.Send (message);
+		}
+
+		static void socketServer_SendToAll (WebSocketServer socketServer, string message)
+		{
+			foreach (var socketSession in socketServer.GetAllSessions()) {
+				socketServer_Send (socketSession, message);
+			}
+		}
+
+		static void socketServer_NewSessionConnected (WebSocketSession socketSession)
+		{
+			// Write socket information to the console
+			Console.WriteLine ("Client " + socketSession.SessionID + " connected from " + socketSession.Origin + " at " + socketSession.StartTime);
+		}
+
+		static void socketServer_SessionClosed (WebSocketSession socketSession, CloseReason reason)
+		{
+			if (reason == CloseReason.ServerShutdown) {
+				return;
+			}
+
+			Console.WriteLine ("Client " + socketSession.SessionID + " disconnected");
 		}
 	}
 }

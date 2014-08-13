@@ -147,18 +147,6 @@ gulp.task('zip', function() {
         .pipe(gulp.dest('/'))
 });
 
-gulp.task('sitemap', function() {
-    gulp.src(htmlGlob, {
-        read: false
-    })
-        .pipe(plugins.plumber())
-        .pipe(plugins.sitemap({
-            siteUrl: siteUrl
-        }))
-        .pipe(gulp.dest('dist/'))
-        .on('error', plugins.util.log)
-});
-
 gulp.task('todo', function() {
     gulp.src(scriptsGlob)
         .pipe(plugins.plumber())
@@ -173,8 +161,4 @@ gulp.task('docs', function() {
         .pipe(plugins.yuidoc())
         .pipe(gulp.dest('docs/'))
         .on('error', plugins.util.log)
-});
-
-gulp.task('humans', function() {
-    gulp.src()
 });
