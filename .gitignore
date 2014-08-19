@@ -219,3 +219,7 @@ FakesAssemblies/
 bin/
 obj/
 *.userprefs
+server/Microsoft.Kinect.2.0.1408.05000.nupkg
+server/Microsoft.Kinect.Face.2.0.1408.05000.nupkg
+server/Microsoft.Kinect.VisualGestureBuilder.2.0.1408.05000.nupkg
+server/Microsoft.Kinect.Wpf.Controls.2.0.1408.05000.nupkg
