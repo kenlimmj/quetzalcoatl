@@ -1,0 +1,168 @@
+﻿<Window x:Class="facerec.TrainingForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Face Training"
+        Width="1280"
+        Height="720"
+        Loaded="Window_Loaded"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Border Grid.RowSpan="8"
+                Grid.Column="0"
+                Margin="10,10,5,10"
+                BorderBrush="Black"
+                BorderThickness="1">
+            <Image x:Name="rgbImage"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Source="{Binding rgbImageDisplay}"
+                   Stretch="UniformToFill" />
+        </Border>
+
+        <Image x:Name="faceImage"
+               Grid.RowSpan="8"
+               Grid.Column="0"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Source="{Binding faceImageDisplay}"
+               Stretch="UniformToFill" />
+
+        <Border Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="5,10,10,10"
+                BorderBrush="Black"
+                BorderThickness="1">
+            <DataGrid x:Name="capturedImagesGrid"
+                      AutoGenerateColumns="False"
+                      BorderThickness="0"
+                      CanUserAddRows="False"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="True"
+                      CanUserResizeRows="False"
+                      CanUserSortColumns="True"
+                      ColumnWidth="*"
+                      ItemsSource="{Binding capturedImagesDisplay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Name}" Header="Name" />
+                    <DataGridTextColumn Binding="{Binding Priority}" Header="Priority" />
+                    <DataGridTemplateColumn Header="Face" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Face}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Label Grid.Row="1"
+               Grid.Column="1"
+               VerticalAlignment="Center">
+            _Name:
+        </Label>
+        <TextBox x:Name="faceName"
+                 Grid.Row="1"
+                 Grid.Column="2"
+                 Margin="10,5"
+                 BorderBrush="#FF707070"
+                 Padding="2.5">
+            John Doe
+        </TextBox>
+
+        <Label Grid.Row="2"
+               Grid.Column="1"
+               VerticalAlignment="Center">
+            _Priority:
+        </Label>
+        <ComboBox x:Name="facePriority"
+                  Grid.Row="2"
+                  Grid.Column="2"
+                  Margin="10,5"
+                  SelectedValuePath="Content">
+            <ComboBoxItem>1</ComboBoxItem>
+            <ComboBoxItem IsSelected="True">2</ComboBoxItem>
+            <ComboBoxItem>3</ComboBoxItem>
+        </ComboBox>
+
+        <Label Grid.Row="3"
+               Grid.Column="1"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Center">
+            Gesture DB:
+        </Label>
+        <Button Grid.Row="3"
+                Grid.Column="2"
+                Margin="10,5"
+                Click="browseButton_click">
+            Browse
+        </Button>
+        <Label Grid.Row="4"
+               Grid.Column="2"
+               Margin="10,5"
+               Padding="0">
+            <TextBlock x:Name="browseFilePathDisplay" TextTrimming="CharacterEllipsis" />
+        </Label>
+
+        <ProgressBar x:Name="progressBar"
+                     Grid.Row="5"
+                     Grid.Column="1"
+                     Grid.ColumnSpan="2"
+                     Height="20"
+                     Margin="5,10,10,5"
+                     BorderBrush="#FF707070"
+                     BorderThickness="1"
+                     Maximum="10" />
+        <TextBlock Grid.Row="5"
+                   Grid.Column="1"
+                   Grid.ColumnSpan="2"
+                   Margin="5,10,10,5"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Text="{Binding ElementName=progressBar,
+                                  Path=Value,
+                                  StringFormat={}{0:0}/10}" />
+        <Button x:Name="captureButton"
+                Grid.Row="6"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="5,5,10,5"
+                Click="captureButton_click">
+            Capture
+        </Button>
+        <Button x:Name="saveButton"
+                Grid.Row="7"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="5,5,10,10"
+                Click="saveButton_click">
+            Save
+        </Button>
+        <StatusBar Grid.Row="8"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   Margin="0"
+                   Padding="10,0">
+            <StatusBarItem>
+                <TextBlock x:Name="statusBarDisplay" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
